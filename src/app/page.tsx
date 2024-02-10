@@ -60,10 +60,6 @@ export default function Home() {
   );
 }
 
-// Authorization: Client-ID YOUR_CLIENT_ID
-// id: 3bca2e4cdbf1b9d
-// secret: bdc692ea7f980f990e4b1bbdaaceefe3cdc3ec379
-
 let cards: ICard[] = [
   {
     id: "card_001",
