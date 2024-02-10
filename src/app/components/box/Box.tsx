@@ -15,7 +15,7 @@ interface ITextBox {
 
 export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadow, handleShadowDragEnd }: ITextBox) {
     // console.log(textData)
-    console.log(data.name, isSelected)
+    // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
     const boxRef = useRef<HTMLDivElement>(null);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -56,11 +56,11 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     toBoxTop: e.clientY - e.currentTarget.offsetTop
                 };
             }}
-            // onDragStart={(e) => {
-            //     e.dataTransfer.setDragImage(e.currentTarget, window.outerWidth, window.outerHeight);
-            //     e.dataTransfer.effectAllowed = "copyMove";
-            //     setIsEditMode(true);
-            // }}
+            onDragStart={(e) => {
+                e.dataTransfer.setDragImage(e.currentTarget, window.outerWidth, window.outerHeight);
+                e.dataTransfer.effectAllowed = "copyMove";
+                setIsEditMode(true);
+            }}
             onDragEnd={(e: DragEvent) => {
                 // 這時候才存資料
                 console.log("box drag end")

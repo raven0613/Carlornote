@@ -14,11 +14,12 @@ interface IBoard {
 }
 
 export default function Board({ elements, handleUpdateElement, handleChangeIdx, draggingBox, handleMouseUp }: IBoard) {
-    console.log(elements)
+    // console.log(elements)
     const [selectedId, setSelectedId] = useState("");
     console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
     const pointerRef = useRef({ x: 0, y: 0 });
+    // console.log("pointerRef", pointerRef.current)
 
     useEffect(() => {
         function handleClick(e: MouseEvent) {
@@ -70,7 +71,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
 
     return (
         <>
-            <div className="board w-full h-full border border-slate-700"
+            <div className="board w-full h-full border border-slate-700 "
             >
                 <input id="board_input" name="board_input" type="file" className="board_input w-full h-full opacity-0"
                     onFocus={(e) => {
@@ -105,7 +106,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                         reader.readAsDataURL(file);
                     }}
                     onMouseMove={(e) => {
-                        pointerRef.current = { x: e.clientX, y: e.clientY }
+                        pointerRef.current = { x: e.clientX, y: e.clientY };
                     }}
                     onClick={(e) => {
                         e.preventDefault()
