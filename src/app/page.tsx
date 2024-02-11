@@ -74,7 +74,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 40,
         left: 500,
-        top: 300
+        top: 300,
+        radius: 0
       }, {
         id: "element_002",
         type: "text",
@@ -84,7 +85,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 20,
         left: 200,
-        top: 100
+        top: 100,
+        radius: 0
       }
     ]
   }, {
@@ -100,7 +102,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 20,
         left: 500,
-        top: 300
+        top: 300,
+        radius: 0
       }
     ]
   }, {
@@ -116,7 +119,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 20,
         left: 500,
-        top: 300
+        top: 300,
+        radius: 0
       }, {
         id: "element_002",
         type: "image",
@@ -126,7 +130,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: -20,
         left: 20,
-        top: 250
+        top: 250,
+        radius: 0
       }, {
         id: "element_003",
         type: "image",
@@ -136,7 +141,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 0,
         left: 700,
-        top: 150
+        top: 150,
+        radius: 0
       },
       {
         id: "element_004",
@@ -147,7 +153,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 0,
         left: 600,
-        top: 150
+        top: 150,
+        radius: 0
       },
       {
         id: "element_005",
@@ -158,7 +165,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 0,
         left: 300,
-        top: 150
+        top: 150,
+        radius: 0
       },
       {
         id: "element_006",
@@ -169,7 +177,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 0,
         left: 100,
-        top: 150
+        top: 150,
+        radius: 0
       }, {
         id: "element_007",
         type: "image",
@@ -179,7 +188,8 @@ let cards: ICard[] = [
         height: 100,
         rotation: 0,
         left: 100,
-        top: 200
+        top: 200,
+        radius: 0
       }
     ]
   }

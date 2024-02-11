@@ -11,9 +11,10 @@ interface ITextBox {
     handleClick: (id: string) => void;
     isShadow?: boolean;
     handleShadowDragEnd?: (e: DragEvent) => void;
+    isLock: boolean;
 }
 
-export default function TextBox({ textData, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd }: ITextBox) {
+export default function TextBox({ textData, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock }: ITextBox) {
     // console.log(textData)
     // console.log("isSelected", isSelected)
     const textRef = useRef<HTMLTextAreaElement>(null);
@@ -26,7 +27,8 @@ export default function TextBox({ textData, handleUpdateElement, isSelected, han
 
     return (
         <Box
-            isShadow={isShadow}
+            isLock={isLock}
+            isShadowElement={isShadow}
             handleUpdate={handleUpdateElement}
             data={textData}
             isSelected={isSelected}

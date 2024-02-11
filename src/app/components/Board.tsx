@@ -16,10 +16,12 @@ interface IBoard {
 export default function Board({ elements, handleUpdateElement, handleChangeIdx, draggingBox, handleMouseUp }: IBoard) {
     // console.log(elements)
     const [selectedId, setSelectedId] = useState("");
-    console.log("selectedId", selectedId)
+    // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
     const pointerRef = useRef({ x: 0, y: 0 });
     // console.log("pointerRef", pointerRef.current)
+    const [isLock, setIsLock] = useState(false);
+    console.log("isLock", isLock)
 
     useEffect(() => {
         function handleClick(e: MouseEvent) {
@@ -33,37 +35,36 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
         return () => document.removeEventListener("click", handleClick);
     }, []);
 
-    // 如果在 board 以外的地方放開，就停止 drop 流程
     useEffect(() => {
         // if (!draggingBox) return;
         function handleMouse(e: MouseEvent) {
+            console.log("mouseup")
             e.stopPropagation();
             e.preventDefault();
-            console.log("mouseup")
             console.log((e.target as HTMLElement))
-            if (e.target instanceof HTMLElement) {
-                if (e.target.classList.contains("board") || e.target.classList.contains("board_input")) {
-                    if (!draggingBox) return;
-                    const id = uuidv4();
-                    const newBoardElement = [...elements, {
-                        id: id,
-                        type: draggingBox,
-                        name: "",
-                        content: "text",
-                        width: 200,
-                        height: 60,
-                        rotation: 0,
-                        left: e.clientX,
-                        top: e.clientY
-                    }]
-                    handleChangeIdx(newBoardElement);
-                    setSelectedId(id);
-                    handleMouseUp();
-                    return;
-                };
-                // console.log((e.target as HTMLElement))
+            if (!(e.target instanceof HTMLElement)) return;
+            if (e.target.classList.contains("board") || e.target.classList.contains("board_input") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) {
+                if (!draggingBox) return;
+                const id = uuidv4();
+                const newBoardElement = [...elements, {
+                    id: id,
+                    type: draggingBox,
+                    name: "",
+                    content: "text",
+                    width: 200,
+                    height: 60,
+                    rotation: 0,
+                    left: e.clientX,
+                    top: e.clientY
+                }]
+                handleChangeIdx(newBoardElement);
+                setSelectedId(id);
                 handleMouseUp();
-            }
+                return;
+            };
+            // console.log((e.target as HTMLElement))
+            // 如果在 board 以外的地方放開，就停止 drop 流程
+            handleMouseUp();
         }
         document.addEventListener("mouseup", handleMouse);
         return () => document.removeEventListener("mouseup", handleMouse);
@@ -72,18 +73,22 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
     return (
         <>
             <div className="board w-full h-full border border-slate-700 "
+                onDragOver={(e) => {
+                    console.log("ㄟㄟ")
+                    e.preventDefault();
+                    setIsLock(true);
+                }}
+                onDragEnd={() => {
+                    console.log("end")
+                    setIsLock(false);
+                }}
             >
                 <input id="board_input" name="board_input" type="file" className="board_input w-full h-full opacity-0"
-                    onFocus={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                    }}
                     onChange={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
-                        const file = e.currentTarget.files[0]
-                        console.log(file)
+                        const file = e.currentTarget.files[0];
                         const reader = new FileReader();
                         reader.onloadend = function () {
                             // console.log("onLoaded", reader.result)
@@ -102,6 +107,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                             }]
                             handleChangeIdx(newBoardElement);
                             e.target.value = "";
+                            setIsLock(false);
                         }
                         reader.readAsDataURL(file);
                     }}
@@ -117,6 +123,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                 {elements && elements.map(item => {
                     if (item.type === "text") return (
                         <TextBox key={item.id}
+                            isLock={isLock}
                             handleUpdateElement={handleUpdateElement}
                             textData={item}
                             isSelected={selectedId === item.id}
@@ -131,6 +138,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                     )
                     if (item.type === "image") return (
                         <ImageBox key={item.id}
+                            isLock={isLock}
                             handleUpdateElement={handleUpdateElement}
                             data={item}
                             isSelected={selectedId === item.id}
@@ -146,6 +154,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                     return <></>
                 })}
                 {draggingBox === "text" && <TextBox
+                    isLock={false}
                     handleUpdateElement={() => { }}
                     textData={{
                         id: "",

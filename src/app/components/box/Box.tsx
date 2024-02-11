@@ -10,10 +10,11 @@ interface ITextBox {
     handleClick: (id: string) => void;
     handleShadowDragEnd?: (e: DragEvent) => void;
     children: ReactNode;
-    isShadow?: boolean;
+    isShadowElement?: boolean;
+    isLock: boolean;
 }
 
-export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadow, handleShadowDragEnd }: ITextBox) {
+export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, handleShadowDragEnd, isLock }: ITextBox) {
     // console.log(textData)
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -22,6 +23,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     const [deg, setDeg] = useState(rotation);
     const [size, setSize] = useState({ width, height });
     const [position, setPosition] = useState({ left, top });
+    const [radius, setRadius] = useState(0);
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
 
     useEffect(() => {
@@ -33,21 +35,26 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
         if (!data) return;
         setDeg(data.rotation);
         setSize({ width: data.width, height: data.height });
-        if (isShadow) return;
+        if (isShadowElement) return;
         setPosition({ left: data.left, top: data.top });
-    }, [data, isShadow])
+    }, [data, isShadowElement])
 
     useEffect(() => {
-        if (!isShadow) return;
+        if (!isShadowElement) return;
         function handleMouse(e: MouseEvent) {
             setPosition({ left: e.clientX, top: e.clientY });
         }
         document.addEventListener("mousemove", handleMouse);
         return () => document.removeEventListener("mousemove", handleMouse);
-    }, [isShadow]);
+    }, [isShadowElement]);
 
     return (
-        <div ref={boxRef} className={`absolute min-h-10 min-w-24 rounded-md border hover:border-slate-400 ${isEditMode ? "border-slate-400" : "border-transparent"} ${isShadow ? "opacity-50" : "opacity-100"}`}
+        <div ref={boxRef}
+            className={`absolute min-h-10 min-w-24 border hover:border-slate-400 
+            ${isEditMode ? "border-slate-400" : "border-transparent"} 
+            ${isShadowElement ? "opacity-50" : "opacity-100"}
+            ${isLock ? "pointer-events-none" : ""}
+            `}
             style={{ left: `${position.left}px`, top: `${position.top}px`, rotate: `${deg}deg`, width: size.width, height: size.height, transition: "border-color 0.15s ease" }}
             onMouseDown={(e) => {
                 // 紀錄點擊的時候的位置
@@ -64,14 +71,18 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
             onDragEnd={(e: DragEvent) => {
                 // 這時候才存資料
                 console.log("box drag end")
-                if (isShadow && handleShadowDragEnd) {
+                if (isShadowElement && handleShadowDragEnd) {
                     handleShadowDragEnd(e);
                     return;
                 }
                 handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg });
                 setIsEditMode(false);
             }}
-            onDragOver={(e) => e.preventDefault()}
+            onDragOver={(e) => {
+                // console.log("ㄟㄟ")
+                e.preventDefault();
+                // setIsLock(true);
+            }}
             onDrag={(e) => {
                 if (!leftTopRef.current) return;
                 if (!e.clientX && !e.clientY) return;
@@ -88,7 +99,10 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
             }}
             draggable={true}
         >
-            {children}
+            <div className="w-full h-full overflow-hidden" style={{ borderRadius: `${radius}px` }}>
+                {children}
+            </div>
+            {/* size */}
             <div
                 draggable={true}
                 onDrag={(e) => {
@@ -108,6 +122,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                 }}
                 className={`w-2.5 h-2.5 rounded-full bg-slate-500 absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 z-20 cursor-nwse-resize duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             ></div>
+            {/* rotate */}
             <div
                 draggable={true}
                 onDrag={(e) => {
@@ -130,6 +145,33 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     setDeg(Number(degree.toFixed(2)));
                 }}
                 className={`w-2.5 h-2.5 bg-slate-500 absolute bottom-1/2 -right-5 translate-y-1/2 translate-x-1/2 z-20 cursor-grab active:cursor-grabbing duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            ></div>
+            {/* radius */}
+            <div
+                draggable={true}
+                onDrag={(e) => {
+                    e.stopPropagation();
+                    console.log("Radius")
+                    if (!boxRef.current) return;
+                    setIsEditMode(true);
+                    const nowX = e.clientX;
+                    if (!nowX) return;
+                    if (nowX === leftTopRef.current.toBoxLeft) return;
+                    if (nowX > leftTopRef.current.toBoxLeft) setRadius(radius - 1);
+                    else setRadius(radius + 1);
+                    leftTopRef.current = {
+                        toBoxLeft: e.clientX,
+                        toBoxTop: e.clientY
+                    };
+                    if (radius < 0) setRadius(0);
+                    else if (radius > width / 2) setRadius(width / 2);
+                    else if (radius > height / 2) setRadius(height / 2);
+                    // console.log("now", leftTopRef.current.toBoxLeft)
+                }}
+                onDragEnd={() => {
+                    setIsEditMode(false);
+                }}
+                className={`w-2.5 h-2.5 rounded-full border-2 border-slate-500 bg-slate-200 absolute top-2 right-2 z-20 cursor-nwse-resize duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             ></div>
         </div>
     )
