@@ -26,7 +26,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     const [position, setPosition] = useState({ left, top });
     const [radius, setRadius] = useState(0);
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
-    console.log(data.name, isEditMode)
+    // console.log("isEditMode", isEditMode)
 
     useEffect(() => {
         if (isSelected) setIsEditMode(true);
@@ -98,7 +98,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                 e.preventDefault();
                 e.stopPropagation();
                 handleClick(data.id);
-                // setIsEditMode(true);
+                setIsEditMode(true);
             }}
             draggable={true}
         >
@@ -110,7 +110,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                 draggable={true}
                 onDrag={(e) => {
                     e.stopPropagation();
-                    console.log("onDrag")
+                    // console.log("onDrag")
                     if (!boxRef.current) return;
                     setIsEditMode(true);
                     const startX = boxRef.current.offsetLeft + boxRef.current.offsetWidth;

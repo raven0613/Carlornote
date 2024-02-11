@@ -3,6 +3,7 @@ import { IBoardElement } from "@/type/card";
 import React, { useEffect, useRef, useState, DragEvent } from "react";
 import Box from "./Box";
 import Image from "next/image";
+import { v4 as uuidv4 } from 'uuid';
 
 function getUrlIsValid(url: string) {
     if (url === "http://" || url === "https://") return false;
@@ -22,16 +23,17 @@ interface IImageBox {
 }
 
 export default function ImageBox({ data, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete }: IImageBox) {
-    // console.log(textData)
+    // console.log(data)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(data.content);
     const [showingBlock, setShowingBlock] = useState<"image" | "input">("input");
     const [imageLoadState, setImageLoadState] = useState<"fail" | "success" | "loading" | "none">("none")
     const inputValueRef = useRef<string>("");
 
-    console.log("imageSentState", imageLoadState)
+    // console.log("imageSentState", imageLoadState)
     useEffect(() => {
-        if (!getUrlIsValid(data.content)) return;
+        if (!data.name) return;
+        setImageLoadState("success");
         setShowingBlock("image");
     }, [data])
 
@@ -47,6 +49,7 @@ export default function ImageBox({ data, handleUpdateElement, isSelected, handle
             handleDelete={handleDelete}
         >
             {(data.name && imageLoadState !== "success") && <div id={data.id} className="imagebox absolute inset-0 bg-slate-400 z-20"></div>}
+
             {showingBlock === "image" && <Image id={data.id}
                 className={`imagebox ${imageLoadState === "success" ? "opacity-100" : "opacity-0"}`} width={data.width} height={data.height} src={url} alt={data.name}
                 style={{
@@ -55,7 +58,9 @@ export default function ImageBox({ data, handleUpdateElement, isSelected, handle
                 onLoad={() => {
                     console.log("onLoad")
                     setShowingBlock("image");
-                    handleUpdateElement({ ...data, content: url, width: 300, height: 300 });
+                    const name = uuidv4();
+                    console.log("imageSentState", imageLoadState)
+                    handleUpdateElement({ ...data, content: url, width: data.name ? data.width : 300, height: data.name ? data.height : 300, name });
                     setImageLoadState("success");
                 }}
                 onError={() => {

@@ -24,7 +24,7 @@ interface IBoard {
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp }: IBoard) {
     // console.log(elements)
     const [selectedId, setSelectedId] = useState("");
-    // console.log("selectedId", selectedId)
+    console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
     const pointerRef = useRef({ x: 0, y: 0 });
     // console.log("pointerRef", pointerRef.current)
@@ -33,7 +33,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
 
     useEffect(() => {
         function handleClick(e: MouseEvent) {
-            // console.log((e.target as HTMLElement))
+            console.log("click", (e.target as HTMLElement))
             if (e.target instanceof HTMLElement) {
                 if (e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) setSelectedId(e.target.id);
                 else setSelectedId("");
@@ -49,7 +49,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             console.log("mouseup")
             e.stopPropagation();
             e.preventDefault();
-            console.log((e.target as HTMLElement))
+            // console.log((e.target as HTMLElement))
             if (!(e.target instanceof HTMLElement)) return;
             // drop 時加入資料
             if (e.target.classList.contains("board") || e.target.classList.contains("board_input") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) {
@@ -99,7 +99,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         <>
             <div className="board w-full h-full border border-slate-700 "
                 onDragOver={(e) => {
-                    console.log("ㄟㄟ")
+                    // console.log("ㄟㄟ")
                     e.preventDefault();
                     setIsLock(true);
                 }}
