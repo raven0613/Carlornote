@@ -5,16 +5,24 @@ import { useEffect, useId, useRef, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ImageBox from "./box/ImageBox";
 
+function getContent(type: boxType) {
+    switch (type) {
+        case "text": return "text";
+        case "image": return "image";
+        default: return "text";
+    }
+}
+
 interface IBoard {
     elements: IBoardElement[];
     handleUpdateElement: (data: IBoardElement) => void;
-    handleChangeIdx: (allElement: IBoardElement[]) => void;
+    handleUpdateElementList: (allElement: IBoardElement[]) => void;
     draggingBox: boxType;
     handleMouseUp: () => void;
 }
 
-export default function Board({ elements, handleUpdateElement, handleChangeIdx, draggingBox, handleMouseUp }: IBoard) {
-    // console.log(elements)
+export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp }: IBoard) {
+    console.log(elements)
     const [selectedId, setSelectedId] = useState("");
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
@@ -43,6 +51,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
             e.preventDefault();
             console.log((e.target as HTMLElement))
             if (!(e.target instanceof HTMLElement)) return;
+            // drop 時加入資料
             if (e.target.classList.contains("board") || e.target.classList.contains("board_input") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) {
                 if (!draggingBox) return;
                 const id = uuidv4();
@@ -50,15 +59,15 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                     id: id,
                     type: draggingBox,
                     name: "",
-                    content: "text",
-                    width: 200,
-                    height: 60,
+                    content: getContent(draggingBox),
+                    width: draggingBox === "image" ? 500 : 200,
+                    height: draggingBox === "image" ? 30 : 60,
                     rotation: 0,
                     left: e.clientX,
                     top: e.clientY,
                     radius: 0
                 }]
-                handleChangeIdx(newBoardElement);
+                handleUpdateElementList(newBoardElement);
                 setSelectedId(id);
                 handleMouseUp();
                 return;
@@ -69,7 +78,20 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
         }
         document.addEventListener("mouseup", handleMouse);
         return () => document.removeEventListener("mouseup", handleMouse);
-    }, [draggingBox, elements, handleChangeIdx, handleMouseUp]);
+    }, [draggingBox, elements, handleUpdateElementList, handleMouseUp]);
+
+    function handleClick(id: string) {
+        const newElements = elements.filter(item => item.id !== id);
+        const selectedElement = elements.find(item => item.id === id);
+        if (!selectedElement) return;
+        newElements.push(selectedElement);
+        handleUpdateElementList(newElements);
+    }
+
+    function handleDelete(id: string) {
+        const newElements = elements.filter(item => item.id !== id)
+        handleUpdateElementList(newElements);
+    }
 
     return (
         <>
@@ -107,7 +129,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                                 top: pointerRef.current.y,
                                 radius: 0
                             }]
-                            handleChangeIdx(newBoardElement);
+                            handleUpdateElementList(newBoardElement);
                             e.target.value = "";
                             setIsLock(false);
                         }
@@ -129,13 +151,8 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                             handleUpdateElement={handleUpdateElement}
                             textData={item}
                             isSelected={selectedId === item.id}
-                            handleClick={(id) => {
-                                const newElements = elements.filter(item => item.id !== id);
-                                const selectedElement = elements.find(item => item.id === id)
-                                if (!selectedElement) return;
-                                newElements.push(selectedElement);
-                                handleChangeIdx(newElements);
-                            }}
+                            handleClick={handleClick}
+                            handleDelete={handleDelete}
                         />
                     )
                     if (item.type === "image") return (
@@ -144,13 +161,8 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                             handleUpdateElement={handleUpdateElement}
                             data={item}
                             isSelected={selectedId === item.id}
-                            handleClick={(id) => {
-                                const newElements = elements.filter(item => item.id !== id);
-                                const selectedElement = elements.find(item => item.id === id);
-                                if (!selectedElement) return;
-                                newElements.push(selectedElement);
-                                handleChangeIdx(newElements);
-                            }}
+                            handleClick={handleClick}
+                            handleDelete={handleDelete}
                         />
                     )
                     return <></>
@@ -190,6 +202,7 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                         // setSelectedId(id);
                         // handleMouseUp();
                     }}
+                    handleDelete={() => { }}
                     isShadow={true}
                 />}
             </div>

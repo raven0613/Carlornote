@@ -12,9 +12,10 @@ interface ITextBox {
     children: ReactNode;
     isShadowElement?: boolean;
     isLock: boolean;
+    handleDelete: (id: string) => void;
 }
 
-export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, handleShadowDragEnd, isLock }: ITextBox) {
+export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, handleShadowDragEnd, isLock, handleDelete }: ITextBox) {
     // console.log(textData)
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -34,6 +35,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     useEffect(() => {
         if (!data) return;
         setDeg(data.rotation);
+        setRadius(data.radius);
         setSize({ width: data.width, height: data.height });
         if (isShadowElement) return;
         setPosition({ left: data.left, top: data.top });
@@ -75,7 +77,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     handleShadowDragEnd(e);
                     return;
                 }
-                handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg });
+                handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
                 setIsEditMode(false);
             }}
             onDragOver={(e) => {
@@ -171,7 +173,20 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                 onDragEnd={() => {
                     setIsEditMode(false);
                 }}
-                className={`w-2.5 h-2.5 rounded-full border-2 border-slate-500 bg-slate-200 absolute top-2 right-2 z-20 cursor-nwse-resize duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                className={`w-2.5 h-2.5 rounded-full border-2 border-slate-500 bg-slate-200 absolute top-2 right-2 z-20 cursor-cell duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            ></div>
+            {/* delete */}
+            <div
+                onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("Radius")
+                    handleDelete(data.id);
+                }}
+                className={`w-3 h-3 rounded-full border border-slate-500 bg-slate-200 absolute cursor-pointer -top-3.5 -right-3.5 z-20 
+                before:content-[""] before:h-[7px] before:w-[1px] before:bg-slate-500 before:absolute before:rotate-45 before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2
+                after:content-[""] after:h-[7px] after:w-[1px] after:bg-slate-500 after:absolute after:-rotate-45 after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 hover:scale-125 duration-200
+                ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}
+                `}
             ></div>
         </div>
     )

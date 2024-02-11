@@ -16,7 +16,7 @@ export default function Home() {
       <section className="w-full h-full border border-slate-700 px-16 py-8 relative">
 
         <Board elements={allCard.find(item => item.id === selectedCardId)?.boardElement || []}
-          handleChangeIdx={(allElement) => {
+          handleUpdateElementList={(allElement) => {
             setAllCard(pre => pre.map(item => {
               if (item.id === selectedCardId) return { ...item, boardElement: allElement };
               return item;

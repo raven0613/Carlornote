@@ -13,9 +13,10 @@ interface IImageBox {
     isShadow?: boolean;
     handleShadowDragEnd?: (e: DragEvent) => void;
     isLock: boolean;
+    handleDelete: (id: string) => void;
 }
 
-export default function ImageBox({ data, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock }: IImageBox) {
+export default function ImageBox({ data, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete }: IImageBox) {
     // console.log(textData)
     // console.log("isSelected", isSelected)
 
@@ -28,12 +29,18 @@ export default function ImageBox({ data, handleUpdateElement, isSelected, handle
             isSelected={isSelected}
             handleClick={handleClick}
             handleShadowDragEnd={handleShadowDragEnd}
+            handleDelete={handleDelete}
         >
-            <Image id={data.id} className="imagebox" width={data.width} height={data.height} src={data.content} alt={data.name}
+            {data.content !== "image" && <Image id={data.id} className="imagebox" width={data.width} height={data.height} src={data.content} alt={data.name}
                 style={{
                     objectFit: 'fill', // cover, contain, none
                 }}
-            />
+            />}
+            {data.content === "image" && <input id={data.id} className="outline-none border w-full h-full px-2 py-"
+                onChange={(e) => {
+                    handleUpdateElement({ ...data, content: e.target.value, width: 300, height: 300 });
+                }}
+            />}
         </Box>
     )
 }
