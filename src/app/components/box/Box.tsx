@@ -26,6 +26,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     const [position, setPosition] = useState({ left, top });
     const [radius, setRadius] = useState(0);
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
+    console.log(data.name, isEditMode)
 
     useEffect(() => {
         if (isSelected) setIsEditMode(true);
@@ -182,7 +183,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     console.log("Radius")
                     handleDelete(data.id);
                 }}
-                className={`w-3 h-3 rounded-full border border-slate-500 bg-slate-200 absolute cursor-pointer -top-3.5 -right-3.5 z-20 
+                className={`w-3 h-3 rounded-full border border-slate-500 bg-slate-100 absolute cursor-pointer -top-3.5 -right-3.5 z-20 
                 before:content-[""] before:h-[7px] before:w-[1px] before:bg-slate-500 before:absolute before:rotate-45 before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2
                 after:content-[""] after:h-[7px] after:w-[1px] after:bg-slate-500 after:absolute after:-rotate-45 after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 hover:scale-125 duration-200
                 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}

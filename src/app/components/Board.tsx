@@ -22,14 +22,14 @@ interface IBoard {
 }
 
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp }: IBoard) {
-    console.log(elements)
+    // console.log(elements)
     const [selectedId, setSelectedId] = useState("");
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
     const pointerRef = useRef({ x: 0, y: 0 });
     // console.log("pointerRef", pointerRef.current)
     const [isLock, setIsLock] = useState(false);
-    console.log("isLock", isLock)
+    // console.log("isLock", isLock)
 
     useEffect(() => {
         function handleClick(e: MouseEvent) {
@@ -81,6 +81,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
     }, [draggingBox, elements, handleUpdateElementList, handleMouseUp]);
 
     function handleClick(id: string) {
+        console.log("id", id)
         const newElements = elements.filter(item => item.id !== id);
         const selectedElement = elements.find(item => item.id === id);
         if (!selectedElement) return;
@@ -91,6 +92,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
     function handleDelete(id: string) {
         const newElements = elements.filter(item => item.id !== id)
         handleUpdateElementList(newElements);
+        setSelectedId("");
     }
 
     return (
@@ -186,21 +188,29 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     handleClick={() => { }}
                     handleShadowDragEnd={(e) => {
                         console.log("mouseup2", draggingBox)
-                        // if (!draggingBox) return;
-                        // const id = uuidv4();
-                        // const newBoardElement = [...elements, {
-                        //     id: id,
-                        //     type: draggingBox,
-                        //     content: "text",
-                        //     width: 200,
-                        //     height: 60,
-                        //     rotation: 0,
-                        //     left: e.clientX,
-                        //     top: e.clientY
-                        // }]
-                        // handleChangeIdx(newBoardElement);
-                        // setSelectedId(id);
-                        // handleMouseUp();
+                    }}
+                    handleDelete={() => { }}
+                    isShadow={true}
+                />}
+                {draggingBox === "image" && <ImageBox
+                    isLock={false}
+                    handleUpdateElement={() => { }}
+                    data={{
+                        id: "",
+                        type: "text",
+                        name: "",
+                        content: "text",
+                        width: 500,
+                        height: 30,
+                        rotation: 0,
+                        left: window.outerWidth,
+                        top: window.outerHeight,
+                        radius: 0
+                    }}
+                    isSelected={true}
+                    handleClick={() => { }}
+                    handleShadowDragEnd={(e) => {
+                        console.log("mouseup2", draggingBox)
                     }}
                     handleDelete={() => { }}
                     isShadow={true}
