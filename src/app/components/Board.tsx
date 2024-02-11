@@ -55,7 +55,8 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                     height: 60,
                     rotation: 0,
                     left: e.clientX,
-                    top: e.clientY
+                    top: e.clientY,
+                    radius: 0
                 }]
                 handleChangeIdx(newBoardElement);
                 setSelectedId(id);
@@ -103,7 +104,8 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                                 height: 200,
                                 rotation: 0,
                                 left: pointerRef.current.x,
-                                top: pointerRef.current.y
+                                top: pointerRef.current.y,
+                                radius: 0
                             }]
                             handleChangeIdx(newBoardElement);
                             e.target.value = "";
@@ -165,7 +167,8 @@ export default function Board({ elements, handleUpdateElement, handleChangeIdx, 
                         height: 60,
                         rotation: 0,
                         left: window.outerWidth,
-                        top: window.outerHeight
+                        top: window.outerHeight,
+                        radius: 0
                     }}
                     isSelected={true}
                     handleClick={() => { }}
