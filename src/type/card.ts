@@ -10,7 +10,7 @@ export interface IBoardElement {
     rotation: number,
     left: number,
     top: number,
-    radius: 0
+    radius: number
 }
 
 export interface ICard {
