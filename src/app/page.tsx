@@ -138,7 +138,7 @@ let cards: ICard[] = [
         name: "element_003",
         content: "https://images.unsplash.com/photo-1495344517868-8ebaf0a2044a?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bG9va2luZ3xlbnwwfHwwfHx8MA%3D%3D",
         width: 250,
-        height: 100,
+        height: 500,
         rotation: 0,
         left: 700,
         top: 150,

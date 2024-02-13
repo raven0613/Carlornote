@@ -59,7 +59,7 @@ export default function ImageBox({ data, handleUpdateElement, isSelected, handle
                     console.log("onLoad")
                     setShowingBlock("image");
                     const name = uuidv4();
-                    console.log("imageSentState", imageLoadState)
+                    console.log("data.name", data.name)
                     handleUpdateElement({ ...data, content: url, width: data.name ? data.width : 300, height: data.name ? data.height : 300, name });
                     setImageLoadState("success");
                 }}

@@ -3,6 +3,20 @@ import useAutosizedTextarea from "@/hooks/useAutosizedTextarea"
 import { IBoardElement } from "@/type/card";
 import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } from "react";
 
+function calculateTriangleSides({ hypotenuse, angle1, angle2 }: { hypotenuse: number, angle1: number, angle2: number }) {
+    // 将角度转换为弧度
+    const angle1Rad = (angle1 * Math.PI) / 180;
+    const angle2Rad = (angle2 * Math.PI) / 180;
+
+    // 计算第一个边的长度
+    const side1 = hypotenuse * Math.sin(angle1Rad);
+
+    // 计算第二个边的长度
+    const side2 = hypotenuse * Math.sin(angle2Rad);
+
+    return { side1, side2 };
+}
+
 interface ITextBox {
     data: IBoardElement;
     handleUpdate: (data: IBoardElement) => void;
@@ -53,7 +67,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
 
     return (
         <div ref={boxRef}
-            className={`absolute min-h-10 min-w-24 border hover:border-slate-400 
+            className={`absolute min-h-5 min-w-12 border hover:border-slate-400 
             ${isEditMode ? "border-slate-400" : "border-transparent"} 
             ${isShadowElement ? "opacity-50" : "opacity-100"}
             ${isLock ? "pointer-events-none" : ""}
@@ -113,15 +127,35 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     // console.log("onDrag")
                     if (!boxRef.current) return;
                     setIsEditMode(true);
-                    const startX = boxRef.current.offsetLeft + boxRef.current.offsetWidth;
-                    const startY = boxRef.current.offsetTop + boxRef.current.offsetHeight;
+
                     const nowX = e.clientX;
                     const nowY = e.clientY;
                     if (!nowX && !nowY) return;
-                    setSize({
-                        width: Number(boxRef.current.style.width.split("px")[0]) + nowX - startX,
-                        height: Number(boxRef.current.style.height.split("px")[0]) + nowY - startY
-                    })
+                    let width, height, startX, startY;
+                    if (rotation === 90) {
+                        // 要改
+                        startX = boxRef.current.offsetTop + boxRef.current.offsetHeight;
+                        startY = boxRef.current.offsetLeft + boxRef.current.offsetWidth;
+                        width = Number(boxRef.current.style.width.split("px")[0]) + nowY - startY;
+                        height = Number(boxRef.current.style.height.split("px")[0]) + nowX - startX;
+                    }
+                    else if (rotation === -90) {
+                        startX = boxRef.current.offsetTop + boxRef.current.offsetHeight;
+                        startY = boxRef.current.offsetLeft + boxRef.current.offsetWidth;
+                        width = Number(boxRef.current.style.width.split("px")[0]) + nowY - startY;
+                        height = Number(boxRef.current.style.height.split("px")[0]) + nowX - startX;
+                    }
+                    else {
+                        startX = boxRef.current.offsetLeft + boxRef.current.offsetWidth;
+                        startY = boxRef.current.offsetTop + boxRef.current.offsetHeight;
+                        width = Number(boxRef.current.style.width.split("px")[0]) + nowX - startX;
+                        height = Number(boxRef.current.style.height.split("px")[0]) + nowY - startY;
+                    }
+                    // let width = Number(boxRef.current.style.width.split("px")[0]) + nowX - startX;
+                    // let height = Number(boxRef.current.style.height.split("px")[0]) + nowY - startY;
+                    if (width <= 48) width = 48;
+                    if (height <= 20) height = 20;
+                    setSize({ width, height });
                 }}
                 className={`w-2.5 h-2.5 rounded-full bg-slate-500 absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 z-20 cursor-nwse-resize duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             ></div>
@@ -142,9 +176,13 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     if (!nowX && !nowY) return;
 
                     if (degree > -5 && degree < 5) degree = 0;
+                    else if (degree > 40 && degree < 50) degree = 45;
                     else if (degree > 85 && degree < 95) degree = 90;
+                    else if (degree > 130 && degree < 140) degree = 135;
                     else if (degree > 175 && degree < 185) degree = 180;
+                    else if (degree > -50 && degree < -40) degree = -45;
                     else if (degree > -95 && degree < -85) degree = -90;
+                    else if (degree > -140 && degree < -130) degree = -135;
                     setDeg(Number(degree.toFixed(2)));
                 }}
                 className={`w-2.5 h-2.5 bg-slate-500 absolute bottom-1/2 -right-5 translate-y-1/2 translate-x-1/2 z-20 cursor-grab active:cursor-grabbing duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
