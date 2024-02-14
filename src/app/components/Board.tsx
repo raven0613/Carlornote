@@ -181,6 +181,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         const reader = new FileReader();
                         reader.onloadend = async function () {
                             // console.log("onLoaded", reader.result)
+                            console.log(process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID)
                             const response = await fetch("https://api.imgur.com/3/image/", {
                                 method: "POST",
                                 headers: { Authorization: `Client - ID ${process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID}` },
