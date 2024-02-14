@@ -184,7 +184,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                             console.log(process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID)
                             const response = await fetch("https://api.imgur.com/3/image/", {
                                 method: "POST",
-                                headers: { Authorization: `Client - ID ${process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID}` },
+                                headers: { Authorization: `Client-ID ${process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID}` },
                                 body: reader.result
                             })
                             const res = await response.json();
