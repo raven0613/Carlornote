@@ -4,8 +4,7 @@ import { IBoardElement, boxType } from "@/type/card";
 import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ImageBox from "./box/ImageBox";
-import imgur from "imgur";
-import { env } from "process";
+import { handlePostImgur } from "@/api/imgur";
 
 function getContent(type: boxType) {
     switch (type) {
@@ -56,15 +55,15 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
     }, [draggingBox, elements, handleMouseUp, handleUpdateElementList])
 
     const handleAddImageBox = useCallback((
-        { file, content, position: { left, top } }:
-            { file: File, content: string, position: { left: number, top: number } }
+        { name, content, position: { left, top } }:
+            { name: string, content: string, position: { left: number, top: number } }
     ) => {
         const id = uuidv4();
         if (!left || !top) return;
         const newBoardElement = [...elements, {
             id: id,
             type: "image" as boxType,
-            name: file.name,
+            name: name,
             content: content,
             width: 200,
             height: 200,
@@ -122,16 +121,16 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             if (!pastedFiles && !pastedText) return;
             if (pastedFiles) {
                 const file = pastedFiles;
-                const reader = new FileReader();
-                reader.onloadend = function () {
-                    // console.log("onLoaded", reader.result)
-                    handleAddImageBox({
-                        file: file,
-                        content: reader.result as string,
-                        position: { left: pointerRef.current.x, top: pointerRef.current.y }
-                    });
-                }
-                reader.readAsDataURL(file);
+                const formData = new FormData();
+                formData.append("image", file);
+                const res = await handlePostImgur(formData);
+
+                if (res.success === false) return;
+                handleAddImageBox({
+                    name: file.name,
+                    content: res.data.link,
+                    position: { left: pointerRef.current.x, top: pointerRef.current.y }
+                });
             }
             else {
                 handleAddTextBox({
@@ -178,25 +177,18 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         e.stopPropagation()
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
                         const file = e.currentTarget.files[0];
-                        // console.log("onLoaded", reader.result)
-                        const formData = new FormData()
-                        formData.append("image", file)
-                        console.log("formData", formData)
+                        e.target.value = "";
+                        const formData = new FormData();
+                        formData.append("image", file);
 
-                        console.log(process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID)
-                        const response = await fetch("https://api.imgur.com/3/image/", {
-                            method: "POST",
-                            headers: { Authorization: `Client-ID ${process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID}` },
-                            body: formData
-                        })
-                        const res = await response.json();
+                        const res = await handlePostImgur(formData);
 
+                        if (res.success === false) return;
                         handleAddImageBox({
-                            file,
-                            content: res.success === true ? res.data.link : "",
+                            name: file.name,
+                            content: res.data.link,
                             position: { left: pointerRef.current.x, top: pointerRef.current.y }
                         });
-                        e.target.value = "";
                     }}
                     onMouseMove={(e) => {
                         pointerRef.current = { x: e.clientX, y: e.clientY };
