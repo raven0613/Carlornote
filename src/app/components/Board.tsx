@@ -173,37 +173,30 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                 }}
             >
                 <input id="board_input" name="board_input" type="file" className="board_input w-full h-full opacity-0"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                         e.preventDefault()
                         e.stopPropagation()
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
                         const file = e.currentTarget.files[0];
-                        const reader = new FileReader();
-                        reader.onloadend = async function () {
-                            // console.log("onLoaded", reader.result)
-                            const formData = new FormData()
-                            formData.append("image", file)
-                            console.log("formData", formData)
-                            console.log("reader", reader.result)
+                        // console.log("onLoaded", reader.result)
+                        const formData = new FormData()
+                        formData.append("image", file)
+                        console.log("formData", formData)
 
-                            console.log(process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID)
-                            const response = await fetch("https://api.imgur.com/3/image/", {
-                                method: "POST",
-                                headers: { Authorization: `Client-ID ${process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID}` },
-                                body: formData
-                            })
-                            const res = await response.json();
-                            console.log("response", response);
-                            console.log("res", res);
+                        console.log(process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID)
+                        const response = await fetch("https://api.imgur.com/3/image/", {
+                            method: "POST",
+                            headers: { Authorization: `Client-ID ${process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID}` },
+                            body: formData
+                        })
+                        const res = await response.json();
 
-                            handleAddImageBox({
-                                file,
-                                content: reader.result as string,
-                                position: { left: pointerRef.current.x, top: pointerRef.current.y }
-                            });
-                            e.target.value = "";
-                        }
-                        reader.readAsDataURL(file);
+                        handleAddImageBox({
+                            file,
+                            content: res.success === true ? res.data.link : "",
+                            position: { left: pointerRef.current.x, top: pointerRef.current.y }
+                        });
+                        e.target.value = "";
                     }}
                     onMouseMove={(e) => {
                         pointerRef.current = { x: e.clientX, y: e.clientY };
