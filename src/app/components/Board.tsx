@@ -4,6 +4,8 @@ import { IBoardElement, boxType } from "@/type/card";
 import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ImageBox from "./box/ImageBox";
+import imgur from "imgur";
+import { env } from "process";
 
 function getContent(type: boxType) {
     switch (type) {
@@ -177,8 +179,17 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
                         const file = e.currentTarget.files[0];
                         const reader = new FileReader();
-                        reader.onloadend = function () {
+                        reader.onloadend = async function () {
                             // console.log("onLoaded", reader.result)
+                            const response = await fetch("https://api.imgur.com/3/image/", {
+                                method: "POST",
+                                headers: { Authorization: `Client - ID ${process.env.NEXT_PUBLIC_IMGUR_CLIENT_ID}` },
+                                body: reader.result
+                            })
+                            const res = await response.json();
+                            console.log("response", response);
+                            console.log("res", res);
+
                             handleAddImageBox({
                                 file,
                                 content: reader.result as string,
