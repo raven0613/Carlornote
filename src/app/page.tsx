@@ -2,14 +2,35 @@
 import Image from "next/image";
 import Card from "@/app/components/Card";
 import Board from "@/app/components/Board";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import ControlPanel from "@/app/components/ControlPanel";
+import { handleGetCard, handleAddCard } from "@/api/card";
 
 export default function Home() {
   const [allCard, setAllCard] = useState<ICard[]>(cards);
   const [selectedCardId, setSelectedCardId] = useState<string>("");
   const [draggingBox, setDraggingBox] = useState<boxType>("");
+
+  useEffect(() => {
+    async function handleFetchCard() {
+      const data = await handleGetCard("qYZpU9CHMY34DAzIdNgF")
+      if (!data.data) return;
+      console.log("get data", JSON.parse(data.data))
+    }
+    handleFetchCard();
+  }, [])
+
+  useEffect(() => {
+    async function handleFetchCard() {
+
+      const data = await handleAddCard({
+        id: "", userId: "", boardElement: []
+      })
+      console.log("post data", data)
+    }
+    handleFetchCard();
+  }, [])
 
   return (
     <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
@@ -63,7 +84,7 @@ export default function Home() {
 let cards: ICard[] = [
   {
     id: "card_001",
-    children: [],
+    userId: null,
     boardElement: [
       {
         id: "element_001",
@@ -91,7 +112,7 @@ let cards: ICard[] = [
     ]
   }, {
     id: "card_002",
-    children: [],
+    userId: null,
     boardElement: [
       {
         id: "element_001",
@@ -108,7 +129,7 @@ let cards: ICard[] = [
     ]
   }, {
     id: "card_003",
-    children: [],
+    userId: null,
     boardElement: [
       {
         id: "element_001",

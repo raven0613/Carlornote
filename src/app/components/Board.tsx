@@ -23,9 +23,9 @@ interface IBoard {
 }
 
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp }: IBoard) {
-    console.log(elements)
+    // console.log(elements)
     const [selectedId, setSelectedId] = useState("");
-    console.log("selectedId", selectedId)
+    // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
     const pointerRef = useRef({ x: 0, y: 0 });
     // console.log("pointerRef", pointerRef.current)
