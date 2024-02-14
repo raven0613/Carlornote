@@ -1,7 +1,7 @@
 "use client"
 import TextBox from "@/app/components/box/TextBox";
 import { IBoardElement, boxType } from "@/type/card";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ImageBox from "./box/ImageBox";
 
@@ -31,6 +31,51 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
     const [isLock, setIsLock] = useState(false);
     // console.log("isLock", isLock)
 
+    const handleAddTextBox = useCallback((
+        { content, position: { left, top } }:
+            { content: string, position: { left: number, top: number } }
+    ) => {
+        const id = uuidv4();
+        const newBoardElement = [...elements, {
+            id: id,
+            type: "text" as boxType,
+            name: "",
+            content: content,
+            width: draggingBox === "image" ? 500 : 200,
+            height: draggingBox === "image" ? 30 : 60,
+            rotation: 0,
+            left,
+            top,
+            radius: 0
+        }]
+        handleUpdateElementList(newBoardElement);
+        setSelectedId(id);
+        handleMouseUp();
+    }, [draggingBox, elements, handleMouseUp, handleUpdateElementList])
+
+    const handleAddImageBox = useCallback((
+        { file, content, position: { left, top } }:
+            { file: File, content: string, position: { left: number, top: number } }
+    ) => {
+        const id = uuidv4();
+        if (!left || !top) return;
+        const newBoardElement = [...elements, {
+            id: id,
+            type: "image" as boxType,
+            name: file.name,
+            content: content,
+            width: 200,
+            height: 200,
+            rotation: 0,
+            left,
+            top,
+            radius: 0
+        }]
+        handleUpdateElementList(newBoardElement);
+        setIsLock(false);
+        handleMouseUp();
+    }, [elements, handleMouseUp, handleUpdateElementList])
+
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             console.log("click", (e.target as HTMLElement))
@@ -54,23 +99,10 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             // drop 時加入資料
             if (e.target.classList.contains("board") || e.target.classList.contains("board_input") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) {
                 if (!draggingBox) return;
-                const id = uuidv4();
-                const newBoardElement = [...elements, {
-                    id: id,
-                    type: draggingBox,
-                    name: "",
+                handleAddTextBox({
                     content: getContent(draggingBox),
-                    width: draggingBox === "image" ? 500 : 200,
-                    height: draggingBox === "image" ? 30 : 60,
-                    rotation: 0,
-                    left: e.clientX,
-                    top: e.clientY,
-                    radius: 0
-                }]
-                handleUpdateElementList(newBoardElement);
-                setSelectedId(id);
-                handleMouseUp();
-                return;
+                    position: { left: e.clientX, top: e.clientY }
+                });
             };
             // console.log((e.target as HTMLElement))
             // 如果在 board 以外的地方放開，就停止 drop 流程
@@ -78,7 +110,37 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         }
         document.addEventListener("mouseup", handleMouse);
         return () => document.removeEventListener("mouseup", handleMouse);
-    }, [draggingBox, elements, handleUpdateElementList, handleMouseUp]);
+    }, [draggingBox, elements, handleUpdateElementList, handleMouseUp, handleAddTextBox]);
+
+    useEffect(() => {
+        async function handlePaste(e: ClipboardEvent) {
+            const pastedFiles = e.clipboardData?.files[0];
+            const pastedText = e.clipboardData?.getData("text/plain") || "";
+            console.log(pastedFiles)
+            if (!pastedFiles && !pastedText) return;
+            if (pastedFiles) {
+                const file = pastedFiles;
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    // console.log("onLoaded", reader.result)
+                    handleAddImageBox({
+                        file: file,
+                        content: reader.result as string,
+                        position: { left: pointerRef.current.x, top: pointerRef.current.y }
+                    });
+                }
+                reader.readAsDataURL(file);
+            }
+            else {
+                handleAddTextBox({
+                    content: pastedText,
+                    position: { left: pointerRef.current.x, top: pointerRef.current.y }
+                });
+            }
+        }
+        document.addEventListener("paste", handlePaste);
+        return () => document.removeEventListener("paste", handlePaste);
+    }, [handleAddImageBox, handleAddTextBox])
 
     function handleClick(id: string) {
         console.log("id", id)
@@ -117,23 +179,12 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         const reader = new FileReader();
                         reader.onloadend = function () {
                             // console.log("onLoaded", reader.result)
-                            const id = uuidv4();
-                            if (!pointerRef.current.x || !pointerRef.current.y) return;
-                            const newBoardElement = [...elements, {
-                                id: id,
-                                type: "image" as boxType,
-                                name: file.name,
+                            handleAddImageBox({
+                                file,
                                 content: reader.result as string,
-                                width: 200,
-                                height: 200,
-                                rotation: 0,
-                                left: pointerRef.current.x,
-                                top: pointerRef.current.y,
-                                radius: 0
-                            }]
-                            handleUpdateElementList(newBoardElement);
+                                position: { left: pointerRef.current.x, top: pointerRef.current.y }
+                            });
                             e.target.value = "";
-                            setIsLock(false);
                         }
                         reader.readAsDataURL(file);
                     }}
