@@ -15,6 +15,6 @@ export interface IBoardElement {
 
 export interface ICard {
     id: string,
-    userId: string | null,
+    userId: string[],
     boardElement: IBoardElement[]
 }

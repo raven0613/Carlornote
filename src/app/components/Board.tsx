@@ -24,6 +24,7 @@ interface IBoard {
 
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp }: IBoard) {
     // console.log(elements)
+    console.log(uuidv4())
     const [selectedId, setSelectedId] = useState("");
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
@@ -95,11 +96,13 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             console.log("mouseup")
             e.stopPropagation();
             e.preventDefault();
-            // console.log((e.target as HTMLElement))
+            console.log((e.target as HTMLElement))
             if (!(e.target instanceof HTMLElement)) return;
             // drop 時加入資料
-            if (e.target.classList.contains("board") || e.target.classList.contains("board_input") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) {
+            if (e.target.classList.contains("board") || e.target.classList.contains("board_input") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox") || e.target.classList.contains("box")) {
+                console.log("draggingBox", draggingBox)
                 if (!draggingBox) return;
+                console.log("ㄟ")
                 handleAddTextBox({
                     content: getContent(draggingBox),
                     position: { left: e.clientX, top: e.clientY }

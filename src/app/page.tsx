@@ -1,11 +1,10 @@
 "use client"
-import Image from "next/image";
 import Card from "@/app/components/Card";
 import Board from "@/app/components/Board";
 import { useEffect, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import ControlPanel from "@/app/components/ControlPanel";
-import { handleGetCard, handleAddCard } from "@/api/card";
+import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards } from "@/api/card";
 
 export default function Home() {
   const [allCard, setAllCard] = useState<ICard[]>(cards);
@@ -14,29 +13,42 @@ export default function Home() {
 
   useEffect(() => {
     async function handleFetchCard() {
-      const data = await handleGetCard("qYZpU9CHMY34DAzIdNgF")
+      const data = await handleGetCards()
       if (!data.data) return;
-      console.log("get data", JSON.parse(data.data))
+      setAllCard(JSON.parse(data.data));
+      // console.log("get data", JSON.parse(data.data))
     }
     handleFetchCard();
   }, [])
-
-  useEffect(() => {
-    async function handleFetchCard() {
-
-      const data = await handleAddCard({
-        id: "", userId: "", boardElement: []
-      })
-      console.log("post data", data)
-    }
-    handleFetchCard();
-  }, [])
+console.log("allCard", allCard)
+  // useEffect(() => {
+  //   async function handleFetchCard() {
+  //     const data = await handleAddCard({
+  //       id: "", userId: null, boardElement: [
+  //         {
+  //           id: "element_50b366cd-81b5-4fd8-a034-c97fbcfbce0b",
+  //           type: "text",
+  //           name: "",
+  //           content: "初始text",
+  //           width: 250,
+  //           height: 100,
+  //           rotation: 40,
+  //           left: 500,
+  //           top: 300,
+  //           radius: 0
+  //         }
+  //       ]
+  //     })
+  //     console.log("post data", data)
+  //   }
+  //   handleFetchCard();
+  // }, [])
 
   return (
-    <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
-      <section className="w-full h-full border border-slate-700 px-16 py-8 relative">
-
-        <Board elements={allCard.find(item => item.id === selectedCardId)?.boardElement || []}
+    <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
+      <section className="w-full h-full px-16 pt-8 relative flex items-center">
+        {!selectedCardId && <p className="text-center w-full">請選擇一張卡片</p>}
+        {selectedCardId && <Board elements={allCard.find(item => item.id === selectedCardId)?.boardElement || []}
           handleUpdateElementList={(allElement) => {
             setAllCard(pre => pre.map(item => {
               if (item.id === selectedCardId) return { ...item, boardElement: allElement };
@@ -59,7 +71,7 @@ export default function Home() {
           handleMouseUp={() => {
             setDraggingBox("");
           }}
-        />
+        />}
         <ControlPanel
           handleDrag={(type) => {
             setDraggingBox(type);
@@ -67,7 +79,7 @@ export default function Home() {
         />
       </section>
       <section className="w-full h-auto my-5 flex items-center justify-center">
-        {cards && cards.map(item =>
+        {allCard && allCard.map(item =>
           <Card key={item.id}
 
             isSelected={selectedCardId === item.id}
@@ -84,7 +96,7 @@ export default function Home() {
 let cards: ICard[] = [
   {
     id: "card_001",
-    userId: null,
+    userId: [],
     boardElement: [
       {
         id: "element_001",
@@ -112,7 +124,7 @@ let cards: ICard[] = [
     ]
   }, {
     id: "card_002",
-    userId: null,
+    userId: [],
     boardElement: [
       {
         id: "element_001",
@@ -129,7 +141,7 @@ let cards: ICard[] = [
     ]
   }, {
     id: "card_003",
-    userId: null,
+    userId: [],
     boardElement: [
       {
         id: "element_001",
@@ -210,6 +222,122 @@ let cards: ICard[] = [
         rotation: 0,
         left: 100,
         top: 200,
+        radius: 0
+      }
+    ]
+  },
+  {
+    id: "card_004",
+    userId: [],
+    boardElement: [
+      {
+        id: "element_001",
+        type: "text",
+        name: "",
+        content: "第一張卡第1個text",
+        width: 250,
+        height: 100,
+        rotation: 40,
+        left: 500,
+        top: 300,
+        radius: 0
+      }, {
+        id: "element_002",
+        type: "text",
+        name: "",
+        content: "第一張卡第2個text",
+        width: 250,
+        height: 100,
+        rotation: 20,
+        left: 200,
+        top: 100,
+        radius: 0
+      }
+    ]
+  },
+  {
+    id: "card_005",
+    userId: [],
+    boardElement: [
+      {
+        id: "element_001",
+        type: "text",
+        name: "",
+        content: "第一張卡第1個text",
+        width: 250,
+        height: 100,
+        rotation: 40,
+        left: 500,
+        top: 300,
+        radius: 0
+      }, {
+        id: "element_002",
+        type: "text",
+        name: "",
+        content: "第一張卡第2個text",
+        width: 250,
+        height: 100,
+        rotation: 20,
+        left: 200,
+        top: 100,
+        radius: 0
+      }
+    ]
+  },
+  {
+    id: "card_006",
+    userId: [],
+    boardElement: [
+      {
+        id: "element_001",
+        type: "text",
+        name: "",
+        content: "第一張卡第1個text",
+        width: 250,
+        height: 100,
+        rotation: 40,
+        left: 500,
+        top: 300,
+        radius: 0
+      }, {
+        id: "element_002",
+        type: "text",
+        name: "",
+        content: "第一張卡第2個text",
+        width: 250,
+        height: 100,
+        rotation: 20,
+        left: 200,
+        top: 100,
+        radius: 0
+      }
+    ]
+  },
+  {
+    id: "card_007",
+    userId: [],
+    boardElement: [
+      {
+        id: "element_001",
+        type: "text",
+        name: "",
+        content: "第一張卡第1個text",
+        width: 250,
+        height: 100,
+        rotation: 40,
+        left: 500,
+        top: 300,
+        radius: 0
+      }, {
+        id: "element_002",
+        type: "text",
+        name: "",
+        content: "第一張卡第2個text",
+        width: 250,
+        height: 100,
+        rotation: 20,
+        left: 200,
+        top: 100,
         radius: 0
       }
     ]

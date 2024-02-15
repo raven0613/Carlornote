@@ -68,7 +68,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     return (
         <>
             <div ref={boxRef}
-                className={`absolute min-h-5 min-w-12 border hover:border-slate-400 
+                className={`box absolute min-h-5 min-w-12 border hover:border-slate-400 
             ${isEditMode ? "border-slate-400" : "border-transparent"} 
             ${isShadowElement ? "opacity-50" : "opacity-100"}
             ${isLock ? "pointer-events-none" : ""}
