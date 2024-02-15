@@ -5,6 +5,7 @@ import { useCallback, useContext, useEffect, useId, useRef, useState } from "rea
 import { v4 as uuidv4 } from 'uuid';
 import ImageBox from "./box/ImageBox";
 import { handlePostImgur } from "@/api/imgur";
+import { handleUpdateCard } from "@/api/card";
 
 function getContent(type: boxType) {
     switch (type) {
@@ -24,7 +25,6 @@ interface IBoard {
 
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp }: IBoard) {
     // console.log(elements)
-    console.log(uuidv4())
     const [selectedId, setSelectedId] = useState("");
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
@@ -37,7 +37,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         { content, position: { left, top } }:
             { content: string, position: { left: number, top: number } }
     ) => {
-        const id = uuidv4();
+        const id = `element_${uuidv4()}`;
         const newBoardElement = [...elements, {
             id: id,
             type: "text" as boxType,
@@ -59,7 +59,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         { name, content, position: { left, top } }:
             { name: string, content: string, position: { left: number, top: number } }
     ) => {
-        const id = uuidv4();
+        const id = `element_${uuidv4()}`;
         if (!left || !top) return;
         const newBoardElement = [...elements, {
             id: id,
@@ -217,7 +217,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         <ImageBox key={item.id}
                             isLock={isLock}
                             handleUpdateElement={handleUpdateElement}
-                            data={item}
+                            imageData={item}
                             isSelected={selectedId === item.id}
                             handleClick={handleClick}
                             handleDelete={handleDelete}
@@ -251,9 +251,9 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                 {draggingBox === "image" && <ImageBox
                     isLock={false}
                     handleUpdateElement={() => { }}
-                    data={{
+                    imageData={{
                         id: "",
-                        type: "text",
+                        type: "image",
                         name: "",
                         content: "text",
                         width: 500,

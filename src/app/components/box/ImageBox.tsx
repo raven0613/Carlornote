@@ -12,7 +12,7 @@ function getUrlIsValid(url: string) {
 }
 
 interface IImageBox {
-    data: IBoardElement;
+    imageData: IBoardElement;
     handleUpdateElement: (data: IBoardElement) => void;
     isSelected: boolean;
     handleClick: (id: string) => void;
@@ -22,7 +22,7 @@ interface IImageBox {
     handleDelete: (id: string) => void;
 }
 
-export default function ImageBox({ data, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete }: IImageBox) {
+export default function ImageBox({ imageData: data, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete }: IImageBox) {
     // console.log(data)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(data.content);

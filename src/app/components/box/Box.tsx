@@ -3,20 +3,6 @@ import useAutosizedTextarea from "@/hooks/useAutosizedTextarea"
 import { IBoardElement } from "@/type/card";
 import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } from "react";
 
-function calculateTriangleSides({ hypotenuse, angle1, angle2 }: { hypotenuse: number, angle1: number, angle2: number }) {
-    // 将角度转换为弧度
-    const angle1Rad = (angle1 * Math.PI) / 180;
-    const angle2Rad = (angle2 * Math.PI) / 180;
-
-    // 计算第一个边的长度
-    const side1 = hypotenuse * Math.sin(angle1Rad);
-
-    // 计算第二个边的长度
-    const side2 = hypotenuse * Math.sin(angle2Rad);
-
-    return { side1, side2 };
-}
-
 interface ITextBox {
     data: IBoardElement;
     handleUpdate: (data: IBoardElement) => void;

@@ -7,9 +7,10 @@ import ControlPanel from "@/app/components/ControlPanel";
 import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards } from "@/api/card";
 
 export default function Home() {
-  const [allCard, setAllCard] = useState<ICard[]>(cards);
+  const [allCard, setAllCard] = useState<ICard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string>("");
   const [draggingBox, setDraggingBox] = useState<boxType>("");
+  const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
     async function handleFetchCard() {
@@ -20,7 +21,31 @@ export default function Home() {
     }
     handleFetchCard();
   }, [])
-console.log("allCard", allCard)
+  console.log("isDirty", isDirty)
+
+  useEffect(() => {
+    let time: NodeJS.Timeout | null = null;
+    if (!isDirty || time) return;
+    time = setInterval(async () => {
+      if (!selectedCardId) return;
+      const data = allCard.find(item => item.id === selectedCardId);
+      if (!data) return;
+      const response = await handleUpdateCard(data);
+      console.log("存檔", response);
+      if (response.status !== "SUCCESS" || !response.data) return;
+      const resData = JSON.parse(response.data);
+      setAllCard(pre => pre.map(item => {
+        if (item.id === resData.id) return resData;
+        return item;
+      }));
+      setIsDirty(false);
+      if (time) clearInterval(time);
+    }, 5000);
+    return () => {
+      if (time) clearInterval(time);
+    }
+  }, [allCard, isDirty, selectedCardId])
+
   // useEffect(() => {
   //   async function handleFetchCard() {
   //     const data = await handleAddCard({
@@ -54,6 +79,7 @@ console.log("allCard", allCard)
               if (item.id === selectedCardId) return { ...item, boardElement: allElement };
               return item;
             }))
+            setIsDirty(true);
           }}
           handleUpdateElement={(data) => {
             setAllCard(pre => pre.map(item => {
@@ -66,6 +92,7 @@ console.log("allCard", allCard)
               };
               return item;
             }))
+            setIsDirty(true);
           }}
           draggingBox={draggingBox}
           handleMouseUp={() => {
