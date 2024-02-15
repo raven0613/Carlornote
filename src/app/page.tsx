@@ -10,7 +10,7 @@ export default function Home() {
   const [allCard, setAllCard] = useState<ICard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string>("");
   const [draggingBox, setDraggingBox] = useState<boxType>("");
-  const [isDirty, setIsDirty] = useState(false);
+  const [dirtyState, setDirtyState] = useState<"dirty" | "clear" | "none">("none");
 
   useEffect(() => {
     async function handleFetchCard() {
@@ -21,11 +21,12 @@ export default function Home() {
     }
     handleFetchCard();
   }, [])
-  console.log("isDirty", isDirty)
+  // console.log("allCard", allCard)
+  console.log("dirtyState", dirtyState)
 
   useEffect(() => {
     let time: NodeJS.Timeout | null = null;
-    if (!isDirty || time) return;
+    if (dirtyState !== "dirty" || time) return;
     time = setInterval(async () => {
       if (!selectedCardId) return;
       const data = allCard.find(item => item.id === selectedCardId);
@@ -38,13 +39,13 @@ export default function Home() {
         if (item.id === resData.id) return resData;
         return item;
       }));
-      setIsDirty(false);
+      setDirtyState("clear");
       if (time) clearInterval(time);
-    }, 5000);
+    }, 3000);
     return () => {
       if (time) clearInterval(time);
     }
-  }, [allCard, isDirty, selectedCardId])
+  }, [allCard, dirtyState, selectedCardId])
 
   // useEffect(() => {
   //   async function handleFetchCard() {
@@ -72,6 +73,9 @@ export default function Home() {
   return (
     <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
       <section className="w-full h-full px-16 pt-8 relative flex items-center">
+        {dirtyState === "dirty" && <p className="absolute top-2 left-16">改動尚未儲存，請勿切換卡片或離開本頁</p>}
+        <p className={`absolute top-2 left-16 ${dirtyState === "clear" ? "opacity-100" : "opacity-0"}`}>已儲存此卡片全部改動</p>
+
         {!selectedCardId && <p className="text-center w-full">請選擇一張卡片</p>}
         {selectedCardId && <Board elements={allCard.find(item => item.id === selectedCardId)?.boardElement || []}
           handleUpdateElementList={(allElement) => {
@@ -79,7 +83,7 @@ export default function Home() {
               if (item.id === selectedCardId) return { ...item, boardElement: allElement };
               return item;
             }))
-            setIsDirty(true);
+            setDirtyState("dirty");
           }}
           handleUpdateElement={(data) => {
             setAllCard(pre => pre.map(item => {
@@ -92,7 +96,7 @@ export default function Home() {
               };
               return item;
             }))
-            setIsDirty(true);
+            setDirtyState("dirty");
           }}
           draggingBox={draggingBox}
           handleMouseUp={() => {
@@ -108,10 +112,10 @@ export default function Home() {
       <section className="w-full h-auto my-5 flex items-center justify-center">
         {allCard && allCard.map(item =>
           <Card key={item.id}
-
             isSelected={selectedCardId === item.id}
             handleClick={() => {
               setSelectedCardId(item.id);
+              setDirtyState("none")
             }}
           />
         )}

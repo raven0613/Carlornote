@@ -24,7 +24,7 @@ interface IBoard {
 }
 
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp }: IBoard) {
-    // console.log(elements)
+    console.log(elements)
     const [selectedId, setSelectedId] = useState("");
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
@@ -40,7 +40,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         const id = `element_${uuidv4()}`;
         const newBoardElement = [...elements, {
             id: id,
-            type: "text" as boxType,
+            type: draggingBox === "image" ? "image" : "text" as boxType,
             name: "",
             content: content,
             width: draggingBox === "image" ? 500 : 200,
@@ -114,13 +114,17 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         }
         document.addEventListener("mouseup", handleMouse);
         return () => document.removeEventListener("mouseup", handleMouse);
-    }, [draggingBox, elements, handleUpdateElementList, handleMouseUp, handleAddTextBox]);
+    }, [draggingBox, handleAddImageBox, handleAddTextBox, handleMouseUp]);
 
     useEffect(() => {
         async function handlePaste(e: ClipboardEvent) {
+            console.log("e.target", e.target)
+            if ((e.target as HTMLElement).classList.contains("imagebox")) return;
+
             const pastedFiles = e.clipboardData?.files[0];
             const pastedText = e.clipboardData?.getData("text/plain") || "";
-            console.log(pastedFiles)
+            console.log("pastedFiles", pastedFiles)
+            console.log("pastedText", pastedText)
             if (!pastedFiles && !pastedText) return;
             if (pastedFiles) {
                 const file = pastedFiles;
@@ -180,12 +184,13 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         e.stopPropagation()
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
                         const file = e.currentTarget.files[0];
-                        e.target.value = "";
+                        console.log("file", file)
                         const formData = new FormData();
                         formData.append("image", file);
+                        e.target.value = "";
 
                         const res = await handlePostImgur(formData);
-
+                        console.log("res", res)
                         if (res.success === false) return;
                         handleAddImageBox({
                             name: file.name,
@@ -229,7 +234,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     isLock={false}
                     handleUpdateElement={() => { }}
                     textData={{
-                        id: "",
+                        id: "dragging_text",
                         type: "text",
                         name: "",
                         content: "text",
@@ -252,7 +257,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     isLock={false}
                     handleUpdateElement={() => { }}
                     imageData={{
-                        id: "",
+                        id: "dragging_image",
                         type: "image",
                         name: "",
                         content: "text",

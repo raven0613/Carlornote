@@ -22,36 +22,36 @@ interface IImageBox {
     handleDelete: (id: string) => void;
 }
 
-export default function ImageBox({ imageData: data, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete }: IImageBox) {
+export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete }: IImageBox) {
     // console.log(data)
     // console.log("isSelected", isSelected)
-    const [url, setUrl] = useState(data.content);
+    const [url, setUrl] = useState(imageData.content);
     const [showingBlock, setShowingBlock] = useState<"image" | "input">("input");
     const [imageLoadState, setImageLoadState] = useState<"fail" | "success" | "loading" | "none">("none")
     const inputValueRef = useRef<string>("");
 
     // console.log("imageSentState", imageLoadState)
     useEffect(() => {
-        if (!data.name) return;
+        if (!imageData.name) return;
         setImageLoadState("success");
         setShowingBlock("image");
-    }, [data])
+    }, [imageData])
 
     return (
         <Box
             isLock={isLock}
             isShadowElement={isShadow}
             handleUpdate={handleUpdateElement}
-            data={data}
+            data={imageData}
             isSelected={isSelected}
             handleClick={handleClick}
             handleShadowDragEnd={handleShadowDragEnd}
             handleDelete={handleDelete}
         >
-            {(data.name && imageLoadState !== "success") && <div id={data.id} className="imagebox absolute inset-0 bg-slate-400 z-20"></div>}
+            {(imageData.name && imageLoadState !== "success") && <div id={imageData.id} className="imagebox absolute inset-0 bg-slate-400 z-20"></div>}
 
-            {showingBlock === "image" && <Image id={data.id}
-                className={`imagebox ${imageLoadState === "success" ? "opacity-100" : "opacity-0"}`} width={data.width} height={data.height} src={url} alt={data.name}
+            {showingBlock === "image" && <Image id={imageData.id}
+                className={`imagebox ${imageLoadState === "success" ? "opacity-100" : "opacity-0"}`} width={imageData.width} height={imageData.height} src={url} alt={imageData.name}
                 style={{
                     objectFit: 'fill', // cover, contain, none
                 }}
@@ -59,9 +59,10 @@ export default function ImageBox({ imageData: data, handleUpdateElement, isSelec
                     console.log("onLoad")
                     setShowingBlock("image");
                     const name = uuidv4();
-                    console.log("data.name", data.name)
-                    handleUpdateElement({ ...data, content: url, width: data.name ? data.width : 300, height: data.name ? data.height : 300, name });
+                    console.log("imageData.name", imageData.name)
                     setImageLoadState("success");
+                    // if (imageData.content) return;
+                    handleUpdateElement({ ...imageData, content: url, width: imageData.name ? imageData.width : 300, height: imageData.name ? imageData.height : 300, name });
                 }}
                 onError={() => {
                     setShowingBlock("input");
@@ -69,10 +70,12 @@ export default function ImageBox({ imageData: data, handleUpdateElement, isSelec
                 }}
             />}
             {imageLoadState !== "success" && <>
-                <input id={data.id}
+                <input id={imageData.id}
                     className={`imagebox outline-none border px-2 absolute inset-y-0 left-0 right-16 ${imageLoadState === "fail" ? "border border-red-500" : ""}
                     `}
                     onChange={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         inputValueRef.current = e.currentTarget.value;
                     }}
                     placeholder="請輸入圖片網址"
