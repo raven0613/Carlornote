@@ -13,6 +13,16 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      animation: {
+        hide: "opacity 5000ms ease-out"
+      },
+      keyframes: {
+        opacity: {
+          '0%': { opacity: "1" },
+          '75%': { opacity: "1" },
+          '100%': { opacity: '0' },
+        }
+      }
     },
   },
   plugins: [],

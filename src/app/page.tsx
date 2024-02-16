@@ -31,15 +31,12 @@ export default function Home() {
     if (dirtyState !== "dirty" || time) return;
     time = setInterval(async () => {
       if (!selectedCardId) return;
-      // const data = allCard.find(item => item.id === selectedCardId);
       const idSet = new Set([...dirtyCards]);
       const data = allCard.filter(item => idSet.has(item.id));
-      // if (!data) return;
       if (data.length === 0) return;
 
       const response = await handleUpdateCard(data);
       console.log("存檔", response);
-      // if (response.status !== "SUCCESS" || !response.data) return;
       const resData = JSON.parse(response.data);
       const failedData = response.failedData && JSON.parse(response.failedData);
       if (failedData) console.log("failedData", failedData);
@@ -79,12 +76,12 @@ export default function Home() {
   //   }
   //   handleFetchCard();
   // }, [])
-
+  // ${dirtyState === "clear" ? "opacity-100" : "opacity-0"}
   return (
     <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
       <section className="w-full h-full px-16 pt-8 relative flex items-center">
         {dirtyCards.length > 0 && <p className="absolute top-2 left-16">改動尚未儲存，請勿離開本頁</p>}
-        <p className={`absolute top-2 left-16 ${dirtyState === "clear" ? "opacity-100" : "opacity-0"}`}>已儲存全部改動</p>
+        {dirtyState === "clear" && <p className={`absolute top-2 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
 
         {!selectedCardId && <p className="text-center w-full">請選擇一張卡片</p>}
         {selectedCardId && <Board elements={allCard.find(item => item.id === selectedCardId)?.boardElement || []}
