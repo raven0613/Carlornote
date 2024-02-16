@@ -145,6 +145,7 @@ let cards: ICard[] = [
   {
     id: "card_001",
     userId: [],
+    visibility: "public",
     boardElement: [
       {
         id: "element_001",
@@ -173,6 +174,7 @@ let cards: ICard[] = [
   }, {
     id: "card_002",
     userId: [],
+    visibility: "public",
     boardElement: [
       {
         id: "element_001",
@@ -190,6 +192,7 @@ let cards: ICard[] = [
   }, {
     id: "card_003",
     userId: [],
+    visibility: "public",
     boardElement: [
       {
         id: "element_001",
@@ -277,6 +280,7 @@ let cards: ICard[] = [
   {
     id: "card_004",
     userId: [],
+    visibility: "public",
     boardElement: [
       {
         id: "element_001",
@@ -306,6 +310,7 @@ let cards: ICard[] = [
   {
     id: "card_005",
     userId: [],
+    visibility: "public",
     boardElement: [
       {
         id: "element_001",
@@ -335,6 +340,7 @@ let cards: ICard[] = [
   {
     id: "card_006",
     userId: [],
+    visibility: "public",
     boardElement: [
       {
         id: "element_001",
@@ -364,6 +370,7 @@ let cards: ICard[] = [
   {
     id: "card_007",
     userId: [],
+    visibility: "public",
     boardElement: [
       {
         id: "element_001",

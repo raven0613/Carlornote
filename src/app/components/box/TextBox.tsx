@@ -68,7 +68,7 @@ export default function TextBox({ textData, handleUpdateElement, isSelected, han
                     handleUpdateElement({ ...textData, content: e.target.value });
                     handleSetDirty();
                 }}
-                className="textbox_textarea w-full h-full p-2 rounded-md overflow-hidden whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700"
+                className="boardElement textbox_textarea w-full h-full p-2 rounded-md overflow-hidden whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700"
                 value={value}>
             </textarea>
         </Box>

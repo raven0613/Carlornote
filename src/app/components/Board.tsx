@@ -103,7 +103,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             console.log((e.target as HTMLElement))
             if (!(e.target instanceof HTMLElement)) return;
             // drop 時加入資料
-            if (e.target.classList.contains("board") || e.target.classList.contains("board_input") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox") || e.target.classList.contains("box")) {
+            if (e.target.classList.contains("boardElement")) {
                 console.log("draggingBox", draggingBox)
                 if (!draggingBox) return;
                 console.log("ㄟ")
@@ -179,7 +179,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
 
     return (
         <>
-            <div className="board w-full h-full border border-slate-700 "
+            <div className="boardElement w-full h-full border border-slate-700 "
                 onDragOver={(e) => {
                     // console.log("ㄟㄟ")
                     e.preventDefault();
@@ -192,7 +192,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     console.log("top", e.clientY)
                 }}
             >
-                <input id="board_input" name="board_input" type="file" className="board_input w-full h-full opacity-0"
+                <input id="board_input" name="board_input" type="file" className="boardElement w-full h-full opacity-0"
                     onChange={async (e) => {
                         console.log("image drop")
                         e.preventDefault()

@@ -50,10 +50,10 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
             handleDelete={handleDelete}
             handleSetDirty={handleSetDirty}
         >
-            {(imageData.name && imageLoadState !== "success") && <div id={imageData.id} className="imagebox absolute inset-0 bg-slate-400 z-20"></div>}
+            {(imageData.name && imageLoadState !== "success") && <div id={imageData.id} className="boardElement imagebox absolute inset-0 bg-slate-400 z-20"></div>}
 
             {showingBlock === "image" && <Image id={imageData.id}
-                className={`imagebox ${imageLoadState === "success" ? "opacity-100" : "opacity-0"}`} width={imageData.width} height={imageData.height} src={url} alt={imageData.name}
+                className={`boardElement imagebox ${imageLoadState === "success" ? "opacity-100" : "opacity-0"}`} width={imageData.width} height={imageData.height} src={url} alt={imageData.name}
                 style={{
                     objectFit: 'fill', // cover, contain, none
                 }}
@@ -72,7 +72,7 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
             />}
             {imageLoadState !== "success" && <>
                 <input id={imageData.id}
-                    className={`imagebox outline-none border px-2 absolute inset-y-0 left-0 right-16 ${imageLoadState === "fail" ? "border border-red-500" : ""}
+                    className={`boardElement imagebox outline-none border px-2 absolute inset-y-0 left-0 right-16 ${imageLoadState === "fail" ? "border border-red-500" : ""}
                     `}
                     onChange={(e) => {
                         e.preventDefault();
@@ -85,7 +85,7 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
                     }}
                 />
                 <button
-                    className={`imagebox w-7 h-7 bg-green-500 absolute right-6 top-1/2 -translate-y-1/2 rounded-full leading-5 text-white
+                    className={`boardElement imagebox w-7 h-7 bg-green-500 absolute right-6 top-1/2 -translate-y-1/2 rounded-full leading-5 text-white
                     `}
                     onClick={(e) => {
                         e.preventDefault();

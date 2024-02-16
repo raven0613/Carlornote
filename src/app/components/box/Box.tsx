@@ -55,7 +55,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     return (
         <>
             <div ref={boxRef}
-                className={`box absolute min-h-5 min-w-12 border hover:border-slate-400 
+                className={`boardElement absolute min-h-5 min-w-12 border hover:border-slate-400 
             ${isEditMode ? "border-slate-400" : "border-transparent"} 
             ${isShadowElement ? "opacity-50" : "opacity-100"}
             ${isLock ? "pointer-events-none" : ""}
@@ -105,7 +105,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                 }}
                 draggable={true}
             >
-                <div className={`w-full h-full overflow-hidden`} style={{ borderRadius: `${radius}px` }}>
+                <div className={`boardElement w-full h-full overflow-hidden`} style={{ borderRadius: `${radius}px` }}>
                     {children}
                 </div>
                 {/* size */}

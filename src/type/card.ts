@@ -10,11 +10,15 @@ export interface IBoardElement {
     rotation: number,
     left: number,
     top: number,
-    radius: number
+    radius: number,
+    textColor?: string,
+    fontSize?: number,
+    fontWeight?: number
 }
 
 export interface ICard {
     id: string,
     userId: string[],
-    boardElement: IBoardElement[]
+    boardElement: IBoardElement[],
+    visibility: "public" | "private"
 }
