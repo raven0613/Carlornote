@@ -20,9 +20,10 @@ interface IImageBox {
     handleShadowDragEnd?: (e: DragEvent) => void;
     isLock: boolean;
     handleDelete: (id: string) => void;
+    handleSetDirty: () => void;
 }
 
-export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete }: IImageBox) {
+export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete, handleSetDirty }: IImageBox) {
     // console.log(data)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(imageData.content);
@@ -47,6 +48,7 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
             handleClick={handleClick}
             handleShadowDragEnd={handleShadowDragEnd}
             handleDelete={handleDelete}
+            handleSetDirty={handleSetDirty}
         >
             {(imageData.name && imageLoadState !== "success") && <div id={imageData.id} className="imagebox absolute inset-0 bg-slate-400 z-20"></div>}
 
@@ -61,7 +63,6 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
                     const name = uuidv4();
                     console.log("imageData.name", imageData.name)
                     setImageLoadState("success");
-                    // if (imageData.content) return;
                     handleUpdateElement({ ...imageData, content: url, width: imageData.name ? imageData.width : 300, height: imageData.name ? imageData.height : 300, name });
                 }}
                 onError={() => {

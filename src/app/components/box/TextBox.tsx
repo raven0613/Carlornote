@@ -13,9 +13,10 @@ interface ITextBox {
     handleShadowDragEnd?: (e: DragEvent) => void;
     isLock: boolean;
     handleDelete: (id: string) => void;
+    handleSetDirty: () => void;
 }
 
-export default function TextBox({ textData, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete }: ITextBox) {
+export default function TextBox({ textData, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete, handleSetDirty }: ITextBox) {
     // console.log(textData)
     // console.log("isSelected", isSelected)
     const textRef = useRef<HTMLTextAreaElement>(null);
@@ -25,6 +26,29 @@ export default function TextBox({ textData, handleUpdateElement, isSelected, han
         if (!textData) return;
         setValue(textData.content);
     }, [textData])
+
+    // useEffect(() => {
+    //     let timer: NodeJS.Timeout | null = null;
+    //     function debounce (fn: (args: any) => void, delay: number) {
+    //         // let timer: NodeJS.Timeout | null = null;
+    //         function callback () {
+    //             let args = arguments;
+    //             if (timer) clearTimeout(timer);
+    //             timer = setTimeout(() => {
+    //                 fn(args);
+    //             }, delay);
+    //         }
+    //         return callback;
+    //     }
+    //     const updateDebounce = debounce(() => {
+    //         console.log("存")
+    //         handleUpdateElement({ ...textData, content: value });
+    //     }, 1000);
+    //     updateDebounce();
+    //     return () => {
+    //         if (timer) clearTimeout(timer);
+    //     }
+    // }, [handleUpdateElement, textData, value])
 
     return (
         <Box
@@ -36,11 +60,13 @@ export default function TextBox({ textData, handleUpdateElement, isSelected, han
             handleClick={handleClick}
             handleShadowDragEnd={handleShadowDragEnd}
             handleDelete={handleDelete}
+            handleSetDirty={handleSetDirty}
         >
             <textarea id={textData.id} ref={textRef}
                 onChange={(e) => {
                     setValue(e.target.value);
                     handleUpdateElement({ ...textData, content: e.target.value });
+                    handleSetDirty();
                 }}
                 className="textbox_textarea w-full h-full p-2 rounded-md overflow-hidden whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700"
                 value={value}>

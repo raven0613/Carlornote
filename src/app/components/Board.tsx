@@ -21,18 +21,22 @@ interface IBoard {
     handleUpdateElementList: (allElement: IBoardElement[]) => void;
     draggingBox: boxType;
     handleMouseUp: () => void;
+    handleSetDirty: () => void;
 }
 
-export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp }: IBoard) {
+export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
     console.log(elements)
     const [selectedId, setSelectedId] = useState("");
+    const pointerRef = useRef({ x: 0, y: 0 });
+    const dropPointerRef = useRef({ x: 0, y: 0 });
+    const [isLock, setIsLock] = useState(false);
+    
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
-    const pointerRef = useRef({ x: 0, y: 0 });
     // console.log("pointerRef", pointerRef.current)
-    const [isLock, setIsLock] = useState(false);
     // console.log("isLock", isLock)
 
+    // add text box or imgUrl box
     const handleAddTextBox = useCallback((
         { content, position: { left, top } }:
             { content: string, position: { left: number, top: number } }
@@ -52,8 +56,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         }]
         handleUpdateElementList(newBoardElement);
         setSelectedId(id);
-        handleMouseUp();
-    }, [draggingBox, elements, handleMouseUp, handleUpdateElementList])
+    }, [draggingBox, elements, handleUpdateElementList])
 
     const handleAddImageBox = useCallback((
         { name, content, position: { left, top } }:
@@ -75,9 +78,9 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         }]
         handleUpdateElementList(newBoardElement);
         setIsLock(false);
-        handleMouseUp();
-    }, [elements, handleMouseUp, handleUpdateElementList])
+    }, [elements, handleUpdateElementList])
 
+    // click
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             console.log("click", (e.target as HTMLElement))
@@ -90,6 +93,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         return () => document.removeEventListener("click", handleClick);
     }, []);
 
+    // mouse up
     useEffect(() => {
         // if (!draggingBox) return;
         function handleMouse(e: MouseEvent) {
@@ -107,15 +111,17 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     content: getContent(draggingBox),
                     position: { left: e.clientX, top: e.clientY }
                 });
-            };
+                handleSetDirty();
+            }
             // console.log((e.target as HTMLElement))
             // 如果在 board 以外的地方放開，就停止 drop 流程
             handleMouseUp();
         }
         document.addEventListener("mouseup", handleMouse);
         return () => document.removeEventListener("mouseup", handleMouse);
-    }, [draggingBox, handleAddImageBox, handleAddTextBox, handleMouseUp]);
+    }, [draggingBox, handleAddImageBox, handleAddTextBox, handleMouseUp, handleSetDirty]);
 
+    // paste
     useEffect(() => {
         async function handlePaste(e: ClipboardEvent) {
             console.log("e.target", e.target)
@@ -145,24 +151,30 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     position: { left: pointerRef.current.x, top: pointerRef.current.y }
                 });
             }
+            handleSetDirty();
         }
         document.addEventListener("paste", handlePaste);
         return () => document.removeEventListener("paste", handlePaste);
-    }, [handleAddImageBox, handleAddTextBox])
+    }, [handleAddImageBox, handleAddTextBox, handleSetDirty])
 
     function handleClick(id: string) {
+        // 被點選到的 element 要拉到最後一個
         console.log("id", id)
         const newElements = elements.filter(item => item.id !== id);
         const selectedElement = elements.find(item => item.id === id);
-        if (!selectedElement) return;
+        // 被點選到的 element 本來就最後一個的話就不用改動
+        if (!selectedElement || selectedElement.id === elements.at(-1)?.id) return;
         newElements.push(selectedElement);
         handleUpdateElementList(newElements);
+        handleSetDirty();
     }
 
     function handleDelete(id: string) {
+        if (!id) return;
         const newElements = elements.filter(item => item.id !== id)
         handleUpdateElementList(newElements);
         setSelectedId("");
+        handleSetDirty();
     }
 
     return (
@@ -173,18 +185,22 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     e.preventDefault();
                     setIsLock(true);
                 }}
-                onDragEnd={() => {
+                onDragEnd={(e) => {
                     console.log("end")
                     setIsLock(false);
+                    console.log("left", e.clientX)
+                    console.log("top", e.clientY)
                 }}
             >
                 <input id="board_input" name="board_input" type="file" className="board_input w-full h-full opacity-0"
                     onChange={async (e) => {
+                        console.log("image drop")
                         e.preventDefault()
                         e.stopPropagation()
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
+
                         const file = e.currentTarget.files[0];
-                        console.log("file", file)
+                        // console.log("file", file)
                         const formData = new FormData();
                         formData.append("image", file);
                         e.target.value = "";
@@ -195,8 +211,9 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         handleAddImageBox({
                             name: file.name,
                             content: res.data.link,
-                            position: { left: pointerRef.current.x, top: pointerRef.current.y }
+                            position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y }
                         });
+                        handleSetDirty();
                     }}
                     onMouseMove={(e) => {
                         pointerRef.current = { x: e.clientX, y: e.clientY };
@@ -204,6 +221,9 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
+                    }}
+                    onDrop={(e) => {
+                        dropPointerRef.current = { x: e.clientX, y: e.clientY };
                     }}
                 />
 
@@ -216,6 +236,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                             isSelected={selectedId === item.id}
                             handleClick={handleClick}
                             handleDelete={handleDelete}
+                            handleSetDirty={handleSetDirty}
                         />
                     )
                     if (item.type === "image") return (
@@ -226,6 +247,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                             isSelected={selectedId === item.id}
                             handleClick={handleClick}
                             handleDelete={handleDelete}
+                            handleSetDirty={handleSetDirty}
                         />
                     )
                     return <></>
@@ -251,6 +273,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         console.log("mouseup2", draggingBox)
                     }}
                     handleDelete={() => { }}
+                    handleSetDirty={() => {}}
                     isShadow={true}
                 />}
                 {draggingBox === "image" && <ImageBox
@@ -270,6 +293,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     }}
                     isSelected={true}
                     handleClick={() => { }}
+                    handleSetDirty={() => {}}
                     handleShadowDragEnd={(e) => {
                         console.log("mouseup2", draggingBox)
                     }}

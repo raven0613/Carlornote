@@ -83,7 +83,7 @@ export default function Home() {
               if (item.id === selectedCardId) return { ...item, boardElement: allElement };
               return item;
             }))
-            setDirtyState("dirty");
+            // setDirtyState("dirty");
           }}
           handleUpdateElement={(data) => {
             setAllCard(pre => pre.map(item => {
@@ -96,11 +96,14 @@ export default function Home() {
               };
               return item;
             }))
-            setDirtyState("dirty");
+            // setDirtyState("dirty");
           }}
           draggingBox={draggingBox}
           handleMouseUp={() => {
             setDraggingBox("");
+          }}
+          handleSetDirty={() => {
+            setDirtyState("dirty");
           }}
         />}
         <ControlPanel
@@ -109,7 +112,11 @@ export default function Home() {
           }}
         />
       </section>
-      <section className="w-full h-auto my-5 flex items-center justify-center">
+      <section className="w-full h-auto my-5 flex items-center justify-center" 
+        onClick={() => {
+          setSelectedCardId("");
+        }}
+      >
         {allCard && allCard.map(item =>
           <Card key={item.id}
             isSelected={selectedCardId === item.id}

@@ -13,10 +13,11 @@ interface ITextBox {
     isShadowElement?: boolean;
     isLock: boolean;
     handleDelete: (id: string) => void;
+    handleSetDirty: () => void;
 }
 
-export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, handleShadowDragEnd, isLock, handleDelete }: ITextBox) {
-    // console.log(textData)
+export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, handleShadowDragEnd, isLock, handleDelete, handleSetDirty }: ITextBox) {
+    // console.log(textData) 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
     const boxRef = useRef<HTMLDivElement>(null);
@@ -81,6 +82,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     }
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
                     setIsEditMode(false);
+                    handleSetDirty();
                 }}
                 onDragOver={(e) => {
                     // console.log("ㄟㄟ")
