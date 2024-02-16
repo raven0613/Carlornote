@@ -25,12 +25,12 @@ interface IBoard {
 }
 
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
-    console.log(elements)
+    // console.log(elements)
     const [selectedId, setSelectedId] = useState("");
     const pointerRef = useRef({ x: 0, y: 0 });
     const dropPointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
-    
+
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
@@ -273,7 +273,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         console.log("mouseup2", draggingBox)
                     }}
                     handleDelete={() => { }}
-                    handleSetDirty={() => {}}
+                    handleSetDirty={() => { }}
                     isShadow={true}
                 />}
                 {draggingBox === "image" && <ImageBox
@@ -293,7 +293,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     }}
                     isSelected={true}
                     handleClick={() => { }}
-                    handleSetDirty={() => {}}
+                    handleSetDirty={() => { }}
                     handleShadowDragEnd={(e) => {
                         console.log("mouseup2", draggingBox)
                     }}

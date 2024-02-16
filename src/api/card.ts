@@ -3,9 +3,10 @@ import { collection, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDo
 import { handleGetFirebaseDB } from "./firebase";
 import { ICard } from "@/type/card";
 import { v4 as uuidv4 } from 'uuid';
+import { IResponse } from "@/type/response";
 
 // use server 一定要傳 async function 出來
-export async function handleGetCards() {
+export async function handleGetCards(): Promise<IResponse> {
     try {
         const db = await handleGetFirebaseDB();
         const q = query(collection(db, "card"));
@@ -15,7 +16,7 @@ export async function handleGetCards() {
             const data: ICard[] = [];
             cardSnap.forEach((doc) => {
                 data.push(doc.data() as ICard);
-              });
+            });
             // console.log("Document data:", data);
             return { code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS" };
         } else {
@@ -30,7 +31,7 @@ export async function handleGetCards() {
 }
 
 // use server 一定要傳 async function 出來
-export async function handleGetCard(id: string) {
+export async function handleGetCard(id: string): Promise<IResponse> {
     try {
         const db = await handleGetFirebaseDB();
         const docRef = doc(db, "card", id);
@@ -51,7 +52,7 @@ export async function handleGetCard(id: string) {
     }
 }
 
-export async function handleAddCard(data: ICard) {
+export async function handleAddCard(data: ICard): Promise<IResponse> {
     const id = `card_${uuidv4()}`;
     const addData = { ...data, id };
     try {
@@ -70,20 +71,24 @@ export async function handleAddCard(data: ICard) {
     }
 }
 
-export async function handleUpdateCard(data: ICard) {
+export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
+    console.log("UpdateCard data", data)
+    const failedFetch = [];
     try {
         const db = await handleGetFirebaseDB();
-        const cardRef = doc(db, "card", data.id);
-
-        await updateDoc(cardRef, {
-            boardElement: data.boardElement
-        });
+        await Promise.all(data.map(async item => {
+            const cardRef = doc(db, "card", item.id);
+            await updateDoc(cardRef, {
+                boardElement: item.boardElement
+            });
+        }))
     } catch (error) {
         console.log("error", error)
-        return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
+        // return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
+        failedFetch.push(JSON.stringify(error));
     } finally {
         return {
-            code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS"
+            code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS", failedData: JSON.stringify(failedFetch)
         };
     }
 }
