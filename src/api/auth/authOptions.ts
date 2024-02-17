@@ -1,8 +1,9 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+"use server"
+import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { Provider } from "next-auth/providers/index";
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
     // Configure one or more authentication providers
     providers: [
         GoogleProvider({
@@ -10,4 +11,8 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         })
     ] as Provider[]
+}
+
+export const handleGetAuthOptions = async () => {
+    return authOptions;
 }
