@@ -10,7 +10,8 @@ const authOptions: NextAuthOptions = {
             clientId: process.env.GOOGLE_CLIENT_ID || "",
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         })
-    ] as Provider[]
+    ] as Provider[],
+    secret: process.env.SECRET
 }
 
 export const handleGetAuthOptions = async () => {
