@@ -30,7 +30,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
     const pointerRef = useRef({ x: 0, y: 0 });
     const dropPointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
-
+    console.log(uuidv4())
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)

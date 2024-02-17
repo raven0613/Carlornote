@@ -1,12 +1,16 @@
 "use client"
 import Card from "@/app/components/Card";
 import Board from "@/app/components/Board";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import ControlPanel from "@/app/components/ControlPanel";
 import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards } from "@/api/card";
+import Loading from "./components/loading";
+import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [allCard, setAllCard] = useState<ICard[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string>("");
   const [draggingBox, setDraggingBox] = useState<boxType>("");
@@ -79,7 +83,17 @@ export default function Home() {
   // ${dirtyState === "clear" ? "opacity-100" : "opacity-0"}
   return (
     <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
-      <section className="w-full h-full px-16 pt-8 relative flex items-center">
+      <header className="fixed inset-x-0 top-0 h-10 bg-zinc-500 grid grid-cols-6 z-50">
+        <div className="w-60 h-full col-span-4"></div>
+        <div className="w-full h-full bg-zinc-700 col-span-2">
+          {status === "unauthenticated" && <Link href={`/login`} scroll={false}>Login</Link>}
+          {status === "authenticated" && <button onClick={async () => {
+            await signOut();
+          }}>Logout</button>}
+        </div>
+      </header>
+
+      <section className="w-full h-full px-16 pt-16 relative flex items-center">
         {dirtyCards.length > 0 && <p className="absolute top-2 left-16">改動尚未儲存，請勿離開本頁</p>}
         {dirtyState === "clear" && <p className={`absolute top-2 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
 
@@ -122,20 +136,22 @@ export default function Home() {
           }}
         />
       </section>
-      <section className="w-full h-auto my-5 flex items-center justify-center" 
+      <section className="w-full h-40 my-5 flex items-center justify-center"
         onClick={() => {
           setSelectedCardId("");
         }}
       >
-        {allCard && allCard.map(item =>
-          <Card key={item.id}
-            isSelected={selectedCardId === item.id}
-            handleClick={() => {
-              setSelectedCardId(item.id);
-              setDirtyState("none")
-            }}
-          />
-        )}
+        <Suspense fallback={<Loading />}>
+          {allCard && allCard.map(item =>
+            <Card key={item.id}
+              isSelected={selectedCardId === item.id}
+              handleClick={() => {
+                setSelectedCardId(item.id);
+                setDirtyState("none")
+              }}
+            />
+          )}
+        </Suspense>
       </section>
     </main>
   );

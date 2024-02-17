@@ -20,3 +20,4 @@ const db = getFirestore(app);
 export const handleGetFirebaseDB = async () => {
     return db;
 }
+// export default app;
