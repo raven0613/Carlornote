@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./components/Providers";
+import { store } from "@/redux/store";
+import Auth from "./components/Auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,23 +19,11 @@ export default function RootLayout({ children }: Readonly<{
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          {children}
+          <Auth>
+            {children}
+          </Auth>
         </Providers>
       </body>
-    </html>
+    </html >
   );
 }
-
-
-// export default function RootLayout({ children, pageProps: { session, ...pageProps } }: Readonly<{
-//   children: React.ReactNode;
-//   pageProps: { session: Session }
-// }>) {
-//   return (
-//     <SessionProvider session={session}>
-//       <html lang="en">
-//         <body className={inter.className}>{children}</body>
-//       </html>
-//     </SessionProvider>
-//   );
-// }

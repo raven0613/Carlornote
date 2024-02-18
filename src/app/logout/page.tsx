@@ -1,5 +1,6 @@
 "use client"
-import { removeUser } from "@/store/user";
+
+import { removeUser } from "@/redux/reducers/user";
 import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation";
 import { useEffect } from "react"

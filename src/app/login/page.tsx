@@ -10,8 +10,9 @@ import * as firebase from "firebase/app";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { handleAddUser, handleGetUserByEmail } from "@/api/user";
-import { IState, addUser, store } from "@/store/user";
+import { IState, store } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
+import { addUser } from "@/redux/reducers/user";
 // import login from "@/api/user";
 
 export default function Login() {

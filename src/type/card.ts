@@ -18,7 +18,10 @@ export interface IBoardElement {
 
 export interface ICard {
     id: string,
+    authorId: string,
     userId: string[],
     boardElement: IBoardElement[],
-    visibility: "public" | "private"
+    visibility: "public" | "private",
+    createdAt: string,
+    updatedAt: string,
 }

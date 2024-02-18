@@ -6,10 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { IResponse } from "@/type/response";
 
 // use server 一定要傳 async function 出來
-export async function handleGetCards(): Promise<IResponse> {
+export async function handleGetCards(userId: string): Promise<IResponse> {
     try {
         const db = await handleGetFirebaseDB();
-        const q = query(collection(db, "card"));
+        const q = query(collection(db, "card"), where("authorId", "==", userId));
         const cardSnap = await getDocs(q);
 
         if (cardSnap) {
