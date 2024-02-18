@@ -17,13 +17,12 @@ interface IImageBox {
     isSelected: boolean;
     handleClick: (id: string) => void;
     isShadow?: boolean;
-    handleShadowDragEnd?: (e: DragEvent) => void;
     isLock: boolean;
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
 }
 
-export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, handleShadowDragEnd, isLock, handleDelete, handleSetDirty }: IImageBox) {
+export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, isLock, handleDelete, handleSetDirty }: IImageBox) {
     // console.log(data)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(imageData.content);
@@ -46,7 +45,6 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
             data={imageData}
             isSelected={isSelected}
             handleClick={handleClick}
-            handleShadowDragEnd={handleShadowDragEnd}
             handleDelete={handleDelete}
             handleSetDirty={handleSetDirty}
         >

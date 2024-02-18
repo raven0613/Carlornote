@@ -7,6 +7,17 @@ import ImageBox from "./box/ImageBox";
 import { handlePostImgur } from "@/api/imgur";
 import { handleUpdateCard } from "@/api/card";
 
+interface INewImageBoxProps {
+    name: string,
+    content: string,
+    position: { left: number, top: number }
+}
+
+interface INewTextBoxProps {
+    content: string,
+    position: { left: number, top: number }
+}
+
 function getContent(type: boxType) {
     switch (type) {
         case "text": return "text";
@@ -37,10 +48,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
     // console.log("isLock", isLock)
 
     // add text box or imgUrl box
-    const handleAddTextBox = useCallback((
-        { content, position: { left, top } }:
-            { content: string, position: { left: number, top: number } }
-    ) => {
+    const handleAddTextBox = useCallback(({ content, position: { left, top } }: INewTextBoxProps) => {
         const id = `element_${uuidv4()}`;
         const newBoardElement = [...elements, {
             id: id,
@@ -58,10 +66,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         setSelectedId(id);
     }, [draggingBox, elements, handleUpdateElementList])
 
-    const handleAddImageBox = useCallback((
-        { name, content, position: { left, top } }:
-            { name: string, content: string, position: { left: number, top: number } }
-    ) => {
+    const handleAddImageBox = useCallback(({ name, content, position: { left, top } }: INewImageBoxProps) => {
         const id = `element_${uuidv4()}`;
         if (!left || !top) return;
         const newBoardElement = [...elements, {
@@ -269,9 +274,6 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     }}
                     isSelected={true}
                     handleClick={() => { }}
-                    handleShadowDragEnd={(e) => {
-                        console.log("mouseup2", draggingBox)
-                    }}
                     handleDelete={() => { }}
                     handleSetDirty={() => { }}
                     isShadow={true}
@@ -294,9 +296,6 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     isSelected={true}
                     handleClick={() => { }}
                     handleSetDirty={() => { }}
-                    handleShadowDragEnd={(e) => {
-                        console.log("mouseup2", draggingBox)
-                    }}
                     handleDelete={() => { }}
                     isShadow={true}
                 />}

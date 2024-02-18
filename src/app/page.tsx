@@ -8,6 +8,8 @@ import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards } from "
 import Loading from "./components/loading";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { IState, removeUser, store } from "@/store/user";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -16,6 +18,12 @@ export default function Home() {
   const [draggingBox, setDraggingBox] = useState<boxType>("");
   const [dirtyState, setDirtyState] = useState<"dirty" | "clear" | "none">("none");
   const [dirtyCards, setDirtyCards] = useState<string[]>([]);
+  const dispatch = useDispatch();
+  const user = useSelector((state: IState) => state.user);
+
+  console.log("user", user)
+  console.log("status", status)
+  console.log("session", session)
 
   useEffect(() => {
     async function handleFetchCard() {
@@ -89,6 +97,7 @@ export default function Home() {
           {status === "unauthenticated" && <Link href={`/login`} scroll={false}>Login</Link>}
           {status === "authenticated" && <button onClick={async () => {
             await signOut();
+            dispatch(removeUser());
           }}>Logout</button>}
         </div>
       </header>

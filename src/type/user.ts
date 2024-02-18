@@ -6,5 +6,8 @@ interface IUser {
     role: "admin" | "user",
     birthday: string,
     accessLevel: "initial" | "prodessional",
-    avatorUrl: string
+    avatorUrl: string,
+    createdAt: string,
+    updatedAt: string,
+    lastLogin: string
 }

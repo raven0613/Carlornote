@@ -8,7 +8,6 @@ interface ITextBox {
     handleUpdate: (data: IBoardElement) => void;
     isSelected: boolean;
     handleClick: (id: string) => void;
-    handleShadowDragEnd?: (e: DragEvent) => void;
     children: ReactNode;
     isShadowElement?: boolean;
     isLock: boolean;
@@ -16,7 +15,7 @@ interface ITextBox {
     handleSetDirty: () => void;
 }
 
-export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, handleShadowDragEnd, isLock, handleDelete, handleSetDirty }: ITextBox) {
+export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, isLock, handleDelete, handleSetDirty }: ITextBox) {
     // console.log(textData) 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -76,10 +75,6 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                 onDragEnd={(e: DragEvent) => {
                     // 這時候才存資料
                     console.log("box drag end")
-                    if (isShadowElement && handleShadowDragEnd) {
-                        handleShadowDragEnd(e);
-                        return;
-                    }
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
                     setIsEditMode(false);
                     handleSetDirty();
