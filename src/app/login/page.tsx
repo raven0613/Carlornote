@@ -65,7 +65,7 @@ export default function Login() {
                 const getUserRes = await handleGetUserByEmail(session.user?.email || "")
                 const registeredUser = JSON.parse(getUserRes.data);
                 console.log("registeredUser", registeredUser)
-                if (registeredUser.length > 0) return;
+                if (registeredUser.length > 0) return router.push("./");
                 const addUserRes = await handleAddUser({
                     id: "",
                     name: session.user?.name || "",
