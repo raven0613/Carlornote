@@ -4,7 +4,7 @@ import Board from "@/app/components/Board";
 import { Suspense, useEffect, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import ControlPanel from "@/app/components/ControlPanel";
-import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards } from "@/api/card";
+import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleDeleteCard } from "@/api/card";
 import Loading from "./components/loading";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
@@ -12,7 +12,7 @@ import { IState } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { handleGetUserByEmail } from "@/api/user";
 import { removeUser } from "@/redux/reducers/user";
-import { addCards, setCards, updateCards } from "@/redux/reducers/card";
+import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/card";
 
 export default function Home() {
   const [selectedCardId, setSelectedCardId] = useState<string>("");
@@ -31,7 +31,6 @@ export default function Home() {
     async function handleFetchCard() {
       const response = await handleGetCards(user?.id || "");
       if (response.status === "FAIL") return;
-      // setAllCard(JSON.parse(data.data));
       dispatch(setCards(JSON.parse(response.data)));
       // console.log("get data", JSON.parse(data.data))
     }
@@ -39,9 +38,10 @@ export default function Home() {
   }, [dispatch, user]);
 
   // console.log("allCard", allCard)
-  console.log("dirtyState", dirtyState)
-  console.log("dirtyCards", dirtyCards)
+  // console.log("dirtyState", dirtyState)
+  // console.log("dirtyCards", dirtyCards)
   console.log("allCards", allCards)
+  console.log("selectedCardId", selectedCardId)
 
   // 有修改的話 5 秒存檔一次
   useEffect(() => {
@@ -69,36 +69,6 @@ export default function Home() {
     }
   }, [allCards, dirtyCards, dirtyState, selectedCardId]);
 
-
-  // useEffect(() => {
-  //   async function handleFetchCard() {
-  //     const data = await handleAddCard({
-  //       id: "",
-  //       authorId: user?.id ?? "",
-  //       boardElement: [
-  //         {
-  //           id: "element_50b366cd-81b5-4fd8-a034-c97fbcfbce0b",
-  //           type: "text",
-  //           name: "",
-  //           content: "初始text",
-  //           width: 250,
-  //           height: 100,
-  //           rotation: 40,
-  //           left: 500,
-  //           top: 300,
-  //           radius: 0
-  //         }
-  //       ],
-  //       userId: user ? [user.id] : [],
-  //       visibility: "private",
-  //       createdAt: new Date().toUTCString(),
-  //       updatedAt: new Date().toUTCString(),
-  //     })
-  //     console.log("post data", data)
-  //   }
-  //   handleFetchCard();
-  // }, [user])
-
   return (
     <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
       <header className="fixed inset-x-0 top-0 h-10 bg-zinc-500 grid grid-cols-6 z-50">
@@ -116,7 +86,7 @@ export default function Home() {
         {dirtyCards.length > 0 && <p className="absolute top-10 left-16">改動尚未儲存，請勿離開本頁</p>}
         {dirtyState === "clear" && <p className={`absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
 
-        {!selectedCardId && <p className="text-center w-full">請選擇一張卡片</p>}
+        {!selectedCardId && <p className="text-center w-full">{user ? "請選擇一張卡片" : "請先登入"}</p>}
         {selectedCardId && <Board elements={allCards.find(item => item.id === selectedCardId)?.boardElement || []}
           handleUpdateElementList={(allElement) => {
             const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
@@ -156,18 +126,43 @@ export default function Home() {
           }}
         />
       </section>
-      <section className="w-full h-40 my-5 flex items-center justify-center"
+      <section className="w-full h-40 my-5 flex items-center justify-center relative"
         onClick={() => {
           setSelectedCardId("");
         }}
       >
-        <Suspense fallback={<Loading />}>
-          {allCards.length > 0 && allCards.map(item =>
+        <button type="button" className="w-16 h-16 bg-slate-400 rounded-full absolute left-10 text-white font-semibold text-3xl"
+          onClick={async () => {
+            // 之後再新增公開匿名卡片
+            if (!user) return;
+            const response = await handleAddCard({
+              id: "",
+              authorId: user.id,
+              boardElement: [],
+              userId: [user.id],
+              visibility: "private",
+              createdAt: new Date().toUTCString(),
+              updatedAt: new Date().toUTCString(),
+            });
+            if (response.status === "FAIL") return;
+            const card = JSON.parse(response.data) as ICard;
+            dispatch(addCard(card));
+            setSelectedCardId(card.id);
+          }}
+        >+</button>
+        <Suspense fallback={<>等等等</>}>
+          {/* 試試看用 server component 裝 cards */}
+          {allCards && allCards.map(item =>
             <Card key={item.id}
               isSelected={selectedCardId === item.id}
               handleClick={() => {
                 setSelectedCardId(item.id);
                 setDirtyState("none");
+              }}
+              handleDelete={async () => {
+                const response = await handleDeleteCard(selectedCardId);
+                if (response.status === "FAIL") return;
+                dispatch(removeCard(selectedCardId));
               }}
             />
           )}
@@ -176,3 +171,32 @@ export default function Home() {
     </main>
   );
 }
+
+// useEffect(() => {
+//   async function handleFetchCard() {
+//     const data = await handleAddCard({
+//       id: "",
+//       authorId: user?.id ?? "",
+//       boardElement: [
+//         {
+//           id: "element_50b366cd-81b5-4fd8-a034-c97fbcfbce0b",
+//           type: "text",
+//           name: "",
+//           content: "初始text",
+//           width: 250,
+//           height: 100,
+//           rotation: 40,
+//           left: 500,
+//           top: 300,
+//           radius: 0
+//         }
+//       ],
+//       userId: user ? [user.id] : [],
+//       visibility: "private",
+//       createdAt: new Date().toUTCString(),
+//       updatedAt: new Date().toUTCString(),
+//     })
+//     console.log("post data", data)
+//   }
+//   handleFetchCard();
+// }, [user])

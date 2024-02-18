@@ -1,5 +1,5 @@
 "use server"
-import { collection, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { handleGetFirebaseDB } from "./firebase";
 import { ICard } from "@/type/card";
 import { v4 as uuidv4 } from 'uuid';
@@ -66,7 +66,7 @@ export async function handleAddCard(data: ICard): Promise<IResponse> {
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     } finally {
         return {
-            code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS"
+            code: 200, status: "SUCCESS", data: JSON.stringify(addData), message: "SUCCESS"
         };
     }
 }
@@ -89,6 +89,21 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
     } finally {
         return {
             code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS", failedData: JSON.stringify(failedFetch)
+        };
+    }
+}
+
+export async function handleDeleteCard(id: string): Promise<IResponse> {
+    console.log("DeleteCard data", id)
+    try {
+        const db = await handleGetFirebaseDB();
+        await deleteDoc(doc(db, "card", id));
+    } catch (error) {
+        console.log("error", error)
+        return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
+    } finally {
+        return {
+            code: 200, status: "SUCCESS", data: id, message: "SUCCESS"
         };
     }
 }

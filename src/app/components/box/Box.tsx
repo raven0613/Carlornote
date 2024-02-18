@@ -184,7 +184,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                 <div
                     onClick={(e) => {
                         e.stopPropagation();
-                        console.log("Radius")
+                        console.log("Delete")
                         handleDelete(data.id);
                     }}
                     className={`w-3 h-3 rounded-full border border-slate-500 bg-slate-100 absolute cursor-pointer -top-3.5 -right-3.5 z-20 
