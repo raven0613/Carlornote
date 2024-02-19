@@ -124,7 +124,7 @@ export default function Home() {
           }}
         />
       </section>
-      <section className="w-full h-40 my-5 flex items-center justify-center relative"
+      <section className="w-full h-[18rem] px-[8rem] my-5 flex items-center justify-center relative"
         onClick={() => {
           setSelectedCardId("");
         }}
@@ -148,35 +148,37 @@ export default function Home() {
             setSelectedCardId(card.id);
           }}
         >+</button>
-        <Suspense fallback={<>等等等</>}>
-          {/* 試試看用 server component 裝 cards */}
-          {allCards && allCards.map(item =>
-            <Card key={item.id}
-              isSelected={selectedCardId === item.id}
-              handleClick={() => {
-                setSelectedCardId(item.id);
-                setDirtyState("none");
-              }}
-              handleDelete={async () => {
-                const response = await handleDeleteCard(selectedCardId);
-                if (response.status === "FAIL") return;
-                dispatch(removeCard(selectedCardId));
-              }}
-              handleShare={async () => {
-                const updatedData = [{ ...item, visibility: "public" }] as ICard[];
-                const response = await handleUpdateCard(updatedData);
-                // console.log("response", response)
-                if (response.status === "FAIL") return false;
-                // console.log("data", JSON.parse(response.data))
+        <div className="w-full h-full overflow-scroll scroll_bar flex items-end pb-4">
+          <Suspense fallback={<>等等等</>}>
+            {/* 試試看用 server component 裝 cards */}
+            {allCards && allCards.map(item =>
+              <Card key={item.id}
+                isSelected={selectedCardId === item.id}
+                handleClick={() => {
+                  setSelectedCardId(item.id);
+                  setDirtyState("none");
+                }}
+                handleDelete={async () => {
+                  const response = await handleDeleteCard(selectedCardId);
+                  if (response.status === "FAIL") return;
+                  dispatch(removeCard(selectedCardId));
+                }}
+                handleShare={async () => {
+                  const updatedData = [{ ...item, visibility: "public" }] as ICard[];
+                  const response = await handleUpdateCard(updatedData);
+                  // console.log("response", response)
+                  if (response.status === "FAIL") return false;
+                  // console.log("data", JSON.parse(response.data))
 
-                dispatch(updateCards(updatedData));
-                const url = process.env.NODE_ENV === "production" ? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
-                navigator.clipboard.writeText(`${url}card/${item.id.split("_")[1]}`);
-                return true;
-              }}
-            />
-          )}
-        </Suspense>
+                  dispatch(updateCards(updatedData));
+                  const url = process.env.NODE_ENV === "production" ? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
+                  navigator.clipboard.writeText(`${url}card/${item.id.split("_")[1]}`);
+                  return true;
+                }}
+              />
+            )}
+          </Suspense>
+        </div>
       </section>
     </main>
   );
