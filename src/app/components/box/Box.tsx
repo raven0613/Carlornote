@@ -16,9 +16,10 @@ interface IBox {
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
+    imageAspectRadio?: { width: number, height: number }  // TODO
 }
 
-export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex }: IBox) {
+export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, imageAspectRadio }: IBox) {
     // console.log(textData) 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -71,6 +72,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     };
                 }}
                 onDragStart={(e) => {
+                    console.log("box drag start", e.currentTarget)
                     // 設定游標 icon
                     e.dataTransfer.setDragImage(e.currentTarget, window.outerWidth, window.outerHeight);
                     e.dataTransfer.effectAllowed = "copyMove";
@@ -125,7 +127,19 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                         height = Number(boxRef.current.style.height.split("px")[0]) + nowY - startY;
                         if (width <= 48) width = 48;
                         if (height <= 20) height = 20;
+
+                        // 圖片需要保持比例一致  拆出去
+                        const imageAspectRatio = data.width / data.height;
+                        console.log("imageAspectRatio", imageAspectRatio)
+                        const widthInAspectRatio = height * imageAspectRatio;
+                        const heightInAspectRatio = width / imageAspectRatio;
+
+                        if (width >= widthInAspectRatio) width = widthInAspectRatio;
+                        if (height >= heightInAspectRatio) height = heightInAspectRatio;
                         setSize({ width, height });
+                    }}
+                    onDragEnd={(e) => {
+                        console.log("ㄟㄟ", )
                     }}
                     className={`w-2.5 h-2.5 rounded-sm bg-slate-500 absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 z-20 cursor-nwse-resize duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 ></div>

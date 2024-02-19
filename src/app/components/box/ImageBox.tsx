@@ -38,6 +38,13 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
         setShowingBlock("image");
     }, [imageData])
 
+    function handleAspectRatio (originalWidth: number, originalHeight: number, width: number, height: number) {
+        const imageAspectRatio = originalWidth / originalHeight;
+        const widthInAspectRatio = height * imageAspectRatio;
+        const heightInAspectRatio = width / imageAspectRatio;
+        return { widthInAspectRatio, heightInAspectRatio }
+    }
+
     return (
         <Box
             isLocked={isLocked}
@@ -57,13 +64,15 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
                 style={{
                     objectFit: 'fill', // cover, contain, none
                 }}
-                onLoad={() => {
+                onLoad={(e) => {
                     console.log("onLoad")
                     setShowingBlock("image");
                     const name = uuidv4();
                     console.log("imageData.name", imageData.name)
                     setImageLoadState("success");
-                    handleUpdateElement({ ...imageData, content: url, width: imageData.name ? imageData.width : 300, height: imageData.name ? imageData.height : 300, name });
+                    handleUpdateElement({ ...imageData, content: url, width: imageData.name ? imageData.width : e.currentTarget.naturalWidth, height: imageData.name ? imageData.height : e.currentTarget.naturalHeight, name });
+                    // console.log(e.currentTarget.naturalWidth)
+                    // console.log(e.currentTarget.naturalHeight)
                 }}
                 onError={() => {
                     setShowingBlock("input");
