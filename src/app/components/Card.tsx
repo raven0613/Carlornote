@@ -10,14 +10,14 @@ interface ICard {
 export default function Card({ handleClick, isSelected, handleDelete }: ICard) {
     return (
         <>
-            <main className={`w-16 h-40 rounded-lg relative group hover:z-50 duration-200  ${isSelected ? "z-20 mx-20" : "hover:w-40"}`}
+            <main className={`w-14 h-36 rounded-lg relative group hover:z-50 duration-200  ${isSelected ? "z-20 mx-16" : "hover:w-36"}`}
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     console.log("Select")
                     handleClick();
                 }}>
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-32 h-40 bg-zinc-300 rounded-lg   duration-200 shadow-lg  ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-10 cursor-pointer"}`}>
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-28 h-36 bg-zinc-300 rounded-lg   duration-200 shadow-lg  ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-10 cursor-pointer"}`}>
                 </div>
 
                 <div

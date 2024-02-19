@@ -10,12 +10,13 @@ interface ITextBox {
     isSelected: boolean;
     handleClick: (id: string) => void;
     isShadow?: boolean;
-    isLock: boolean;
+    isLocked: boolean;
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
+    handleChangeZIndex: (id: string) => void;
 }
 
-export default function TextBox({ textData, handleUpdateElement, isSelected, handleClick, isShadow, isLock, handleDelete, handleSetDirty }: ITextBox) {
+export default function TextBox({ textData, handleUpdateElement, isSelected, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex }: ITextBox) {
     // console.log(textData)
     // console.log("isSelected", isSelected)
     const textRef = useRef<HTMLTextAreaElement>(null);
@@ -51,7 +52,7 @@ export default function TextBox({ textData, handleUpdateElement, isSelected, han
 
     return (
         <Box
-            isLock={isLock}
+            isLocked={isLocked}
             isShadowElement={isShadow}
             handleUpdate={handleUpdateElement}
             data={textData}
@@ -59,6 +60,7 @@ export default function TextBox({ textData, handleUpdateElement, isSelected, han
             handleClick={handleClick}
             handleDelete={handleDelete}
             handleSetDirty={handleSetDirty}
+            handleChangeZIndex={handleChangeZIndex}
         >
             <textarea id={textData.id} ref={textRef}
                 onChange={(e) => {

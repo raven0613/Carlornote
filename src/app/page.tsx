@@ -87,39 +87,43 @@ export default function Home() {
         {dirtyState === "clear" && <p className={`absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
 
         {!selectedCardId && <p className="text-center w-full">{user ? "請選擇一張卡片" : "請先登入"}</p>}
-        {selectedCardId && <Board elements={allCards.find(item => item.id === selectedCardId)?.boardElement || []}
-          handleUpdateElementList={(allElement) => {
-            const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
-            const updatedCard: ICard = {
-              ...selectedCard,
-              boardElement: allElement
-            }
-            dispatch(updateCards([updatedCard]));
-          }}
-          handleUpdateElement={(data) => {
-            const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
-            const updatedCard: ICard = {
-              ...selectedCard,
-              boardElement: selectedCard.boardElement.map(ele => {
-                if (ele.id === data.id) return data;
-                return ele;
-              })
-            }
-            dispatch(updateCards([updatedCard]));
-          }}
-          draggingBox={draggingBox}
-          handleMouseUp={() => {
-            setDraggingBox("");
-          }}
-          handleSetDirty={() => {
-            setDirtyState("dirty");
-            setDirtyCards(pre => {
-              const set = new Set([...pre]);
-              set.add(selectedCardId);
-              return Array.from(set);
-            });
-          }}
-        />}
+        {selectedCardId && <>
+          <main className="w-full h-full border border-slate-500 overflow-hidden">
+            <Board elements={allCards.find(item => item.id === selectedCardId)?.boardElement || []}
+              handleUpdateElementList={(allElement) => {
+                const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
+                const updatedCard: ICard = {
+                  ...selectedCard,
+                  boardElement: allElement
+                }
+                dispatch(updateCards([updatedCard]));
+              }}
+              handleUpdateElement={(data) => {
+                const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
+                const updatedCard: ICard = {
+                  ...selectedCard,
+                  boardElement: selectedCard.boardElement.map(ele => {
+                    if (ele.id === data.id) return data;
+                    return ele;
+                  })
+                }
+                dispatch(updateCards([updatedCard]));
+              }}
+              draggingBox={draggingBox}
+              handleMouseUp={() => {
+                setDraggingBox("");
+              }}
+              handleSetDirty={() => {
+                setDirtyState("dirty");
+                setDirtyCards(pre => {
+                  const set = new Set([...pre]);
+                  set.add(selectedCardId);
+                  return Array.from(set);
+                });
+              }}
+            />
+          </main>
+        </>}
         <ControlPanel
           handleDrag={(type) => {
             setDraggingBox(type);

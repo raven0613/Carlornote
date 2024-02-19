@@ -17,12 +17,13 @@ interface IImageBox {
     isSelected: boolean;
     handleClick: (id: string) => void;
     isShadow?: boolean;
-    isLock: boolean;
+    isLocked: boolean;
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
+    handleChangeZIndex: (id: string) => void;
 }
 
-export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, isLock, handleDelete, handleSetDirty }: IImageBox) {
+export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex }: IImageBox) {
     // console.log(data)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(imageData.content);
@@ -39,7 +40,7 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
 
     return (
         <Box
-            isLock={isLock}
+            isLocked={isLocked}
             isShadowElement={isShadow}
             handleUpdate={handleUpdateElement}
             data={imageData}
@@ -47,6 +48,7 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
             handleClick={handleClick}
             handleDelete={handleDelete}
             handleSetDirty={handleSetDirty}
+            handleChangeZIndex={handleChangeZIndex}
         >
             {(imageData.name && imageLoadState !== "success") && <div id={imageData.id} className="boardElement imagebox absolute inset-0 bg-slate-400 z-20"></div>}
 

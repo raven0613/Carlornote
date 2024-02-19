@@ -7,6 +7,8 @@ import ImageBox from "./box/ImageBox";
 import { handlePostImgur } from "@/api/imgur";
 import { handleUpdateCard } from "@/api/card";
 
+export const distenceToLeftTop = { left: 64, top: 64 };
+
 interface INewImageBoxProps {
     name: string,
     content: string,
@@ -114,7 +116,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                 console.log("ㄟ")
                 handleAddTextBox({
                     content: getContent(draggingBox),
-                    position: { left: e.clientX, top: e.clientY }
+                    position: { left: e.clientX - distenceToLeftTop.left, top: e.clientY - distenceToLeftTop.top }
                 });
                 handleSetDirty();
             }
@@ -162,6 +164,17 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         return () => document.removeEventListener("paste", handlePaste);
     }, [handleAddImageBox, handleAddTextBox, handleSetDirty])
 
+    function handleChangeZIndex(id: string) {
+        // 被點選到的 element 要拉到第一個
+        console.log("id", id)
+        const filteredElements = elements.filter(item => item.id !== id);
+        const selectedElement = elements.find(item => item.id === id);
+        // 被點選到的 element 本來就第一個的話就不用改動
+        if (!selectedElement || selectedElement.id === elements.at(0)?.id) return;
+        handleUpdateElementList([selectedElement, ...filteredElements]);
+        handleSetDirty();
+    }
+
     function handleClick(id: string) {
         // 被點選到的 element 要拉到最後一個
         console.log("id", id)
@@ -184,7 +197,8 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
 
     return (
         <>
-            <div className="boardElement w-full h-full border border-slate-700 "
+            <div className="boardElement relative w-full h-full"
+                // style={{ scale: "70%" }}
                 onDragOver={(e) => {
                     // console.log("ㄟㄟ")
                     e.preventDefault();
@@ -193,8 +207,12 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                 onDragEnd={(e) => {
                     console.log("end")
                     setIsLock(false);
-                    console.log("left", e.clientX)
-                    console.log("top", e.clientY)
+                    // console.log("left", e.clientX)
+                    // console.log("top", e.clientY)
+                }}
+                onWheel={() => {
+
+                    console.log("weeeeee")
                 }}
             >
                 <input id="board_input" name="board_input" type="file" className="boardElement w-full h-full opacity-0"
@@ -221,44 +239,46 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         handleSetDirty();
                     }}
                     onMouseMove={(e) => {
-                        pointerRef.current = { x: e.clientX, y: e.clientY };
+                        pointerRef.current = { x: e.clientX - distenceToLeftTop.left, y: e.clientY - distenceToLeftTop.top };
                     }}
                     onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
                     }}
                     onDrop={(e) => {
-                        dropPointerRef.current = { x: e.clientX, y: e.clientY };
+                        dropPointerRef.current = { x: e.clientX - distenceToLeftTop.left, y: e.clientY - distenceToLeftTop.top };
                     }}
                 />
 
                 {elements && elements.map(item => {
                     if (item.type === "text") return (
                         <TextBox key={item.id}
-                            isLock={isLock}
+                            isLocked={isLock}
                             handleUpdateElement={handleUpdateElement}
                             textData={item}
                             isSelected={selectedId === item.id}
                             handleClick={handleClick}
                             handleDelete={handleDelete}
                             handleSetDirty={handleSetDirty}
+                            handleChangeZIndex={handleChangeZIndex}
                         />
                     )
                     if (item.type === "image") return (
                         <ImageBox key={item.id}
-                            isLock={isLock}
+                            isLocked={isLock}
                             handleUpdateElement={handleUpdateElement}
                             imageData={item}
                             isSelected={selectedId === item.id}
                             handleClick={handleClick}
                             handleDelete={handleDelete}
                             handleSetDirty={handleSetDirty}
+                            handleChangeZIndex={handleChangeZIndex}
                         />
                     )
                     return <></>
                 })}
                 {draggingBox === "text" && <TextBox
-                    isLock={false}
+                    isLocked={false}
                     handleUpdateElement={() => { }}
                     textData={{
                         id: "dragging_text",
@@ -277,9 +297,10 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     handleDelete={() => { }}
                     handleSetDirty={() => { }}
                     isShadow={true}
+                    handleChangeZIndex={() => {}}
                 />}
                 {draggingBox === "image" && <ImageBox
-                    isLock={false}
+                    isLocked={false}
                     handleUpdateElement={() => { }}
                     imageData={{
                         id: "dragging_image",
@@ -298,6 +319,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     handleSetDirty={() => { }}
                     handleDelete={() => { }}
                     isShadow={true}
+                    handleChangeZIndex={() => {}}
                 />}
             </div>
         </>
