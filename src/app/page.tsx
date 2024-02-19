@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { handleGetUserByEmail } from "@/api/user";
 import { removeUser } from "@/redux/reducers/user";
 import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/card";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [selectedCardId, setSelectedCardId] = useState<string>("");
@@ -22,6 +23,7 @@ export default function Home() {
   const dispatch = useDispatch();
   const user = useSelector((state: IState) => state.user);
   const allCards = useSelector((state: IState) => state.card);
+  const router = useRouter();
 
   console.log("user", user)
   // console.log("session", session)
@@ -126,6 +128,7 @@ export default function Home() {
         </>}
         <ControlPanel
           handleDrag={(type) => {
+            if (!selectedCardId) return;
             setDraggingBox(type);
           }}
         />
@@ -167,6 +170,18 @@ export default function Home() {
                 const response = await handleDeleteCard(selectedCardId);
                 if (response.status === "FAIL") return;
                 dispatch(removeCard(selectedCardId));
+              }}
+              handleShare={async() => {
+                const updatedData = [{...item, visibility: "public"}] as ICard[];
+                const response = await handleUpdateCard(updatedData);
+                // console.log("response", response)
+                if (response.status === "FAIL") return false;
+                // console.log("data", JSON.parse(response.data))
+
+                dispatch(updateCards(updatedData));
+                const url = process.env.NODE_ENV === "production"? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
+                navigator.clipboard.writeText(`${url}card/${item.id.split("_")[1]}`);
+                return true;
               }}
             />
           )}

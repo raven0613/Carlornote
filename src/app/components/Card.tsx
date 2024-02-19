@@ -1,13 +1,16 @@
 "use client"
 import { useState } from "react"
+import ShareIcon from "./svg/Share";
+import Link from "next/link";
 
 interface ICard {
     handleClick: () => void;
     isSelected: boolean;
     handleDelete: () => void;
+    handleShare: () => Promise<boolean>;
 }
 
-export default function Card({ handleClick, isSelected, handleDelete }: ICard) {
+export default function Card({ handleClick, isSelected, handleDelete, handleShare }: ICard) {
     return (
         <>
             <main className={`w-14 h-36 rounded-lg relative group hover:z-50 duration-200  ${isSelected ? "z-20 mx-16" : "hover:w-36"}`}
@@ -19,7 +22,7 @@ export default function Card({ handleClick, isSelected, handleDelete }: ICard) {
                 }}>
                 <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-28 h-36 bg-zinc-300 rounded-lg   duration-200 shadow-lg  ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-10 cursor-pointer"}`}>
                 </div>
-
+                {/* delete */}
                 <div
                     onClick={(e) => {
                         e.preventDefault();
@@ -34,6 +37,20 @@ export default function Card({ handleClick, isSelected, handleDelete }: ICard) {
                 
                 `}
                 ></div>
+                {/* share */}
+                <div
+                    onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log("share");
+                        const canOpen = await handleShare();
+                        console.log("canOpen", canOpen)
+                        if (!canOpen) return;
+                    }}
+                    className={`w-5 h-5 p-[3px] rounded-full border border-slate-500 bg-slate-100 absolute bottom-1 -right-6 z-50 
+                    ${isSelected ? "opacity-0 group-hover:opacity-100 group-hover:cursor-pointer" : "opacity-0"} hover:scale-125 duration-200
+                `}
+                ><ShareIcon classProps="fill-none stroke-slate-500" /></div>
             </main>
         </>
     )

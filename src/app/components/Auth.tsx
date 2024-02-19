@@ -13,6 +13,7 @@ interface IProps {
 const Auth = (props: IProps) => {
     const { data: session, status } = useSession();
     const dispatch = useDispatch();
+    console.log("status", status)
 
     useEffect(() => {
         if (status !== "authenticated") return;
@@ -30,7 +31,7 @@ const Auth = (props: IProps) => {
     }, [dispatch, session?.user?.email, status])
 
     return (
-        <>{props.children}</>
+        <>{status === "loading" ? <>確認身分中</> : props.children }</>
     )
 }
 

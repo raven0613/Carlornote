@@ -21,7 +21,7 @@ export interface ICard {
     authorId: string,
     userId: string[],
     boardElement: IBoardElement[],
-    visibility: "public" | "private",
+    visibility: "public" | "private" | "free",
     createdAt: string,
     updatedAt: string,
 }

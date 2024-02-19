@@ -53,7 +53,7 @@ export default function Login() {
                     lastLogin: new Date().toUTCString()
                 })
                 console.log("addUserRes", addUserRes)
-                dispatch(addUser(addUserRes.data));
+                dispatch(addUser(JSON.parse(addUserRes.data)));
                 router.push("./");
             }
         }
