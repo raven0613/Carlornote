@@ -1,5 +1,5 @@
 "use client"
-import TextBox from "@/app/components/box/TextBox";
+import TextBox from "@/components/box/TextBox";
 import { IBoardElement, boxType } from "@/type/card";
 import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
@@ -12,7 +12,8 @@ export const distenceToLeftTop = { left: 64, top: 64 };
 interface INewImageBoxProps {
     name: string,
     content: string,
-    position: { left: number, top: number }
+    position: { left: number, top: number },
+    size: { width: number, height: number }
 }
 
 interface INewTextBoxProps {
@@ -43,7 +44,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
     const pointerRef = useRef({ x: 0, y: 0 });
     const dropPointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
-    console.log(uuidv4())
+
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
@@ -68,7 +69,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         setSelectedId(id);
     }, [draggingBox, elements, handleUpdateElementList])
 
-    const handleAddImageBox = useCallback(({ name, content, position: { left, top } }: INewImageBoxProps) => {
+    const handleAddImageBox = useCallback(({ name, content, position: { left, top }, size: { width, height } }: INewImageBoxProps) => {
         const id = `element_${uuidv4()}`;
         if (!left || !top) return;
         const newBoardElement = [...elements, {
@@ -76,8 +77,8 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             type: "image" as boxType,
             name: name,
             content: content,
-            width: 200,
-            height: 200,
+            width: width,
+            height: height,
             rotation: 0,
             left,
             top,
@@ -144,12 +145,14 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                 const formData = new FormData();
                 formData.append("image", file);
                 const res = await handlePostImgur(formData);
+                console.log("res", res)
 
                 if (res.success === false) return;
                 handleAddImageBox({
-                    name: file.name,
+                    name: pastedFiles.name,
                     content: res.data.link,
-                    position: { left: pointerRef.current.x, top: pointerRef.current.y }
+                    position: { left: pointerRef.current.x, top: pointerRef.current.y },
+                    size: { width: res.data.width, height: res.data.height }
                 });
             }
             else {
@@ -234,7 +237,8 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         handleAddImageBox({
                             name: file.name,
                             content: res.data.link,
-                            position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y }
+                            position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y },
+                            size: { width: res.data.width, height: res.data.height }
                         });
                         handleSetDirty();
                     }}
@@ -297,7 +301,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     handleDelete={() => { }}
                     handleSetDirty={() => { }}
                     isShadow={true}
-                    handleChangeZIndex={() => {}}
+                    handleChangeZIndex={() => { }}
                 />}
                 {draggingBox === "image" && <ImageBox
                     isLocked={false}
@@ -319,7 +323,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     handleSetDirty={() => { }}
                     handleDelete={() => { }}
                     isShadow={true}
-                    handleChangeZIndex={() => {}}
+                    handleChangeZIndex={() => { }}
                 />}
             </div>
         </>

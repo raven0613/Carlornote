@@ -15,8 +15,8 @@ import { IState, store } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { addUser, removeUser } from "@/redux/reducers/user";
 import { setCards, updateCards } from "@/redux/reducers/card";
-import Board from "@/app/components/Board";
-import ControlPanel from "@/app/components/ControlPanel";
+import Board from "@/components/Board";
+import ControlPanel from "@/components/ControlPanel";
 import Link from "next/link";
 // import login from "@/api/user";
 

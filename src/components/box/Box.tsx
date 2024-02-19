@@ -3,7 +3,7 @@ import useAutosizedTextarea from "@/hooks/useAutosizedTextarea"
 import { IBoardElement } from "@/type/card";
 import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } from "react";
 import RotateIcon from "../svg/Rotate";
-import { distenceToLeftTop } from "@/app/components/Board";
+import { distenceToLeftTop } from "@/components/Board";
 
 interface IBox {
     data: IBoardElement;
@@ -16,10 +16,10 @@ interface IBox {
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
-    imageAspectRadio?: { width: number, height: number }  // TODO
+    isImage?: boolean;
 }
 
-export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, imageAspectRadio }: IBox) {
+export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage }: IBox) {
     // console.log(textData) 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -128,18 +128,15 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                         if (width <= 48) width = 48;
                         if (height <= 20) height = 20;
 
-                        // 圖片需要保持比例一致  拆出去
-                        const imageAspectRatio = data.width / data.height;
-                        console.log("imageAspectRatio", imageAspectRatio)
-                        const widthInAspectRatio = height * imageAspectRatio;
-                        const heightInAspectRatio = width / imageAspectRatio;
-
-                        if (width >= widthInAspectRatio) width = widthInAspectRatio;
-                        if (height >= heightInAspectRatio) height = heightInAspectRatio;
+                        // 圖片需要保持比例一致
+                        if (isImage) {
+                            const imageAspectRatio = data.width / data.height;
+                            const widthInAspectRatio = height * imageAspectRatio;
+                            const heightInAspectRatio = width / imageAspectRatio;
+                            if (width >= widthInAspectRatio) width = widthInAspectRatio;
+                            if (height >= heightInAspectRatio) height = heightInAspectRatio;
+                        }
                         setSize({ width, height });
-                    }}
-                    onDragEnd={(e) => {
-                        console.log("ㄟㄟ", )
                     }}
                     className={`w-2.5 h-2.5 rounded-sm bg-slate-500 absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 z-20 cursor-nwse-resize duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 ></div>

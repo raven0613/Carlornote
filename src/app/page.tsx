@@ -1,11 +1,11 @@
 "use client"
-import Card from "@/app/components/Card";
-import Board from "@/app/components/Board";
+import Card from "@/components/Card";
+import Board from "@/components/Board";
 import { Suspense, useEffect, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
-import ControlPanel from "@/app/components/ControlPanel";
+import ControlPanel from "@/components/ControlPanel";
 import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleDeleteCard } from "@/api/card";
-import Loading from "./components/loading";
+import Loading from "@/components/loading";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { IState } from "@/redux/store";
@@ -14,6 +14,7 @@ import { handleGetUserByEmail } from "@/api/user";
 import { removeUser } from "@/redux/reducers/user";
 import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/card";
 import { useRouter } from "next/navigation";
+import Header from "@/components/Header";
 
 export default function Home() {
   const [selectedCardId, setSelectedCardId] = useState<string>("");
@@ -25,7 +26,7 @@ export default function Home() {
   const allCards = useSelector((state: IState) => state.card);
   const router = useRouter();
 
-  console.log("user", user)
+  // console.log("user", user)
   // console.log("session", session)
 
   useEffect(() => {
@@ -42,8 +43,8 @@ export default function Home() {
   // console.log("allCard", allCard)
   // console.log("dirtyState", dirtyState)
   // console.log("dirtyCards", dirtyCards)
-  console.log("allCards", allCards)
-  console.log("selectedCardId", selectedCardId)
+  // console.log("allCards", allCards)
+  // console.log("selectedCardId", selectedCardId)
 
   // 有修改的話 5 秒存檔一次
   useEffect(() => {
@@ -73,17 +74,7 @@ export default function Home() {
 
   return (
     <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
-      <header className="fixed inset-x-0 top-0 h-10 bg-zinc-500 grid grid-cols-6 z-50">
-        <div className="w-60 h-full col-span-4">{user && `Hi! ${user.name}`}</div>
-        <div className="w-full h-full bg-zinc-700 col-span-2">
-          {!user && <Link href={`/login`} scroll={false}>Login</Link>}
-          {user && <button onClick={async () => {
-            await signOut();
-            dispatch(removeUser());
-          }}>Logout</button>}
-        </div>
-      </header>
-
+      <Header />
       <section className="w-full h-full px-16 pt-16 relative flex items-center">
         {dirtyCards.length > 0 && <p className="absolute top-10 left-16">改動尚未儲存，請勿離開本頁</p>}
         {dirtyState === "clear" && <p className={`absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
@@ -171,15 +162,15 @@ export default function Home() {
                 if (response.status === "FAIL") return;
                 dispatch(removeCard(selectedCardId));
               }}
-              handleShare={async() => {
-                const updatedData = [{...item, visibility: "public"}] as ICard[];
+              handleShare={async () => {
+                const updatedData = [{ ...item, visibility: "public" }] as ICard[];
                 const response = await handleUpdateCard(updatedData);
                 // console.log("response", response)
                 if (response.status === "FAIL") return false;
                 // console.log("data", JSON.parse(response.data))
 
                 dispatch(updateCards(updatedData));
-                const url = process.env.NODE_ENV === "production"? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
+                const url = process.env.NODE_ENV === "production" ? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
                 navigator.clipboard.writeText(`${url}card/${item.id.split("_")[1]}`);
                 return true;
               }}

@@ -24,7 +24,7 @@ interface IImageBox {
 }
 
 export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex }: IImageBox) {
-    // console.log(data)
+    // console.log("imageData", imageData)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(imageData.content);
     const [showingBlock, setShowingBlock] = useState<"image" | "input">("input");
@@ -38,7 +38,7 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
         setShowingBlock("image");
     }, [imageData])
 
-    function handleAspectRatio (originalWidth: number, originalHeight: number, width: number, height: number) {
+    const handleAspectRatio = (originalWidth: number, originalHeight: number, width: number, height: number) => {
         const imageAspectRatio = originalWidth / originalHeight;
         const widthInAspectRatio = height * imageAspectRatio;
         const heightInAspectRatio = width / imageAspectRatio;
@@ -56,6 +56,7 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
             handleDelete={handleDelete}
             handleSetDirty={handleSetDirty}
             handleChangeZIndex={handleChangeZIndex}
+            isImage={true}
         >
             {(imageData.name && imageLoadState !== "success") && <div id={imageData.id} className="boardElement imagebox absolute inset-0 bg-slate-400 z-20"></div>}
 
@@ -68,9 +69,9 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
                     console.log("onLoad")
                     setShowingBlock("image");
                     const name = uuidv4();
-                    console.log("imageData.name", imageData.name)
+                    // console.log("imageData.name", imageData.name)
                     setImageLoadState("success");
-                    handleUpdateElement({ ...imageData, content: url, width: imageData.name ? imageData.width : e.currentTarget.naturalWidth, height: imageData.name ? imageData.height : e.currentTarget.naturalHeight, name });
+                    handleUpdateElement({ ...imageData, content: url, width: imageData.width, height: imageData.height, name });
                     // console.log(e.currentTarget.naturalWidth)
                     // console.log(e.currentTarget.naturalHeight)
                 }}
