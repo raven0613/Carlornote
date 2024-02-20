@@ -21,7 +21,7 @@ export default function Header({ }: IHeader) {
     const [openPopup, setOpenPopup] = useState<"setting" | null>(null);
 
     return (
-        <header className="fixed inset-x-0 top-0 h-10 bg-zinc-400 grid grid-cols-6 z-50">
+        <header className="fixed inset-x-0 top-0 h-10 bg-zinc-400 grid grid-cols-6 z-40">
             <div className="w-60 h-full col-span-4"></div>
             <div className="w-full h-full col-span-2 flex items-center justify-end px-2">
                 <button type="button" className="w-6 h-6 bg-slate-100 rounded-full relative"

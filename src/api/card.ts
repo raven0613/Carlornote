@@ -82,7 +82,9 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
                 boardElement: item.boardElement,
                 visibility: item.visibility,
                 updatedAt: new Date().toUTCString(),
-                userId: item.userId
+                userId: item.userId,
+                imageUrl: item.imageUrl,
+                name: item.name
             });
         }))
     } catch (error) {

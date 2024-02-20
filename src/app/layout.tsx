@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import { store } from "@/redux/store";
 import Auth from "@/components/Auth";
+import SharedComponents from "@/components/SharedComponents";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: Readonly<{
       <body className={inter.className}>
         <Providers>
           <Auth>
-            {children}
+            <SharedComponents>
+              {children}
+            </SharedComponents>
           </Auth>
         </Providers>
       </body>

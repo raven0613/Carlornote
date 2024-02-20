@@ -38,13 +38,6 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
         setShowingBlock("image");
     }, [imageData])
 
-    const handleAspectRatio = (originalWidth: number, originalHeight: number, width: number, height: number) => {
-        const imageAspectRatio = originalWidth / originalHeight;
-        const widthInAspectRatio = height * imageAspectRatio;
-        const heightInAspectRatio = width / imageAspectRatio;
-        return { widthInAspectRatio, heightInAspectRatio }
-    }
-
     return (
         <Box
             isLocked={isLocked}

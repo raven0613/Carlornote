@@ -15,6 +15,9 @@ import { removeUser } from "@/redux/reducers/user";
 import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/card";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
+import { openModal } from "@/redux/reducers/modal";
+
+const showCardAmounts = 8;
 
 export default function Home() {
   const [selectedCardId, setSelectedCardId] = useState<string>("");
@@ -24,8 +27,9 @@ export default function Home() {
   const dispatch = useDispatch();
   const user = useSelector((state: IState) => state.user);
   const allCards = useSelector((state: IState) => state.card);
-  const router = useRouter();
+  const [wheelPx, setWheelPx] = useState(0);
 
+  // console.log("wheelPx", wheelPx)
   // console.log("user", user)
   // console.log("session", session)
 
@@ -40,10 +44,9 @@ export default function Home() {
     handleFetchCard();
   }, [dispatch, user]);
 
-  // console.log("allCard", allCard)
+  console.log("allCards", allCards)
   // console.log("dirtyState", dirtyState)
   // console.log("dirtyCards", dirtyCards)
-  // console.log("allCards", allCards)
   // console.log("selectedCardId", selectedCardId)
 
   // 有修改的話 5 秒存檔一次
@@ -124,7 +127,8 @@ export default function Home() {
           }}
         />
       </section>
-      <section className="w-full h-[18rem] px-[8rem] my-5 flex items-center justify-center relative"
+
+      <section className="w-full h-[18rem] px-28 my-5 flex items-center justify-center relative"
         onClick={() => {
           setSelectedCardId("");
         }}
@@ -136,23 +140,49 @@ export default function Home() {
             const response = await handleAddCard({
               id: "",
               authorId: user.id,
+              name: "",
               boardElement: [],
               userId: [user.id],
               visibility: "private",
+              imageUrl: "",
               createdAt: new Date().toUTCString(),
               updatedAt: new Date().toUTCString(),
             });
             if (response.status === "FAIL") return;
             const card = JSON.parse(response.data) as ICard;
             dispatch(addCard(card));
+            // 新增的卡片要被選取並且卡片欄位要顯示
             setSelectedCardId(card.id);
+            if (allCards.length - showCardAmounts + 1 >= 0) setWheelPx(allCards.length - showCardAmounts + 1);
+            else setWheelPx(0);
           }}
         >+</button>
-        <div className="w-full h-full overflow-scroll scroll_bar flex items-end pb-4">
+
+        <div className="w-auto h-full flex items-end pb-4"
+          onWheel={(e) => {
+            // console.log(e.deltaX)
+            // console.log(e.deltaY)
+            if (e.deltaY > 0) setWheelPx(pre => {
+              if (pre + showCardAmounts >= allCards.length) return allCards.length - showCardAmounts;
+              return pre + 1
+            });
+            else setWheelPx(pre => {
+              if (pre <= 0) return 0;
+              return pre - 1
+            });
+          }}
+        >
           <Suspense fallback={<>等等等</>}>
             {/* 試試看用 server component 裝 cards */}
-            {allCards && allCards.map(item =>
+            {allCards && 
+            allCards.slice(
+              allCards.length <= showCardAmounts ? 0: wheelPx, 
+              allCards.length <= showCardAmounts? allCards.length : wheelPx + showCardAmounts
+            )
+            .map((item) =>
               <Card key={item.id}
+                name={item.name}
+                url={item.imageUrl}
                 isSelected={selectedCardId === item.id}
                 handleClick={() => {
                   setSelectedCardId(item.id);
@@ -175,10 +205,15 @@ export default function Home() {
                   navigator.clipboard.writeText(`${url}card/${item.id.split("_")[1]}`);
                   return true;
                 }}
+                handleClickEdit={() => {
+                  dispatch(openModal({ type: "card", data: item }));
+                }}
               />
             )}
           </Suspense>
         </div>
+
+
       </section>
     </main>
   );
@@ -212,3 +247,5 @@ export default function Home() {
 //   }
 //   handleFetchCard();
 // }, [user])
+
+

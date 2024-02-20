@@ -32,16 +32,6 @@ body {
   }
 }
 
-.scroll_bar {
-  &::-webket-scrollbar {
-    width: 6px;
-  }
-  &::-webket-scrollbar-thumb {
-    border-radius: 3px;
-    background-color: lightcoral;
-  }
-}
-
 *::-webkit-scrollbar {
   width: 0px;
   height: 6px;

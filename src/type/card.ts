@@ -24,4 +24,6 @@ export interface ICard {
     visibility: "public" | "private" | "free",
     createdAt: string,
     updatedAt: string,
+    imageUrl: string,
+    name: string
 }

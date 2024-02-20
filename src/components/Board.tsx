@@ -9,7 +9,7 @@ import { handleUpdateCard } from "@/api/card";
 
 export const distenceToLeftTop = { left: 64, top: 64 };
 
-interface INewImageBoxProps {
+export interface INewImageBoxProps {
     name: string,
     content: string,
     position: { left: number, top: number },
