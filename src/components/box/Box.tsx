@@ -21,7 +21,7 @@ interface IBox {
 
 export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage }: IBox) {
     // console.log(textData) 
-    // console.log(data.name, isSelected)
+    console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
     const boxRef = useRef<HTMLDivElement>(null);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -30,6 +30,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     const [position, setPosition] = useState({ left, top });
     const [radius, setRadius] = useState(0);
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
+    const [isDragging, setIsDragging] = useState(false);
     // console.log("isEditMode", isEditMode)
 
     useEffect(() => {
@@ -62,6 +63,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
             ${isEditMode ? "border-slate-400" : "border-transparent"} 
             ${isShadowElement ? "opacity-50" : "opacity-100"}
             ${isLocked ? "pointer-events-none" : ""}
+            ${(isSelected || isDragging) ? "shadow-md shadow-black/30" : ""}
             `}
                 style={{ left: `${position.left}px`, top: `${position.top}px`, rotate: `${deg}deg`, width: size.width, height: size.height, transition: "border-color 0.15s ease" }}
                 onMouseDown={(e) => {
@@ -71,12 +73,15 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                         toBoxTop: e.clientY - distenceToLeftTop.top - e.currentTarget.offsetTop
                     };
                 }}
-                onDragStart={(e) => {
+                onDragStart={(e: DragEvent) => {
                     console.log("box drag start", e.currentTarget)
-                    // 設定游標 icon
-                    e.dataTransfer.setDragImage(e.currentTarget, window.outerWidth, window.outerHeight);
+                    // 設定游標 iconvar image = new Image();
+                    const image = new Image();
+                    image.src = 'https://static.thenounproject.com/png/617175-200.png';
+                    e.dataTransfer.setDragImage(image, window.outerWidth, window.outerHeight);
                     e.dataTransfer.effectAllowed = "copyMove";
                     setIsEditMode(true);
+                    setIsDragging(true);
                 }}
                 onDragEnd={(e: DragEvent) => {
                     // 這時候才存資料
@@ -84,6 +89,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
                     setIsEditMode(false);
                     handleSetDirty();
+                    setIsDragging(false);
                 }}
                 onDragOver={(e) => {
                     // console.log("ㄟㄟ")
@@ -223,7 +229,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
                     before:content-[""] before:w-2 before:h-2 before:border-2 before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:absolute before:rounded-[2px] before:bg-transparent before:border-slate-500
                     `}
                 ></div>
-            </div>
+            </div >
         </>
     )
 }

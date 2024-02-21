@@ -16,7 +16,7 @@ export const updateCards = (payload: ICard[]) => ({ type: UPDATE_CARDS, payload 
 export const removeCard = (payload: string) => ({ type: REMOVE_CARD, payload });
 
 export function cardsReducer(state: ICard[] = initCardState, action: IAction<ICard[] | string>) {
-    console.log("payload", action.payload)
+    // console.log("payload", action.payload)
     switch (action.type) {
         case ADD_CARD: {
             return [...state, action.payload];

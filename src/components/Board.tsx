@@ -5,7 +5,6 @@ import { useCallback, useContext, useEffect, useId, useRef, useState } from "rea
 import { v4 as uuidv4 } from 'uuid';
 import ImageBox from "./box/ImageBox";
 import { handlePostImgur } from "@/api/imgur";
-import { handleUpdateCard } from "@/api/card";
 
 export const distenceToLeftTop = { left: 64, top: 64 };
 
@@ -86,6 +85,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         }]
         handleUpdateElementList(newBoardElement);
         setIsLock(false);
+        return newBoardElement.at(-1);
     }, [elements, handleUpdateElementList])
 
     // click
@@ -225,6 +225,15 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         e.stopPropagation()
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
 
+                        // 這邊有問題  沒有成功在 card 裡面加入 boardElement
+                        // const newBoardElement = handleAddImageBox({
+                        //     name: "",
+                        //     content: "",
+                        //     position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y },
+                        //     size: { width: 250, height: 250 }
+                        // });
+                        // console.log("newBoardElement", newBoardElement)
+
                         const file = e.currentTarget.files[0];
                         // console.log("file", file)
                         const formData = new FormData();
@@ -232,8 +241,17 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         e.target.value = "";
 
                         const res = await handlePostImgur(formData);
-                        console.log("res", res)
+                        console.log("imgur res", res)
                         if (res.success === false) return;
+                        // if (!newBoardElement) return;
+
+                        // handleUpdateElement({ 
+                        //     ...newBoardElement, 
+                        //     name: file.name, 
+                        //     content: res.data.link,
+                        //     width: res.data.width, 
+                        //     height: res.data.height
+                        // })
                         handleAddImageBox({
                             name: file.name,
                             content: res.data.link,

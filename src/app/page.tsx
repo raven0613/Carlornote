@@ -7,7 +7,7 @@ import ControlPanel from "@/components/ControlPanel";
 import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleDeleteCard } from "@/api/card";
 import Loading from "@/components/loading";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { IState } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { handleGetUserByEmail } from "@/api/user";
@@ -16,10 +16,13 @@ import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/car
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import { openModal } from "@/redux/reducers/modal";
+import CardList from "@/components/CardList";
+import { IResponse } from "@/type/response";
 
 const showCardAmounts = 8;
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [selectedCardId, setSelectedCardId] = useState<string>("");
   const [draggingBox, setDraggingBox] = useState<boxType>("");
   const [dirtyState, setDirtyState] = useState<"dirty" | "clear" | "none">("none");
@@ -27,24 +30,12 @@ export default function Home() {
   const dispatch = useDispatch();
   const user = useSelector((state: IState) => state.user);
   const allCards = useSelector((state: IState) => state.card);
-  const [wheelPx, setWheelPx] = useState(0);
 
   // console.log("wheelPx", wheelPx)
   // console.log("user", user)
   // console.log("session", session)
 
-  useEffect(() => {
-    if (!user) return;
-    async function handleFetchCard() {
-      const response = await handleGetCards(user?.id || "");
-      if (response.status === "FAIL") return;
-      dispatch(setCards(JSON.parse(response.data)));
-      // console.log("get data", JSON.parse(data.data))
-    }
-    handleFetchCard();
-  }, [dispatch, user]);
-
-  console.log("allCards", allCards)
+  // console.log("allCards", allCards)
   // console.log("dirtyState", dirtyState)
   // console.log("dirtyCards", dirtyCards)
   // console.log("selectedCardId", selectedCardId)
@@ -77,12 +68,12 @@ export default function Home() {
 
   return (
     <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
-      <Header />
+      
       <section className="w-full h-full px-16 pt-16 relative flex items-center">
         {dirtyCards.length > 0 && <p className="absolute top-10 left-16">改動尚未儲存，請勿離開本頁</p>}
         {dirtyState === "clear" && <p className={`absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
 
-        {!selectedCardId && <p className="text-center w-full">{user ? "請選擇一張卡片" : "請先登入"}</p>}
+        {!selectedCardId && <p className="text-center w-full">{status !== "authenticated" ? "請先登入" : "請選擇一張卡片"}</p>}
         {selectedCardId && <>
           <main className="w-full h-full border border-slate-500 overflow-hidden">
             <Board elements={allCards.find(item => item.id === selectedCardId)?.boardElement || []}
@@ -95,7 +86,9 @@ export default function Home() {
                 dispatch(updateCards([updatedCard]));
               }}
               handleUpdateElement={(data) => {
+                console.log("UpdateElement", data)
                 const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
+                console.log("selectedCard", selectedCard)
                 const updatedCard: ICard = {
                   ...selectedCard,
                   boardElement: selectedCard.boardElement.map(ele => {
@@ -127,94 +120,9 @@ export default function Home() {
           }}
         />
       </section>
-
-      <section className="w-full h-[18rem] px-28 my-5 flex items-center justify-center relative"
-        onClick={() => {
-          setSelectedCardId("");
-        }}
-      >
-        <button type="button" className="w-16 h-16 bg-slate-400 rounded-full absolute left-10 text-white font-semibold text-3xl"
-          onClick={async () => {
-            // 之後再新增公開匿名卡片
-            if (!user) return;
-            const response = await handleAddCard({
-              id: "",
-              authorId: user.id,
-              name: "",
-              boardElement: [],
-              userId: [user.id],
-              visibility: "private",
-              imageUrl: "",
-              createdAt: new Date().toUTCString(),
-              updatedAt: new Date().toUTCString(),
-            });
-            if (response.status === "FAIL") return;
-            const card = JSON.parse(response.data) as ICard;
-            dispatch(addCard(card));
-            // 新增的卡片要被選取並且卡片欄位要顯示
-            setSelectedCardId(card.id);
-            if (allCards.length - showCardAmounts + 1 >= 0) setWheelPx(allCards.length - showCardAmounts + 1);
-            else setWheelPx(0);
-          }}
-        >+</button>
-
-        <div className="w-auto h-full flex items-end pb-4"
-          onWheel={(e) => {
-            // console.log(e.deltaX)
-            // console.log(e.deltaY)
-            if (e.deltaY > 0) setWheelPx(pre => {
-              if (pre + showCardAmounts >= allCards.length) return allCards.length - showCardAmounts;
-              return pre + 1
-            });
-            else setWheelPx(pre => {
-              if (pre <= 0) return 0;
-              return pre - 1
-            });
-          }}
-        >
-          <Suspense fallback={<>等等等</>}>
-            {/* 試試看用 server component 裝 cards */}
-            {allCards && 
-            allCards.slice(
-              allCards.length <= showCardAmounts ? 0: wheelPx, 
-              allCards.length <= showCardAmounts? allCards.length : wheelPx + showCardAmounts
-            )
-            .map((item) =>
-              <Card key={item.id}
-                name={item.name}
-                url={item.imageUrl}
-                isSelected={selectedCardId === item.id}
-                handleClick={() => {
-                  setSelectedCardId(item.id);
-                  setDirtyState("none");
-                }}
-                handleDelete={async () => {
-                  const response = await handleDeleteCard(selectedCardId);
-                  if (response.status === "FAIL") return;
-                  dispatch(removeCard(selectedCardId));
-                }}
-                handleShare={async () => {
-                  const updatedData = [{ ...item, visibility: "public" }] as ICard[];
-                  const response = await handleUpdateCard(updatedData);
-                  // console.log("response", response)
-                  if (response.status === "FAIL") return false;
-                  // console.log("data", JSON.parse(response.data))
-
-                  dispatch(updateCards(updatedData));
-                  const url = process.env.NODE_ENV === "production" ? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
-                  navigator.clipboard.writeText(`${url}card/${item.id.split("_")[1]}`);
-                  return true;
-                }}
-                handleClickEdit={() => {
-                  dispatch(openModal({ type: "card", data: item }));
-                }}
-              />
-            )}
-          </Suspense>
-        </div>
-
-
-      </section>
+      <CardList selectedCardId={selectedCardId} handleSetSelectedCard={(id: string) => {
+        setSelectedCardId(id);
+      }} />
     </main>
   );
 }

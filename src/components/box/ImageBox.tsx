@@ -24,14 +24,14 @@ interface IImageBox {
 }
 
 export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex }: IImageBox) {
-    // console.log("imageData", imageData)
+    console.log("imageData", imageData)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(imageData.content);
     const [showingBlock, setShowingBlock] = useState<"image" | "input">("input");
     const [imageLoadState, setImageLoadState] = useState<"fail" | "success" | "loading" | "none">("none")
     const inputValueRef = useRef<string>("");
 
-    // console.log("imageSentState", imageLoadState)
+    console.log("imageSentState", imageLoadState)
     useEffect(() => {
         if (!imageData.name) return;
         setImageLoadState("success");

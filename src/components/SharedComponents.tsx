@@ -20,7 +20,7 @@ const SharedComponents = (props: IProps) => {
     const { data: session, status } = useSession();
     const dispatch = useDispatch();
     const { type: openModalType, data: modalProp } = useSelector((state: IState) => state.modal)
-    console.log("status", status)
+    // console.log("status", status)
 
     return (
         <>
