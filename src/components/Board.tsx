@@ -38,7 +38,7 @@ interface IBoard {
 }
 
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
-    // console.log(elements)
+    console.log("Board elements", elements)
     const [selectedId, setSelectedId] = useState("");
     const pointerRef = useRef({ x: 0, y: 0 });
     const dropPointerRef = useRef({ x: 0, y: 0 });
@@ -71,7 +71,8 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
     const handleAddImageBox = useCallback(({ name, content, position: { left, top }, size: { width, height } }: INewImageBoxProps) => {
         const id = `element_${uuidv4()}`;
         if (!left || !top) return;
-        const newBoardElement = [...elements, {
+        console.log("ㄟㄟ")
+        const newBoardElements = [...elements, {
             id: id,
             type: "image" as boxType,
             name: name,
@@ -83,9 +84,9 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             top,
             radius: 0
         }]
-        handleUpdateElementList(newBoardElement);
+        handleUpdateElementList(newBoardElements);
         setIsLock(false);
-        return newBoardElement.at(-1);
+        return newBoardElements;
     }, [elements, handleUpdateElementList])
 
     // click
@@ -139,21 +140,52 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             const pastedText = e.clipboardData?.getData("text/plain") || "";
             console.log("pastedFiles", pastedFiles)
             console.log("pastedText", pastedText)
+            console.log("dropPointerRef", dropPointerRef)
+
             if (!pastedFiles && !pastedText) return;
             if (pastedFiles) {
                 const file = pastedFiles;
                 const formData = new FormData();
                 formData.append("image", file);
+
+                let newBoardElement: IBoardElement[] = [];
+
+                // 使用 FileReader 預覽圖片
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const base64 = reader.result as string;
+                    const img = new Image();
+                    img.src = base64;
+                    img.onload = function () {
+                        // 取得圖片的寬和高
+                        newBoardElement = handleAddImageBox({
+                            name: "",
+                            content: "",
+                            position: { left: pointerRef.current.x, top: pointerRef.current.y },
+                            size: { width: img.width, height: img.height }
+                        }) ?? [];
+                        console.log("newBoardElement", newBoardElement)
+                    };
+                };
+                reader.readAsDataURL(file);
+
+
                 const res = await handlePostImgur(formData);
                 console.log("res", res)
 
                 if (res.success === false) return;
-                handleAddImageBox({
-                    name: pastedFiles.name,
-                    content: res.data.link,
-                    position: { left: pointerRef.current.x, top: pointerRef.current.y },
-                    size: { width: res.data.width, height: res.data.height }
-                });
+                if (!newBoardElement) return;
+
+                handleUpdateElementList(newBoardElement.map((item, index) => {
+                    if (index === newBoardElement.length - 1) return {
+                        ...item,
+                        name: pastedFiles.name,
+                        content: res.data.link,
+                        width: res.data.width,
+                        height: res.data.height
+                    };
+                    return item;
+                }))
             }
             else {
                 handleAddTextBox({
@@ -165,7 +197,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         }
         document.addEventListener("paste", handlePaste);
         return () => document.removeEventListener("paste", handlePaste);
-    }, [handleAddImageBox, handleAddTextBox, handleSetDirty])
+    }, [handleAddImageBox, handleAddTextBox, handleSetDirty, handleUpdateElementList])
 
     function handleChangeZIndex(id: string) {
         // 被點選到的 element 要拉到第一個
@@ -214,8 +246,6 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     // console.log("top", e.clientY)
                 }}
                 onWheel={() => {
-
-                    console.log("weeeeee")
                 }}
             >
                 <input id="board_input" name="board_input" type="file" className="boardElement w-full h-full opacity-0"
@@ -225,39 +255,48 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         e.stopPropagation()
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
 
-                        // 這邊有問題  沒有成功在 card 裡面加入 boardElement
-                        // const newBoardElement = handleAddImageBox({
-                        //     name: "",
-                        //     content: "",
-                        //     position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y },
-                        //     size: { width: 250, height: 250 }
-                        // });
-                        // console.log("newBoardElement", newBoardElement)
-
                         const file = e.currentTarget.files[0];
                         // console.log("file", file)
                         const formData = new FormData();
                         formData.append("image", file);
                         e.target.value = "";
+                        let newBoardElement: IBoardElement[] = [];
+
+                        // 使用 FileReader 預覽圖片
+                        const reader = new FileReader();
+                        reader.onload = function () {
+                            const base64 = reader.result as string;
+                            const img = new Image();
+                            img.src = base64;
+                            img.onload = function () {
+                                // 取得圖片的寬和高
+                                newBoardElement = handleAddImageBox({
+                                    name: "",
+                                    content: "",
+                                    position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y },
+                                    size: { width: img.width || 200, height: img.height || 200 }
+                                }) ?? [];
+                                console.log("newBoardElement", newBoardElement)
+                            };
+                        };
+                        reader.readAsDataURL(file);
 
                         const res = await handlePostImgur(formData);
                         console.log("imgur res", res)
                         if (res.success === false) return;
-                        // if (!newBoardElement) return;
+                        if (!newBoardElement) return;
 
-                        // handleUpdateElement({ 
-                        //     ...newBoardElement, 
-                        //     name: file.name, 
-                        //     content: res.data.link,
-                        //     width: res.data.width, 
-                        //     height: res.data.height
-                        // })
-                        handleAddImageBox({
-                            name: file.name,
-                            content: res.data.link,
-                            position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y },
-                            size: { width: res.data.width, height: res.data.height }
-                        });
+                        handleUpdateElementList(newBoardElement.map((item, index) => {
+                            if (index === newBoardElement.length - 1) return {
+                                ...item,
+                                name: file.name,
+                                content: res.data.link,
+                                width: res.data.width,
+                                height: res.data.height
+                            };
+                            return item;
+                        }))
+
                         handleSetDirty();
                     }}
                     onMouseMove={(e) => {
@@ -328,7 +367,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         id: "dragging_image",
                         type: "image",
                         name: "",
-                        content: "text",
+                        content: "dragging_image",
                         width: 500,
                         height: 30,
                         rotation: 0,

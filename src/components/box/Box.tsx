@@ -21,7 +21,7 @@ interface IBox {
 
 export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage }: IBox) {
     // console.log(textData) 
-    console.log(data.name, isSelected)
+    // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
     const boxRef = useRef<HTMLDivElement>(null);
     const [isEditMode, setIsEditMode] = useState(false);

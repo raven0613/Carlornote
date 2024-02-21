@@ -36,11 +36,11 @@ export function cardsReducer(state: ICard[] = initCardState, action: IAction<ICa
             const newCardMap = new Map();
             for (let item of (action.payload ?? [])) {
                 const card = item as ICard;
-                console.log("card", card)
+                // console.log("card", card)
                 if (newCardMap.get(card.id)) continue;
                 newCardMap.set(card.id, card);
             }
-            console.log("newCardMap", newCardMap)
+            // console.log("newCardMap", newCardMap)
             return state.map(item => {
                 if (newCardMap.get(item.id)) return newCardMap.get(item.id);
                 return item;

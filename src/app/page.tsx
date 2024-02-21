@@ -35,10 +35,11 @@ export default function Home() {
   // console.log("user", user)
   // console.log("session", session)
 
-  // console.log("allCards", allCards)
+  // console.log("allCards page", allCards)
   // console.log("dirtyState", dirtyState)
   // console.log("dirtyCards", dirtyCards)
   // console.log("selectedCardId", selectedCardId)
+  // console.log("selectedCard page", allCards.find(item => item.id === selectedCardId))
 
   // 有修改的話 5 秒存檔一次
   useEffect(() => {
@@ -68,7 +69,7 @@ export default function Home() {
 
   return (
     <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
-      
+
       <section className="w-full h-full px-16 pt-16 relative flex items-center">
         {dirtyCards.length > 0 && <p className="absolute top-10 left-16">改動尚未儲存，請勿離開本頁</p>}
         {dirtyState === "clear" && <p className={`absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
@@ -77,7 +78,8 @@ export default function Home() {
         {selectedCardId && <>
           <main className="w-full h-full border border-slate-500 overflow-hidden">
             <Board elements={allCards.find(item => item.id === selectedCardId)?.boardElement || []}
-              handleUpdateElementList={(allElement) => {
+              handleUpdateElementList={(allElement: IBoardElement[]) => {
+                console.log("update allElement list", allElement)
                 const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
                 const updatedCard: ICard = {
                   ...selectedCard,
@@ -85,10 +87,9 @@ export default function Home() {
                 }
                 dispatch(updateCards([updatedCard]));
               }}
-              handleUpdateElement={(data) => {
-                console.log("UpdateElement", data)
+              handleUpdateElement={(data: IBoardElement) => {
+                console.log("updatee element data", data)
                 const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
-                console.log("selectedCard", selectedCard)
                 const updatedCard: ICard = {
                   ...selectedCard,
                   boardElement: selectedCard.boardElement.map(ele => {
