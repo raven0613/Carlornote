@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "./imageLoading.css";
 import Providers from "@/components/Providers";
 import { store } from "@/redux/store";
 import Auth from "@/components/Auth";

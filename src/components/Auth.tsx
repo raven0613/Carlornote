@@ -3,6 +3,7 @@ import { handleGetUserByEmail } from "@/api/user";
 import { addUser } from "@/redux/reducers/user";
 
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
@@ -13,7 +14,8 @@ interface IProps {
 const Auth = (props: IProps) => {
     const { data: session, status } = useSession();
     const dispatch = useDispatch();
-    // console.log("status", status)
+    const pathname = usePathname();
+    console.log("Auth status", status)
 
     useEffect(() => {
         if (status !== "authenticated") return;
@@ -30,6 +32,7 @@ const Auth = (props: IProps) => {
         handleCheckUser();
     }, [dispatch, session?.user?.email, status])
 
+    if (pathname.includes("login")) return <>{props.children}</>
     if (status === "loading") return <>確認身分中</>
 
     return (

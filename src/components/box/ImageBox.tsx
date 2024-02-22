@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, DragEvent } from "react";
 import Box from "./Box";
 import Image from "next/image";
 import { v4 as uuidv4 } from 'uuid';
+import { ImageLoading } from "../ImageLoading";
 
 function getUrlIsValid(url: string) {
     if (url === "http://" || url === "https://") return false;
@@ -57,7 +58,7 @@ export default function ImageBox({ imageData, handleUpdateElement, isSelected, h
             handleChangeZIndex={handleChangeZIndex}
             isImage={true}
         >
-            {(imageLoadState === "loading") && <div id={imageData.id} className="boardElement imagebox absolute inset-0 bg-slate-400 z-20"></div>}
+            {(imageLoadState === "loading") && <ImageLoading />}
 
             {showingBlock === "image" && <Image id={imageData.id}
                 className={`boardElement imagebox ${imageLoadState === "success" ? "opacity-100" : "opacity-0"}`} width={imageData.width} height={imageData.height} src={url} alt={imageData.name}

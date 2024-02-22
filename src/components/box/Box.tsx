@@ -32,6 +32,7 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
     const [isDragging, setIsDragging] = useState(false);
     // console.log("isEditMode", isEditMode)
+    console.log("isLocked", isLocked)
 
     useEffect(() => {
         if (isSelected) setIsEditMode(true);

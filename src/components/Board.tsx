@@ -254,7 +254,6 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         e.preventDefault()
                         e.stopPropagation()
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
-
                         const file = e.currentTarget.files[0];
                         // console.log("file", file)
                         const formData = new FormData();
@@ -285,7 +284,6 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         console.log("imgur res", res)
                         if (res.success === false) return;
                         if (!newBoardElement) return;
-
                         handleUpdateElementList(newBoardElement.map((item, index) => {
                             if (index === newBoardElement.length - 1) return {
                                 ...item,

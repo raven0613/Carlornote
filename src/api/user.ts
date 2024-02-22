@@ -58,9 +58,9 @@ export async function handleGetUserByEmail(email: string): Promise<IResponse> {
         const docSnap = await getDocs(q);
 
         if (docSnap) {
-            const data: ICard[] = [];
+            const data: IUser[] = [];
             docSnap.forEach((doc) => {
-                data.push(doc.data() as ICard);
+                data.push(doc.data() as IUser);
             });
             return { code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS" };
         }

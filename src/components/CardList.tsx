@@ -60,10 +60,10 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                     handleSetSelectedCard("");
                 }}
             >
-                <button disabled={addCardState === "loading"} type="button" className={`w-16 h-16 bg-slate-400 rounded-full absolute left-10 text-white font-semibold text-3xl disabled:bg-slate-200`}
+                <button disabled={addCardState === "loading" || !user?.id} type="button" className={`w-16 h-16 bg-slate-400 rounded-full absolute left-10 text-white font-semibold text-3xl disabled:bg-slate-200`}
                     onClick={async () => {
                         // 之後再新增公開匿名卡片
-                        if (!user) return;
+                        if (!user?.id) return;
                         setAddCardState("loading");
                         const response = await handleAddCard({
                             id: "",
