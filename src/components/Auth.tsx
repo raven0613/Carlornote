@@ -32,8 +32,8 @@ const Auth = (props: IProps) => {
         handleCheckUser();
     }, [dispatch, session?.user?.email, status])
 
-    if (pathname.includes("login")) return <>{props.children}</>
-    if (status === "loading") return <>確認身分中</>
+    if (["login", "signup"].includes(pathname)) return <>{props.children}</>
+    if (status === "loading") return <main className="w-full h-full">確認身分中</main>
 
     return (
         <>{props.children}</>

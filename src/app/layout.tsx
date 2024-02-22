@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "./imageLoading.css";
 import Providers from "@/components/Providers";
-import { store } from "@/redux/store";
 import Auth from "@/components/Auth";
 import SharedComponents from "@/components/SharedComponents";
 import Header from "@/components/Header";

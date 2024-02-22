@@ -13,7 +13,8 @@ interface IPopup {
         content: string,
         handleClick: () => void,
         isLink?: boolean,
-        href?: string
+        href?: string,
+        hrefAs?: string
     }[];
     isOpen: boolean;
     handleClose: () => void;
@@ -31,7 +32,7 @@ export default function Popup({ options = [], isOpen, handleClose }: IPopup) {
             {isOpen && options.map(item => {
                 return (
                     item.isLink ?
-                        <Link key={item.content} href={item.href ?? ""} className="px-5 py-1.5 flex items-center gap-4 hover:bg-slate-200 text-sm"
+                        <Link key={item.content} href={item.href ?? ""} as={item.hrefAs} className="px-5 py-1.5 flex items-center gap-4 hover:bg-slate-200 text-sm"
                             onClick={() => {
                                 item.handleClick();
                             }}

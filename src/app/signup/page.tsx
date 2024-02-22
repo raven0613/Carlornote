@@ -8,7 +8,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 // import { firebaseConfig } from "@/api/firebase";
 import * as firebase from "firebase/app";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { handleAddUser, handleGetUserByEmail } from "@/api/user";
 import { IState, store } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,20 +17,15 @@ import { SignPanel } from "@/components/SignPanel";
 // import login from "@/api/user";
 
 
-export default function Login() {
+export default function Signup() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
 
-    const query = useSearchParams().get("page");
-    const path = usePathname()
-    // const [page, setPage] = useState("login");
 
+    const path = usePathname();
 
-    console.log("path", path)
-    console.log("query", query)
-    // console.log("page", page)
     console.log("session", session)
     console.log("status", status)
     console.log("user", user)
@@ -93,6 +88,9 @@ export default function Login() {
             `}>
                 <SignPanel type="signup" />
             </section>
+
+
+
         </main>
     )
 }

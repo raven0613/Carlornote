@@ -39,6 +39,7 @@ export default function Header({ }: IHeader) {
                         content: user ? "Logout" : "Login",
                         isLink: true,
                         href: user ? "" : "/login",
+                        // hrefAs: user ? "" : "/login",
                         handleClick: user ? async () => {
                             // logout
                             await signOut();
