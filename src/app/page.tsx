@@ -76,6 +76,7 @@ export default function Home() {
                                     boardElement: allElement
                                 }
                                 dispatch(updateCards([updatedCard]));
+                                dispatch(selectCard(updatedCard));
                             }}
                             handleUpdateElement={(data: IBoardElement) => {
                                 console.log("updatee element data", data)
@@ -88,6 +89,7 @@ export default function Home() {
                                     })
                                 }
                                 dispatch(updateCards([updatedCard]));
+                                dispatch(selectCard(updatedCard));
                             }}
                             draggingBox={draggingBox}
                             handleMouseUp={() => {
@@ -111,10 +113,13 @@ export default function Home() {
                     }}
                 />
             </section>
-            <CardList selectedCardId={selectedCard?.id} handleSetSelectedCard={(id: string) => {
-                // setSelectedCardId(id);
-                dispatch(selectCard(allCards.find(item => item.id === id) || null));
-            }} />
+            <CardList selectedCardId={selectedCard?.id}
+                handleSetSelectedCard={(id: string) => {
+                    console.log("id", id)
+                    // setSelectedCardId(id);
+                    dispatch(selectCard(allCards.find(item => item.id === id) || null));
+                }}
+            />
         </main>
     );
 }

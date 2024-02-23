@@ -10,8 +10,8 @@ export const distenceToLeftTop = { left: 64, top: 64 };
 
 export function getResizedSize (originWidth: number, originHeight: number) {
     const imageAspectRatio = originWidth / originHeight;
-    let width = 200;
-    let height = 200;
+    let width = originWidth;
+    let height = originHeight;
     if (originWidth > originHeight && originWidth >= 800) {
         width = 800;
         height = width / imageAspectRatio;

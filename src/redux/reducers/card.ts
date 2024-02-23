@@ -54,7 +54,7 @@ export const initSelectedCardState = null;
 const SELECT_CARD = "SELECT_CARD";
 export const selectCard = (payload: ICard | null) => ({ type: SELECT_CARD, payload });
 
-export function selectedCardReducer(state: ICard | null = initSelectedCardState, action: IAction<ICard[] | string>) {
+export function selectedCardReducer(state: ICard | null = initSelectedCardState, action: IAction<ICard | string>) {
     // console.log("payload", action.payload)
     switch (action.type) {
         case SELECT_CARD: {

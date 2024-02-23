@@ -15,6 +15,7 @@ interface IModal {
 }
 
 export default function Modal({ isOpen, handleClose, children, position }: IModal) {
+    // TODO: 點到 svg 不會關掉
     const nodeRef = useClickOutside<HTMLDivElement>({
         handleMouseDown: () => {
             handleClose();
