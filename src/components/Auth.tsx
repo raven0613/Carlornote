@@ -16,6 +16,7 @@ const Auth = (props: IProps) => {
     const dispatch = useDispatch();
     const pathname = usePathname();
     console.log("Auth status", status)
+    console.log("Auth session", session)
 
     useEffect(() => {
         if (status !== "authenticated") return;

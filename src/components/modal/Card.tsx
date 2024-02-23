@@ -60,7 +60,6 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                     />}
                     {url && <Image
                         className={`rounded-md`} width={200} height={220} src={url}
-                        priority={true}
                         alt={`${cardData.name} image`}
                         style={{
                             objectFit: 'cover', // cover, contain, none

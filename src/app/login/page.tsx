@@ -1,21 +1,12 @@
 "use client"
-// import { handleGoogleLogin } from "@/api/firebase_admin";
-import useAutosizedTextarea from "@/hooks/useAutosizedTextarea"
-import { IBoardElement } from "@/type/card";
-import React, { RefObject, useEffect, useRef, useState, DragEvent, use, Suspense } from "react";
-import { getFirestore } from "firebase/firestore";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-// import { firebaseConfig } from "@/api/firebase";
-import * as firebase from "firebase/app";
-import { useSession, signIn, signOut } from "next-auth/react";
+import React, { useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { handleAddUser, handleGetUserByEmail } from "@/api/user";
-import { IState, store } from "@/redux/store";
+import { IState } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { addUser } from "@/redux/reducers/user";
 import { SignPanel } from "@/components/SignPanel";
-// import login from "@/api/user";
-
 
 export default function Login() {
     const { data: session, status } = useSession();
