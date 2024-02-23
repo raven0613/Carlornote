@@ -31,7 +31,7 @@ export default function Card({ handleClick, isSelected, handleDelete, handleShar
                     ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-6 cursor-pointer"}`}
                 >
                     <div className={`${name ? "row-span-4" : "row-span-5"} flex items-center justify-center`}>
-                        {!url && <EmptyImageIcon classProps="p-2" />}
+                        {!url && <EmptyImageIcon classProps="p-2 pointer-events-none" />}
                         {url && <Image
                             className={`rounded-md`} width={80} height={100} src={url}
                             priority={true}
