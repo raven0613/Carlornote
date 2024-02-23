@@ -28,7 +28,7 @@ export default function Popup({ options = [], isOpen, handleClose }: IPopup) {
     })
 
     return (
-        <div ref={nodeRef} className="flex flex-col absolute bg-slate-100 shadow-md rounded-sm top-10 right-2/4">
+        <div ref={nodeRef} className="flex flex-col absolute bg-slate-100 shadow-md rounded-sm top-10 right-2/4 text-slate-700">
             {isOpen && options.map(item => {
                 return (
                     item.isLink ?

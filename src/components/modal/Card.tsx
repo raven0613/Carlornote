@@ -83,12 +83,12 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                         placeholder="輸入圖片網址或拖曳圖片"
                     />
                     <button className="absolute right-4 top-1/2 -translate-y-1/2 hover:scale-125 duration-150"
-                    onClick={(e) => {
-                        console.log("image url ok")
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setUrl(inputUrl);
-                    }}
+                        onClick={(e) => {
+                            console.log("image url ok")
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setUrl(inputUrl);
+                        }}
                     >v</button>
                 </div>
 
@@ -97,51 +97,53 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                     setName(e.target.value.trim());
                 }} />
 
-                {/* OK button */}
-                <button className="absolute -bottom-8 right-2 bg-green-400 w-5 h-5 rounded-full text-slate-100" onClick={async () => {
-                    const response = await handleUpdateCard([{ ...cardData, imageUrl: url, name }]);
-                    if (response.status === "FAIL") return;
-                    const resData = JSON.parse(response.data);
-                    console.log("resData", resData)
-                    dispatch(updateCards(resData));
-                    dispatch(closeModal());
-                }} >v</button>
+                <div className="absolute -bottom-8 right-0 flex gap-4">
 
-                {/* delete */}
-                <div
-                    onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log("Delete")
-                        const response = await handleDeleteCard(cardData.id);
+
+                    {/* delete */}
+                    <div
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log("Delete")
+                            const response = await handleDeleteCard(cardData.id);
+                            if (response.status === "FAIL") return;
+                            dispatch(removeCard(cardData.id));
+                            handleDelete();
+                        }}
+                        className={`w-5 h-5 rounded-full border border-slate-100 bg-red-500 cursor-pointer hover:scale-125 duration-200
+                `}
+                    ></div>
+                    {/* share */}
+                    <div
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const updatedData = [{ ...cardData, visibility: "public" }] as ICard[];
+                            const response = await handleUpdateCard(updatedData);
+                            // console.log("response", response)
+                            if (response.status === "FAIL") return false;
+                            // console.log("data", JSON.parse(response.data))
+
+                            dispatch(updateCards(updatedData));
+                            const url = process.env.NODE_ENV === "production" ? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
+                            navigator.clipboard.writeText(`${url}card/${cardData.id.split("_")[1]}`);
+                            return true;
+                        }}
+                        className={`w-5 h-5 p-[3px] rounded-full border border-slate-500 bg-slate-100 cursor-pointer hover:scale-125 duration-200
+                `}
+                    ><ShareIcon classProps="fill-none stroke-slate-500" /></div>
+
+                    {/* OK button */}
+                    <button className="bg-green-400 w-5 h-5 rounded-full text-slate-100" onClick={async () => {
+                        const response = await handleUpdateCard([{ ...cardData, imageUrl: url, name }]);
                         if (response.status === "FAIL") return;
-                        dispatch(removeCard(cardData.id));
-                        handleDelete();
-                    }}
-                    className={`w-5 h-5 rounded-full border border-slate-100 bg-red-500 absolute -top-6 -right-6 z-50 cursor-pointer
-                before:content-[""] before:h-[8px] before:w-[1px] before:bg-slate-100 before:absolute before:rotate-45 before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2
-                after:content-[""] after:h-[8px] after:w-[1px] after:bg-slate-100 after:absolute after:-rotate-45 after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 hover:scale-125 duration-200
-                `}
-                ></div>
-                {/* share */}
-                <div
-                    onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const updatedData = [{ ...cardData, visibility: "public" }] as ICard[];
-                        const response = await handleUpdateCard(updatedData);
-                        // console.log("response", response)
-                        if (response.status === "FAIL") return false;
-                        // console.log("data", JSON.parse(response.data))
-
-                        dispatch(updateCards(updatedData));
-                        const url = process.env.NODE_ENV === "production" ? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
-                        navigator.clipboard.writeText(`${url}card/${cardData.id.split("_")[1]}`);
-                        return true;
-                    }}
-                    className={`w-5 h-5 p-[3px] rounded-full border border-slate-500 bg-slate-100 absolute -bottom-8 right-10 z-50 cursor-pointer hover:scale-125 duration-200
-                `}
-                ><ShareIcon classProps="fill-none stroke-slate-500" /></div>
+                        const resData = JSON.parse(response.data);
+                        console.log("resData", resData)
+                        dispatch(updateCards(resData));
+                        dispatch(closeModal());
+                    }} >v</button>
+                </div>
             </div>
         </>
     )

@@ -55,7 +55,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
 
     return (
         <>
-            <section className="w-full h-[18rem] px-28 my-5 flex items-center justify-center relative"
+            <section className="w-full h-[16rem] px-28 flex items-center justify-center relative"
                 onClick={() => {
                     handleSetSelectedCard("");
                 }}

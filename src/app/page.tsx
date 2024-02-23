@@ -1,37 +1,26 @@
 "use client"
-import Card from "@/components/Card";
 import Board from "@/components/Board";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import ControlPanel from "@/components/ControlPanel";
-import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleDeleteCard } from "@/api/card";
-import Loading from "@/components/loading";
-import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+import { handleUpdateCard } from "@/api/card";
+import { useSession } from "next-auth/react";
 import { IState } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
-import { handleGetUserByEmail } from "@/api/user";
-import { removeUser } from "@/redux/reducers/user";
-import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/card";
-import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
-import { openModal } from "@/redux/reducers/modal";
+import { selectCard, updateCards } from "@/redux/reducers/card";
 import CardList from "@/components/CardList";
-import { IResponse } from "@/type/response";
-import { handleGetAllImage } from "@/api/imgur";
-
-const showCardAmounts = 8;
 
 export default function Home() {
     const { data: session, status } = useSession();
-    const [selectedCardId, setSelectedCardId] = useState<string>("");
+    // const [selectedCardId, setSelectedCardId] = useState<string>("");
     const [draggingBox, setDraggingBox] = useState<boxType>("");
     const [dirtyState, setDirtyState] = useState<"dirty" | "clear" | "none">("none");
     const [dirtyCards, setDirtyCards] = useState<string[]>([]);
     const dispatch = useDispatch();
-    const user = useSelector((state: IState) => state.user);
+    const selectedCard = useSelector((state: IState) => state.selectedCard);
     const allCards = useSelector((state: IState) => state.card);
 
+    console.log("selectedCard", selectedCard?.boardElement)
     // console.log("wheelPx", wheelPx)
     // console.log("user", user)
     // console.log("session", session)
@@ -47,7 +36,7 @@ export default function Home() {
         let time: NodeJS.Timeout | null = null;
         if (dirtyState !== "dirty" || time) return;
         time = setInterval(async () => {
-            if (!selectedCardId) return;
+            // if (!selectedCardId) return;
             const idSet = new Set([...dirtyCards]);
             const data = allCards.filter(item => idSet.has(item.id));
             if (data.length === 0) return;
@@ -66,7 +55,7 @@ export default function Home() {
         return () => {
             if (time) clearInterval(time);
         }
-    }, [allCards, dirtyCards, dirtyState, selectedCardId]);
+    }, [allCards, dirtyCards, dirtyState]);
 
     return (
         <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
@@ -75,25 +64,25 @@ export default function Home() {
                 {dirtyCards.length > 0 && <p className="absolute top-10 left-16">改動尚未儲存，請勿離開本頁</p>}
                 {dirtyState === "clear" && <p className={`absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
 
-                {!selectedCardId && <p className="text-center w-full">{status !== "authenticated" ? "請先登入" : "請選擇一張卡片"}</p>}
-                {selectedCardId && <>
+                {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ? "請先登入" : "請選擇一張卡片"}</p>}
+                {selectedCard && <>
                     <main className="w-full h-full border border-slate-500 overflow-hidden">
-                        <Board elements={allCards.find(item => item.id === selectedCardId)?.boardElement || []}
+                        <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
                             handleUpdateElementList={(allElement: IBoardElement[]) => {
                                 console.log("update allElement list", allElement)
-                                const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
+                                const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
                                 const updatedCard: ICard = {
-                                    ...selectedCard,
+                                    ...newCard,
                                     boardElement: allElement
                                 }
                                 dispatch(updateCards([updatedCard]));
                             }}
                             handleUpdateElement={(data: IBoardElement) => {
                                 console.log("updatee element data", data)
-                                const selectedCard: ICard = allCards.find(item => item.id === selectedCardId) as ICard;
+                                const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
                                 const updatedCard: ICard = {
-                                    ...selectedCard,
-                                    boardElement: selectedCard.boardElement.map(ele => {
+                                    ...newCard,
+                                    boardElement: newCard.boardElement.map(ele => {
                                         if (ele.id === data.id) return data;
                                         return ele;
                                     })
@@ -108,7 +97,7 @@ export default function Home() {
                                 setDirtyState("dirty");
                                 setDirtyCards(pre => {
                                     const set = new Set([...pre]);
-                                    set.add(selectedCardId);
+                                    set.add(selectedCard.id);
                                     return Array.from(set);
                                 });
                             }}
@@ -117,13 +106,14 @@ export default function Home() {
                 </>}
                 <ControlPanel
                     handleDrag={(type) => {
-                        if (!selectedCardId) return;
+                        if (!selectedCard) return;
                         setDraggingBox(type);
                     }}
                 />
             </section>
-            <CardList selectedCardId={selectedCardId} handleSetSelectedCard={(id: string) => {
-                setSelectedCardId(id);
+            <CardList selectedCardId={selectedCard?.id} handleSetSelectedCard={(id: string) => {
+                // setSelectedCardId(id);
+                dispatch(selectCard(allCards.find(item => item.id === id) || null));
             }} />
         </main>
     );

@@ -11,7 +11,7 @@ const OPEN_MODAL = "OPEN_MODAL";
 const CLOSE_MODAL = "CLOSE_MODAL";
 
 export const openModal = (payload: IModalPayload) => ({ type: OPEN_MODAL, payload });
-export const closeModal = () => ({ type: CLOSE_MODAL });
+export const closeModal = (payload?: IModalPayload) => ({ type: CLOSE_MODAL, payload });
 
 export function modalReducer(state: IModalPayload = initModalState, action: IAction<IModalPayload>) {
     console.log("payload", action.payload)
@@ -20,7 +20,7 @@ export function modalReducer(state: IModalPayload = initModalState, action: IAct
             return action.payload;
         }
         case CLOSE_MODAL: {
-            return { type: "" };
+            return action.payload;
         }
         default: return state;
     }

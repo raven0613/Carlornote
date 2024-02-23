@@ -28,7 +28,7 @@ export default function Card({ handleClick, isSelected, handleDelete, handleShar
 
                 <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-28 h-36 bg-zinc-300 rounded-lg   duration-200 shadow-lg  
                 grid grid-rows-5
-                    ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-10 cursor-pointer"}`}
+                    ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-6 cursor-pointer"}`}
                 >
                     <div className={`${name ? "row-span-4" : "row-span-5"} flex items-center justify-center`}>
                         {!url && <EmptyImageIcon classProps="p-2" />}
@@ -59,7 +59,7 @@ export default function Card({ handleClick, isSelected, handleDelete, handleShar
                             handleClickEdit();
                         }}
                         className={`w-5 h-5 p-[3px] rounded-full border border-slate-500 bg-slate-100 absolute bottom-1 right-1 z-50 
-                    ${isSelected ? "opacity-0 group-hover:opacity-100 group-hover:cursor-pointer" : "opacity-0"} hover:scale-125 duration-200
+                    ${isSelected ? "opacity-0 group-hover:opacity-100 group-hover:cursor-pointer" : "opacity-0 pointer-events-none"} hover:scale-125 duration-200
                 `}
                     ><ShareIcon classProps="fill-none stroke-slate-500" /></div>
                 </div>

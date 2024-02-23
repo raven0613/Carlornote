@@ -8,6 +8,21 @@ import { handlePostImgur } from "@/api/imgur";
 
 export const distenceToLeftTop = { left: 64, top: 64 };
 
+export function getResizedSize (originWidth: number, originHeight: number) {
+    const imageAspectRatio = originWidth / originHeight;
+    let width = 200;
+    let height = 200;
+    if (originWidth > originHeight && originWidth >= 800) {
+        width = 800;
+        height = width / imageAspectRatio;
+    }
+    else if (originHeight > originWidth && originHeight >= 400) {
+        height = 400;
+        width = height * imageAspectRatio;
+    }
+    return { width, height }
+}
+
 export interface INewImageBoxProps {
     name: string,
     content: string,
@@ -267,13 +282,15 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                             const base64 = reader.result as string;
                             const img = new Image();
                             img.src = base64;
+                            
                             img.onload = function () {
+                                const { width, height } = getResizedSize(img.width, img.height);
                                 // 取得圖片的寬和高
                                 newBoardElement = handleAddImageBox({
                                     name: "",
                                     content: "",
                                     position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y },
-                                    size: { width: img.width || 200, height: img.height || 200 }
+                                    size: { width, height }
                                 }) ?? [];
                                 console.log("newBoardElement", newBoardElement)
                             };
@@ -284,13 +301,14 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                         console.log("imgur res", res)
                         if (res.success === false) return;
                         if (!newBoardElement) return;
+                        const { width, height } = getResizedSize(res.data.width, res.data.height);
                         handleUpdateElementList(newBoardElement.map((item, index) => {
                             if (index === newBoardElement.length - 1) return {
                                 ...item,
                                 name: file.name,
                                 content: res.data.link,
-                                width: res.data.width,
-                                height: res.data.height
+                                width,
+                                height
                             };
                             return item;
                         }))
