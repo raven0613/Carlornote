@@ -112,6 +112,50 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         return newBoardElements;
     }, [dispatch, elements, handleUpdateElementList])
 
+    const imageUpload = useCallback(async (file: File) => {
+        const formData = new FormData();
+        formData.append("image", file);
+        let newBoardElement: IBoardElement[] = [];
+
+        // 使用 FileReader 預覽圖片
+        const reader = new FileReader();
+        reader.onload = function () {
+            const base64 = reader.result as string;
+            const img = new Image();
+            img.src = base64;
+            img.onload = function () {
+                const { width, height } = getResizedSize(img.width, img.height);
+                // 取得圖片的寬和高
+                newBoardElement = handleAddImageBox({
+                    name: "",
+                    content: "",
+                    position: { left: pointerRef.current.x, top: pointerRef.current.y },
+                    size: { width, height }
+                }) ?? [];
+                console.log("newBoardElement", newBoardElement)
+            };
+        };
+        reader.readAsDataURL(file);
+
+
+        const res = await handlePostImgur(formData);
+        console.log("res", res)
+
+        if (res.success === false) return;
+        if (!newBoardElement) return;
+        const { width, height } = getResizedSize(res.data.width, res.data.height);
+        handleUpdateElementList(newBoardElement.map((item, index) => {
+            if (index === newBoardElement.length - 1) return {
+                ...item,
+                name: file.name,
+                content: res.data.link,
+                width,
+                height
+            };
+            return item;
+        }))
+    }, [handleAddImageBox, handleUpdateElementList])
+
     // click
     useEffect(() => {
         function handleClick(e: MouseEvent) {
@@ -166,52 +210,11 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             const pastedText = e.clipboardData?.getData("text/plain") || "";
             console.log("pastedFiles", pastedFiles)
             console.log("pastedText", pastedText)
-            console.log("dropPointerRef", dropPointerRef)
 
             if (!pastedFiles && !pastedText) return;
             if (pastedFiles) {
                 const file = pastedFiles;
-                const formData = new FormData();
-                formData.append("image", file);
-
-                let newBoardElement: IBoardElement[] = [];
-
-                // 使用 FileReader 預覽圖片
-                const reader = new FileReader();
-                reader.onload = function () {
-                    const base64 = reader.result as string;
-                    const img = new Image();
-                    img.src = base64;
-                    img.onload = function () {
-                        // 取得圖片的寬和高
-                        newBoardElement = handleAddImageBox({
-                            name: "",
-                            content: "",
-                            position: { left: pointerRef.current.x, top: pointerRef.current.y },
-                            size: { width: img.width, height: img.height }
-                        }) ?? [];
-                        console.log("newBoardElement", newBoardElement)
-                    };
-                };
-                reader.readAsDataURL(file);
-
-
-                const res = await handlePostImgur(formData);
-                console.log("res", res)
-
-                if (res.success === false) return;
-                if (!newBoardElement) return;
-
-                handleUpdateElementList(newBoardElement.map((item, index) => {
-                    if (index === newBoardElement.length - 1) return {
-                        ...item,
-                        name: pastedFiles.name,
-                        content: res.data.link,
-                        width: res.data.width,
-                        height: res.data.height
-                    };
-                    return item;
-                }))
+                imageUpload(file);
             }
             else {
                 handleAddTextBox({
@@ -223,7 +226,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         }
         document.addEventListener("paste", handlePaste);
         return () => document.removeEventListener("paste", handlePaste);
-    }, [handleAddImageBox, handleAddTextBox, handleSetDirty, handleUpdateElementList])
+    }, [handleAddTextBox, handleSetDirty, imageUpload])
 
     function handleChangeZIndex(id: string) {
         // 被點選到的 element 要拉到第一個
@@ -281,49 +284,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
 
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
                         const file = e.currentTarget.files[0];
-                        // console.log("file", file)
-                        const formData = new FormData();
-                        formData.append("image", file);
-                        e.target.value = "";
-                        let newBoardElement: IBoardElement[] = [];
-
-                        // 使用 FileReader 預覽圖片
-                        const reader = new FileReader();
-                        reader.onload = function () {
-                            const base64 = reader.result as string;
-                            const img = new Image();
-                            img.src = base64;
-
-                            img.onload = function () {
-                                const { width, height } = getResizedSize(img.width, img.height);
-                                // 取得圖片的寬和高
-                                newBoardElement = handleAddImageBox({
-                                    name: "",
-                                    content: "",
-                                    position: { left: dropPointerRef.current.x, top: dropPointerRef.current.y },
-                                    size: { width, height }
-                                }) ?? [];
-                                console.log("newBoardElement", newBoardElement)
-                            };
-                        };
-                        reader.readAsDataURL(file);
-
-                        const res = await handlePostImgur(formData);
-                        console.log("imgur res", res)
-                        if (res.success === false) return;
-                        if (!newBoardElement) return;
-                        const { width, height } = getResizedSize(res.data.width, res.data.height);
-                        handleUpdateElementList(newBoardElement.map((item, index) => {
-                            if (index === newBoardElement.length - 1) return {
-                                ...item,
-                                name: file.name,
-                                content: res.data.link,
-                                width,
-                                height
-                            };
-                            return item;
-                        }))
-
+                        imageUpload(file);
                         handleSetDirty();
                     }}
                     onMouseMove={(e) => {
