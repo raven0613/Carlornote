@@ -7,20 +7,28 @@ import { selectElementId } from "@/redux/reducers/boardElement";
 import { ImageCore } from "../box/ImageBox";
 import { selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
 import { handleChangeZIndex } from "../Board";
+import { ReactNode } from "react";
+import StackArrowIcon from "../svg/StackArrow";
+import DeleteIcon from "../svg/Delete";
+import PositionIcon from "../svg/Position";
+import UnlockIcon from "../svg/Unlock";
+import LockIcon from "../svg/Lock";
+import EyeIcon from "../svg/Eye";
+import EyeCloseIcon from "../svg/EyeClose";
 
 interface IButton {
-    text: string;
+    children: ReactNode;
     handleClick: () => void;
     classProps?: string;
 }
 
-function Button({ text, handleClick, classProps }: IButton) {
+function Button({ children, handleClick, classProps }: IButton) {
     return (
-        <button type="button" className={`boardElement w-8 h-8 rounded-full ${classProps}`}
+        <button type="button" className={`boardElement w-8 h-8 rounded-full p-1.5 ${classProps}`}
             onClick={() => {
                 handleClick();
             }}
-        >{text}</button>
+        >{children}</button>
     )
 }
 
@@ -59,7 +67,7 @@ export default function ElementModal({ }: IElementModal) {
                             >
                                 {/* buttons */}
                                 {<section className={`boardElement w-full  flex gap-2 items-center justify-center overflow-hidden duration-150 ${selectedElementId === item.id ? "h-10 opacity-100" : "h-0 opacity-0"}`}>
-                                    <Button text="刪"
+                                    <Button
                                         handleClick={() => {
                                             const newElements = selectedCard.boardElement.filter(ele => ele.id !== item.id);
                                             const updatedCard: ICard = {
@@ -68,8 +76,10 @@ export default function ElementModal({ }: IElementModal) {
                                             }
                                             save(updatedCard);
                                             dispatch(selectElementId(""));
-                                        }} classProps="bg-red-500" />
-                                    <Button text="重"
+                                        }} classProps="bg-red-500" >
+                                        <DeleteIcon />
+                                    </Button>
+                                    <Button
                                         handleClick={() => {
                                             const updatedCard: ICard = {
                                                 ...selectedCard,
@@ -83,11 +93,25 @@ export default function ElementModal({ }: IElementModal) {
                                                 })
                                             }
                                             save(updatedCard);
-                                        }} classProps="bg-slate-300" />
-                                    <Button text="鎖" handleClick={() => {
-
-                                    }} classProps="bg-slate-300" />
-                                    <Button text={`${item.opacity === 0 ? "開" : "隱"}`}
+                                        }} classProps="bg-slate-300" >
+                                        <PositionIcon />
+                                    </Button>
+                                    <Button handleClick={() => {
+                                        const updatedCard: ICard = {
+                                            ...selectedCard,
+                                            boardElement: selectedCard.boardElement.map(ele => {
+                                                if (ele.id === item.id) return {
+                                                    ...ele,
+                                                    isLock: item.isLock ? false : true
+                                                }
+                                                return ele;
+                                            })
+                                        }
+                                        save(updatedCard);
+                                    }} classProps="bg-slate-300" >
+                                        {item.isLock ? <UnlockIcon /> : <LockIcon />}
+                                    </Button>
+                                    <Button
                                         handleClick={() => {
                                             const updatedCard: ICard = {
                                                 ...selectedCard,
@@ -101,8 +125,10 @@ export default function ElementModal({ }: IElementModal) {
                                             }
                                             save(updatedCard);
                                         }} classProps="bg-slate-300"
-                                    />
-                                    <Button text="下"
+                                    >
+                                        {item.opacity === 0 ? <EyeIcon /> : <EyeCloseIcon />}
+                                    </Button>
+                                    <Button
                                         handleClick={() => {
                                             const updatedElements = handleChangeZIndex(item.id, "bottom", selectedCard.boardElement);
                                             if (!updatedElements) return;
@@ -112,8 +138,10 @@ export default function ElementModal({ }: IElementModal) {
                                             }
                                             save(updatedCard);
                                         }} classProps="bg-slate-300"
-                                    />
-                                    <Button text="上"
+                                    >
+                                        <StackArrowIcon classProps="rotate-180" />
+                                    </Button>
+                                    <Button
                                         handleClick={() => {
                                             const updatedElements = handleChangeZIndex(item.id, "top", selectedCard.boardElement);
                                             if (!updatedElements) return;
@@ -123,7 +151,9 @@ export default function ElementModal({ }: IElementModal) {
                                             }
                                             save(updatedCard);
                                         }} classProps="bg-slate-300"
-                                    />
+                                    >
+                                        <StackArrowIcon />
+                                    </Button>
                                 </section>}
                                 {item.type === "text" && <>
                                     <div

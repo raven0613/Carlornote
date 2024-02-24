@@ -33,23 +33,25 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     const [radius, setRadius] = useState(0);
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
     const [isDragging, setIsDragging] = useState(false);
+    const [isLock, setIsLock] = useState(false);
     // console.log("isEditMode", isEditMode)
-    // console.log("isLocked", isLocked)
+    console.log("isLock", isLock)
     // const isSelected = isShadowElement ? true : selectedElementId === data.id;
 
     useEffect(() => {
         if (isSelected) setIsEditMode(true);
         else setIsEditMode(false);
-    }, [isSelected])
+    }, [isSelected]);
 
     useEffect(() => {
         if (!data) return;
         setDeg(data.rotation);
         setRadius(data.radius);
         setSize({ width: data.width, height: data.height });
+        setIsLock((isLocked || data.isLock) ?? false);
         if (isShadowElement) return;
         setPosition({ left: data.left, top: data.top });
-    }, [data, isShadowElement])
+    }, [data, isLocked, isShadowElement]);
 
     useEffect(() => {
         if (!isShadowElement) return;
@@ -66,7 +68,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 className={`boardElement absolute min-h-5 min-w-12 border hover:border-slate-400 
             ${isEditMode ? "border-slate-400" : "border-transparent"} 
             ${isShadowElement ? "opacity-50" : "opacity-100"}
-            ${isLocked ? "pointer-events-none" : ""}
+            ${data.isLock ? "pointer-events-none" : ""}
             ${(isSelected || isDragging) ? "shadow-md shadow-black/30" : ""}
             `}
                 style={{
@@ -104,7 +106,6 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     setIsDragging(false);
                 }}
                 onDragOver={(e) => {
-                    // console.log("ㄟㄟ")
                     e.preventDefault();
                     // setIsLock(true);
                 }}

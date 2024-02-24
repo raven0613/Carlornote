@@ -257,7 +257,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             <div className="boardElement relative w-full h-full"
                 // style={{ scale: "70%" }}
                 onDragOver={(e) => {
-                    // console.log("ㄟㄟ")
+                    // 為了防止在圖片上方 drop 的時候變成在瀏覽器打開圖片的行為，需要將圖片設定成 pointer-events-none
                     e.preventDefault();
                     setIsLock(true);
                 }}
@@ -353,7 +353,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     return <></>
                 })}
                 {draggingBox === "text" && <TextBox
-                    isLocked={false}
+                    isLocked={isLock}
                     handleUpdateElement={() => { }}
                     textData={{
                         id: "dragging_text",
@@ -375,7 +375,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     handleChangeZIndex={() => { }}
                 />}
                 {draggingBox === "image" && <ImageBox
-                    isLocked={false}
+                    isLocked={isLock}
                     handleUpdateElement={() => { }}
                     imageData={{
                         id: "dragging_image",
