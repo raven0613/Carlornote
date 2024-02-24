@@ -112,17 +112,6 @@ export default function CardPage() {
                                 }
                                 dispatch(updateCards([updatedCard]));
                             }}
-                            handleUpdateElement={(data) => {
-                                const selectedCard: ICard = allCards[0];
-                                const updatedCard: ICard = {
-                                    ...selectedCard,
-                                    boardElement: selectedCard.boardElement.map(ele => {
-                                        if (ele.id === data.id) return data;
-                                        return ele;
-                                    })
-                                }
-                                dispatch(updateCards([updatedCard]));
-                            }}
                             draggingBox={draggingBox}
                             handleMouseUp={() => {
                                 setDraggingBox("");

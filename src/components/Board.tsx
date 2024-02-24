@@ -27,6 +27,22 @@ export function getResizedSize(originWidth: number, originHeight: number) {
     return { width, height }
 }
 
+export function handleChangeZIndex(id: string, to: "top" | "bottom", elements: IBoardElement[]) {
+    // 被點選到的 element 要拉到第一個
+    console.log("id", id)
+    const filteredElements = elements.filter(item => item.id !== id);
+    const selectedElement = elements.find(item => item.id === id);
+    if (!selectedElement) return;
+    if (to === "bottom") {
+        if (selectedElement.id === elements.at(0)?.id) return;
+        return [selectedElement, ...filteredElements];
+    }
+    else if (to === "top") {
+        if (selectedElement.id === elements.at(-1)?.id) return;
+        return [...filteredElements, selectedElement];
+    }
+}
+
 export interface INewImageBoxProps {
     name: string,
     content: string,
@@ -49,14 +65,13 @@ function getContent(type: boxType) {
 
 interface IBoard {
     elements: IBoardElement[];
-    handleUpdateElement: (data: IBoardElement) => void;
     handleUpdateElementList: (allElement: IBoardElement[]) => void;
     draggingBox: boxType;
     handleMouseUp: () => void;
     handleSetDirty: () => void;
 }
 
-export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
+export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
     console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     console.log("selectedElementId", selectedElementId)
@@ -228,29 +243,6 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         return () => document.removeEventListener("paste", handlePaste);
     }, [handleAddTextBox, handleSetDirty, imageUpload])
 
-    function handleChangeZIndex(id: string) {
-        // 被點選到的 element 要拉到第一個
-        console.log("id", id)
-        const filteredElements = elements.filter(item => item.id !== id);
-        const selectedElement = elements.find(item => item.id === id);
-        // 被點選到的 element 本來就第一個的話就不用改動
-        if (!selectedElement || selectedElement.id === elements.at(0)?.id) return;
-        handleUpdateElementList([selectedElement, ...filteredElements]);
-        handleSetDirty();
-    }
-
-    function handleClick(id: string) {
-        // 被點選到的 element 要拉到最後一個
-        console.log("id", id)
-        const newElements = elements.filter(item => item.id !== id);
-        const selectedElement = elements.find(item => item.id === id);
-        // 被點選到的 element 本來就最後一個的話就不用改動
-        if (!selectedElement || selectedElement.id === elements.at(-1)?.id) return;
-        newElements.push(selectedElement);
-        handleUpdateElementList(newElements);
-        handleSetDirty();
-    }
-
     function handleDelete(id: string) {
         if (!id) return;
         const newElements = elements.filter(item => item.id !== id)
@@ -303,25 +295,59 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     if (item.type === "text") return (
                         <TextBox key={item.id}
                             isLocked={isLock}
-                            handleUpdateElement={handleUpdateElement}
+                            handleUpdateElement={(data: IBoardElement) => {
+                                handleUpdateElementList(elements.map((item) => {
+                                    if (item.id === data.id) return data;
+                                    return item;
+                                }))
+                            }}
                             textData={item}
                             isSelected={selectedElementId === item.id}
-                            handleClick={handleClick}
+                            handleClick={() => {
+                                // 拉到DOM最上方
+                                const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                if (!updatedElements) return;
+                                handleUpdateElementList(updatedElements);
+                                handleSetDirty();
+                            }}
                             handleDelete={handleDelete}
                             handleSetDirty={handleSetDirty}
-                            handleChangeZIndex={handleChangeZIndex}
+                            handleChangeZIndex={() => {
+                                // 拉到DOM最下方
+                                const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                if (!updatedElements) return;
+                                handleUpdateElementList(updatedElements);
+                                handleSetDirty();
+                            }}
                         />
                     )
                     if (item.type === "image") return (
                         <ImageBox key={item.id}
                             isLocked={isLock}
-                            handleUpdateElement={handleUpdateElement}
+                            handleUpdateElement={(data: IBoardElement) => {
+                                handleUpdateElementList(elements.map((item) => {
+                                    if (item.id === data.id) return data;
+                                    return item;
+                                }))
+                            }}
                             imageData={item}
                             isSelected={selectedElementId === item.id}
-                            handleClick={handleClick}
+                            handleClick={() => {
+                                // 拉到DOM最上方
+                                const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                if (!updatedElements) return;
+                                handleUpdateElementList(updatedElements);
+                                handleSetDirty();
+                            }}
                             handleDelete={handleDelete}
                             handleSetDirty={handleSetDirty}
-                            handleChangeZIndex={handleChangeZIndex}
+                            handleChangeZIndex={() => {
+                                // 拉到DOM最下方
+                                const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                if (!updatedElements) return;
+                                handleUpdateElementList(updatedElements);
+                                handleSetDirty();
+                            }}
                         />
                     )
                     return <></>

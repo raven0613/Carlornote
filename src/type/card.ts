@@ -13,7 +13,9 @@ export interface IBoardElement {
     radius: number,
     textColor?: string,
     fontSize?: number,
-    fontWeight?: number
+    fontWeight?: number,
+    opacity?: number,
+    isLock?: boolean
 }
 
 export interface ICard {

@@ -19,7 +19,7 @@ export default function Home() {
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
 
-    console.log("selectedCard", selectedCard)
+
     // console.log("wheelPx", wheelPx)
     // console.log("user", user)
     // console.log("session", session)
@@ -75,19 +75,6 @@ export default function Home() {
                                 const updatedCard: ICard = {
                                     ...newCard,
                                     boardElement: allElement
-                                }
-                                dispatch(updateCards([updatedCard]));
-                                dispatch(selectCard(updatedCard));
-                            }}
-                            handleUpdateElement={(data: IBoardElement) => {
-                                console.log("updatee element data", data)
-                                const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
-                                const updatedCard: ICard = {
-                                    ...newCard,
-                                    boardElement: newCard.boardElement.map(ele => {
-                                        if (ele.id === data.id) return data;
-                                        return ele;
-                                    })
                                 }
                                 dispatch(updateCards([updatedCard]));
                                 dispatch(selectCard(updatedCard));

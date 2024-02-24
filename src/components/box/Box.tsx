@@ -69,7 +69,15 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
             ${isLocked ? "pointer-events-none" : ""}
             ${(isSelected || isDragging) ? "shadow-md shadow-black/30" : ""}
             `}
-                style={{ left: `${position.left}px`, top: `${position.top}px`, rotate: `${deg}deg`, width: size.width, height: size.height, transition: "border-color 0.15s ease" }}
+                style={{
+                    left: `${position.left}px`,
+                    top: `${position.top}px`,
+                    rotate: `${deg}deg`,
+                    width: size.width,
+                    height: size.height,
+                    transition: "border-color 0.15s ease",
+                    opacity: data.opacity
+                }}
                 onMouseDown={(e) => {
                     // 紀錄點擊的時候的位置
                     leftTopRef.current = {

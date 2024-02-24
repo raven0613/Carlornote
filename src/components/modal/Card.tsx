@@ -36,8 +36,8 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                     <input id="board_input" name="board_input" type="file" className="w-full h-full opacity-0 absolute inset-0"
                         onChange={async (e) => {
                             console.log("image drop")
-                            e.preventDefault()
-                            e.stopPropagation()
+                            e.preventDefault();
+                            e.stopPropagation();
                             if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
 
                             const file = e.currentTarget.files[0];
