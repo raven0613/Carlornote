@@ -30,14 +30,15 @@ export default function Card({ handleClick, isSelected, handleDelete, handleShar
                 grid grid-rows-5
                     ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-6 cursor-pointer"}`}
                 >
-                    <div className={`${name ? "row-span-4" : "row-span-5"} flex items-center justify-center`}>
+                    <div className={`${name ? "row-span-4" : "row-span-5"} flex items-center justify-center overflow-hidden`}>
                         {!url && <EmptyImageIcon classProps="p-2 pointer-events-none" />}
                         {url && <Image
-                            className={`rounded-md`} width={80} height={100} src={url}
+                            className={`rounded-md`} width={150} height={150} src={url}
                             priority={true}
                             alt={name}
                             style={{
                                 objectFit: 'cover', // cover, contain, none
+                                width: '80%', height: '80%',
                             }}
                             onLoad={(e) => {
                                 console.log("onLoad")

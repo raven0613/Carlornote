@@ -5,10 +5,14 @@ import { useCallback, useContext, useEffect, useId, useRef, useState } from "rea
 import { v4 as uuidv4 } from 'uuid';
 import ImageBox from "./box/ImageBox";
 import { handlePostImgur } from "@/api/imgur";
+import { useDispatch, useSelector } from "react-redux";
+import { selectElementId } from "@/redux/reducers/boardElement";
+import { IState } from "@/redux/store";
+import { closeModal } from "@/redux/reducers/modal";
 
 export const distenceToLeftTop = { left: 64, top: 64 };
 
-export function getResizedSize (originWidth: number, originHeight: number) {
+export function getResizedSize(originWidth: number, originHeight: number) {
     const imageAspectRatio = originWidth / originHeight;
     let width = originWidth;
     let height = originHeight;
@@ -54,10 +58,12 @@ interface IBoard {
 
 export default function Board({ elements, handleUpdateElement, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
     console.log("Board elements", elements)
-    const [selectedId, setSelectedId] = useState("");
+    const selectedElementId = useSelector((state: IState) => state.selectedElementId);
+    console.log("selectedElementId", selectedElementId)
     const pointerRef = useRef({ x: 0, y: 0 });
     const dropPointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
+    const dispatch = useDispatch();
 
     // console.log("selectedId", selectedId)
     // console.log("draggingBox", draggingBox)
@@ -80,13 +86,14 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
             radius: 0
         }]
         handleUpdateElementList(newBoardElement);
-        setSelectedId(id);
-    }, [draggingBox, elements, handleUpdateElementList])
+        dispatch(selectElementId(newBoardElement.at(-1)?.id ?? ""));
+        dispatch(closeModal({ type: "" }));
+    }, [dispatch, draggingBox, elements, handleUpdateElementList])
 
     const handleAddImageBox = useCallback(({ name, content, position: { left, top }, size: { width, height } }: INewImageBoxProps) => {
         const id = `element_${uuidv4()}`;
         if (!left || !top) return;
-        console.log("ㄟㄟ")
+        // console.log("ㄟㄟ")
         const newBoardElements = [...elements, {
             id: id,
             type: "image" as boxType,
@@ -101,21 +108,25 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         }]
         handleUpdateElementList(newBoardElements);
         setIsLock(false);
+        dispatch(closeModal({ type: "" }));
         return newBoardElements;
-    }, [elements, handleUpdateElementList])
+    }, [dispatch, elements, handleUpdateElementList])
 
     // click
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             console.log("click", (e.target as HTMLElement))
             if (e.target instanceof HTMLElement) {
-                if (e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) setSelectedId(e.target.id);
-                else setSelectedId("");
+                console.log("click", e.target.id)
+                if (e.target.classList.contains("boardElement") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) {
+                    if (e.target.id) dispatch(selectElementId(e.target.id));
+                }
+                else dispatch(selectElementId(""))
             }
         }
         document.addEventListener("click", handleClick);
         return () => document.removeEventListener("click", handleClick);
-    }, []);
+    }, [dispatch]);
 
     // mouse up
     useEffect(() => {
@@ -241,7 +252,8 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
         if (!id) return;
         const newElements = elements.filter(item => item.id !== id)
         handleUpdateElementList(newElements);
-        setSelectedId("");
+        // setSelectedId("");
+        dispatch(selectElementId(""))
         handleSetDirty();
     }
 
@@ -260,14 +272,13 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                     // console.log("left", e.clientX)
                     // console.log("top", e.clientY)
                 }}
-                onWheel={() => {
-                }}
             >
                 <input id="board_input" name="board_input" type="file" className="boardElement w-full h-full opacity-0"
                     onChange={async (e) => {
                         console.log("image drop")
                         e.preventDefault()
                         e.stopPropagation()
+
                         if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
                         const file = e.currentTarget.files[0];
                         // console.log("file", file)
@@ -282,7 +293,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                             const base64 = reader.result as string;
                             const img = new Image();
                             img.src = base64;
-                            
+
                             img.onload = function () {
                                 const { width, height } = getResizedSize(img.width, img.height);
                                 // 取得圖片的寬和高
@@ -333,7 +344,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                             isLocked={isLock}
                             handleUpdateElement={handleUpdateElement}
                             textData={item}
-                            isSelected={selectedId === item.id}
+                            isSelected={selectedElementId === item.id}
                             handleClick={handleClick}
                             handleDelete={handleDelete}
                             handleSetDirty={handleSetDirty}
@@ -345,7 +356,7 @@ export default function Board({ elements, handleUpdateElement, handleUpdateEleme
                             isLocked={isLock}
                             handleUpdateElement={handleUpdateElement}
                             imageData={item}
-                            isSelected={selectedId === item.id}
+                            isSelected={selectedElementId === item.id}
                             handleClick={handleClick}
                             handleDelete={handleDelete}
                             handleSetDirty={handleSetDirty}

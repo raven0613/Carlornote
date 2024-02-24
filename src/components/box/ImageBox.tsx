@@ -57,7 +57,6 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
                         // 沒有名字代表是直接貼上網址
                         handleOnLoad({ ...imageData, content: url, width: e.currentTarget.naturalWidth, height: e.currentTarget.naturalHeight, name });
                     }
-
                     // console.log("load imageData", imageData)
                     // console.log("imageData.name", imageData.name)
                     // setImageLoadState("success");
@@ -129,7 +128,7 @@ interface IImageBox {
     handleChangeZIndex: (id: string) => void;
 }
 
-export default function ImageBox({ imageData, handleUpdateElement, isSelected, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex }: IImageBox) {
+export default function ImageBox({ imageData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: IImageBox) {
     console.log("imageData", imageData)
     // console.log("isSelected", isSelected)
     // const [url, setUrl] = useState(imageData.content);

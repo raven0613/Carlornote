@@ -22,11 +22,11 @@ export function cardsReducer(state: ICard[] = initCardState, action: IAction<ICa
             return [...state, action.payload];
         }
         case ADD_CARDS: {
-            console.log("ADD_CARDS")
+            // console.log("ADD_CARDS")
             return [...state, ...(action.payload ?? [])];
         }
         case SET_CARDS: {
-            console.log("SET_CARDS")
+            // console.log("SET_CARDS")
             return action.payload;
         }
         case REMOVE_CARD: {
@@ -58,6 +58,43 @@ export function selectedCardReducer(state: ICard | null = initSelectedCardState,
     // console.log("payload", action.payload)
     switch (action.type) {
         case SELECT_CARD: {
+            return action.payload;
+        }
+        default: return state;
+    }
+}
+
+export const initDirtyCardsIdState = [];
+const SET_DIRTY_CARD = "SET_DIRTY_CARD";
+const CLEAR_DIRTY_CARD = "CLEAR_DIRTY_CARD";
+export const setDirtyCardId = (payload: string) => ({ type: SET_DIRTY_CARD, payload });
+export const clearDirtyCardId = () => ({ type: CLEAR_DIRTY_CARD });
+
+export function dirtyCardsIdReducer(state: string[] = initDirtyCardsIdState, action: IAction<string>) {
+    console.log("dirtyCards payload", action.payload)
+    switch (action.type) {
+        case SET_DIRTY_CARD: {
+            const set = new Set([...state]);
+            if (!action.payload) return [];
+            set.add(action.payload);
+            return Array.from(set);
+        }
+        case CLEAR_DIRTY_CARD: {
+            return [];
+        }
+        default: return state;
+    }
+}
+
+export type dirtyStateType = "dirty" | "clear" | "none";
+export const initDirtyState = "none";
+const SET_DIRTY_STATE = "SET_DIRTY_STATE";
+export const setDirtyState = (payload: dirtyStateType) => ({ type: SET_DIRTY_STATE, payload });
+
+export function dirtyReducer(state: dirtyStateType = initDirtyState, action: IAction<dirtyStateType>) {
+    console.log("dirtyState payload", action.payload)
+    switch (action.type) {
+        case SET_DIRTY_STATE: {
             return action.payload;
         }
         default: return state;

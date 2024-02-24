@@ -15,12 +15,12 @@ interface IModal {
 }
 
 export default function Modal({ isOpen, handleClose, children, position }: IModal) {
-    // TODO: 點到 svg 不會關掉
     const nodeRef = useClickOutside<HTMLDivElement>({
         handleMouseDown: () => {
             handleClose();
         }
     })
+    // console.log("nodeRef", nodeRef)
     if (position === "center") return (
         <>
             {isOpen && <>
@@ -33,8 +33,11 @@ export default function Modal({ isOpen, handleClose, children, position }: IModa
     )
     if (position === "aside") return (
         <>
-            <div ref={nodeRef} className="flex flex-col fixed top-14 w-fit h-fit shadow-md shadow-black/30 z-30 duration-300 ease-in-out rounded-xl"
-                style={{ right: isOpen? "0.5rem" : -(nodeRef.current?.offsetWidth ?? 0) }}
+            <div ref={nodeRef} className={`flex-col fixed top-14 w-fit h-fit  duration-300 ease-in-out rounded-xl right-0 shadow-md shadow-black/30
+            ${isOpen ? "-translate-x-[0.55rem]" : "translate-x-full"}
+            `}
+                style={{
+                }}
             >
                 {children}
             </div>

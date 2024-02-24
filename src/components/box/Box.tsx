@@ -4,6 +4,8 @@ import { IBoardElement } from "@/type/card";
 import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } from "react";
 import RotateIcon from "../svg/Rotate";
 import { distenceToLeftTop } from "@/components/Board";
+import { useSelector } from "react-redux";
+import { IState } from "@/redux/store";
 
 interface IBox {
     data: IBoardElement;
@@ -19,8 +21,8 @@ interface IBox {
     isImage?: boolean;
 }
 
-export default function Box({ data, handleUpdate, isSelected, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage }: IBox) {
-    // console.log(textData) 
+export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected }: IBox) {
+
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
     const boxRef = useRef<HTMLDivElement>(null);
@@ -32,7 +34,8 @@ export default function Box({ data, handleUpdate, isSelected, handleClick, child
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
     const [isDragging, setIsDragging] = useState(false);
     // console.log("isEditMode", isEditMode)
-    console.log("isLocked", isLocked)
+    // console.log("isLocked", isLocked)
+    // const isSelected = isShadowElement ? true : selectedElementId === data.id;
 
     useEffect(() => {
         if (isSelected) setIsEditMode(true);

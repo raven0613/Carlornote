@@ -31,9 +31,9 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                     ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-10"}`}
             >
                 {/* display image */}
-                <div className={`row-span-6 flex items-center justify-center relative`}>
+                <div className={`row-span-6 flex items-center justify-center relative overflow-hidden rounded-md`}>
                     {!url && <EmptyImageIcon classProps="absolute inset-0" />}
-                    {!url && <input id="board_input" name="board_input" type="file" className="w-full h-full opacity-0"
+                    <input id="board_input" name="board_input" type="file" className="w-full h-full opacity-0 absolute inset-0"
                         onChange={async (e) => {
                             console.log("image drop")
                             e.preventDefault()
@@ -57,12 +57,13 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                         }}
                         onDrop={(e) => {
                         }}
-                    />}
+                    />
                     {url && <Image
                         className={`rounded-md`} width={200} height={220} src={url}
                         alt={`${cardData.name} image`}
                         style={{
                             objectFit: 'cover', // cover, contain, none
+                            width: '100%', height: '100%',
                         }}
                         onLoad={(e) => {
                             console.log("onLoad")
@@ -141,7 +142,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                         const resData = JSON.parse(response.data);
                         console.log("resData", resData)
                         dispatch(updateCards(resData));
-                        dispatch(closeModal());
+                        dispatch(closeModal({ type: "", data: null }));
                     }} >v</button>
                 </div>
             </div>

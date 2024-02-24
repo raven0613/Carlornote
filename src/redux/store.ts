@@ -1,14 +1,23 @@
 "use client"
 import { combineReducers, legacy_createStore as createStore } from 'redux';
 import { initUserState, userReducer } from './reducers/user';
-import { ICard } from '@/type/card';
-import { cardsReducer, selectedCardReducer } from './reducers/card';
+import { IBoardElement, ICard } from '@/type/card';
+import { cardsReducer, dirtyCardsIdReducer, selectedCardReducer, dirtyStateType, dirtyReducer } from './reducers/card';
 import { modalReducer, IModalPayload } from './reducers/modal';
+import { selectedElementIdReducer } from './reducers/boardElement';
 
 export interface IAction<T> { type: string, payload?: T }
-export interface IState { user: IUser | null, card: ICard[], modal: IModalPayload, selectedCard: ICard }
+export interface IState { user: IUser | null, card: ICard[], modal: IModalPayload, selectedCard: ICard, selectedElementId: string, dirtyCardsId: string[], dirtyState: dirtyStateType }
 
-const rootReducer = combineReducers({ user: userReducer, card: cardsReducer, modal: modalReducer, selectedCard: selectedCardReducer });
+const rootReducer = combineReducers({
+    user: userReducer,
+    card: cardsReducer,
+    modal: modalReducer,
+    selectedCard: selectedCardReducer,
+    selectedElementId: selectedElementIdReducer,
+    dirtyCardsId: dirtyCardsIdReducer,
+    dirtyState: dirtyReducer
+});
 const initialState = { user: initUserState }
 
 export const store = createStore(rootReducer, initialState);
