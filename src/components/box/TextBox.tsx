@@ -105,11 +105,11 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
                     }}
-                    className={`boardElement textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700 
+                    className={`textInput boardElement textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700 
                     ${fontWeightMap[textData.fontWeight ?? "normal"]}
                     ${fontSizeMap[textData.fontSize ?? "base"]}
                     `}
-                    style={{ color: textData.textColor ?? "#FFFFFF" }}
+                    style={{ color: textData.textColor ?? "#525252" }}
                     value={value}>
                 </textarea>
 

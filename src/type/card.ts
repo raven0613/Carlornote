@@ -1,4 +1,4 @@
-export type boxType = "text" | "card" | "image" | "";
+export type boxType = "text" | "card" | "image" | "code" | "";
 
 export interface IBoardElement {
     id: string,

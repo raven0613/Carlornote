@@ -88,7 +88,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                 {/* url input */}
                 <div className="relative">
                     <input
-                        className={`row-span-1 outline-none border h-full m-auto text-sm pl-2 pr-8 rounded-md w-full
+                        className={`textInput row-span-1 outline-none border h-full m-auto text-sm pl-2 pr-8 rounded-md w-full
                     `} value={inputUrl || ""}
                         onChange={(e) => {
                             setInputUrl(e.target.value.trim());
@@ -109,7 +109,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                 </div>
 
                 {/* name input */}
-                <input className="row-span-1 h-full text-slate-700 m-auto text-sm outline-none px-2 rounded-md placeholder:text-sm" placeholder="輸入卡片名稱" value={name} onChange={(e) => {
+                <input className="textInput row-span-1 h-full text-slate-700 m-auto text-sm outline-none px-2 rounded-md placeholder:text-sm" placeholder="輸入卡片名稱" value={name} onChange={(e) => {
                     setName(e.target.value.trim());
                 }} />
 

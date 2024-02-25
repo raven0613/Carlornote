@@ -6,6 +6,7 @@ import Image from "next/image";
 import { v4 as uuidv4 } from 'uuid';
 import { ImageLoading } from "../ImageLoading";
 import UrlLoading from "../UrlLoading";
+import OKIcon from "../svg/OK";
 
 interface IImageCore {
     imageData: IBoardElement;
@@ -85,7 +86,7 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
                     }}
                 />
                 <button
-                    className={`boardElement imagebox w-7 h-7 bg-green-500 absolute right-6 top-1/2 -translate-y-1/2 rounded-full leading-5 text-white
+                    className={`boardElement imagebox w-6 h-6 bg-green-500 absolute right-6 top-1/2 -translate-y-1/2 rounded-full leading-5 text-white p-1
         `}
                     onClick={(e) => {
                         e.preventDefault();
@@ -100,7 +101,7 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
                         setUrl(inputValueRef.current);
                     }}
                 >
-                    {imageLoadState === "url-loading" ? "o" : "v"}
+                    {imageLoadState === "url-loading" ? "o" : <OKIcon classProps="stroke-slate-600 stroke-2" />}
                 </button>
             </>}
         </>

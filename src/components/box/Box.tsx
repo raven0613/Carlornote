@@ -24,7 +24,7 @@ interface IBox {
 
 export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove }: IBox) {
 
-    // console.log(data.name, isSelected)
+    console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
     const boxRef = useRef<HTMLDivElement>(null);
     const clickedRef = useRef<EventTarget | null>(null);

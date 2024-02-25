@@ -9,8 +9,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectElementId } from "@/redux/reducers/boardElement";
 import { IState } from "@/redux/store";
 import { closeModal } from "@/redux/reducers/modal";
+import CodeBox from "./box/CodeBox";
 
 export const distenceToLeftTop = { left: 64, top: 64 };
+
+const draggingBoxWidth = {
+    text: 200,
+    image: 500, // for url box
+    code: 500
+}
+
+const draggingBoxHeight = {
+    text: 60,
+    image: 30, // for url box
+    code: 300
+}
 
 export function getResizedSize(originWidth: number, originHeight: number) {
     const imageAspectRatio = originWidth / originHeight;
@@ -50,10 +63,13 @@ export interface INewImageBoxProps {
     size: { width: number, height: number }
 }
 
-interface INewTextBoxProps {
+interface INewBoxProps {
+    type: boxType,
     content: string,
     position: { left: number, top: number }
+    size: { width: number, height: number }
 }
+
 
 function getContent(type: boxType) {
     switch (type) {
@@ -80,30 +96,35 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const [isLock, setIsLock] = useState(false);
     const dispatch = useDispatch();
 
-    // console.log("selectedId", selectedId)
+    console.log("selectedId", selectedElementId)
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
     // console.log("isLock", isLock)
 
-    // add text box or imgUrl box
-    const handleAddTextBox = useCallback(({ content, position: { left, top } }: INewTextBoxProps) => {
+    // add box
+    const handleAddBox = useCallback(({ type, content, position: { left, top }, size: { width, height } }: INewBoxProps) => {
         const id = `element_${uuidv4()}`;
-        const newBoardElement = [...elements, {
+        const newBoardElement: IBoardElement[] = [...elements, {
             id: id,
-            type: draggingBox === "image" ? "image" : "text" as boxType,
+            type,
             name: "",
             content: content,
-            width: draggingBox === "image" ? 500 : 200,
-            height: draggingBox === "image" ? 30 : 60,
+            width,
+            height,
             rotation: 0,
             left,
             top,
-            radius: 0
+            radius: 0,
+            textColor: "#525252",
+            fontSize: "base",
+            fontWeight: "normal",
+            opacity: 100,
+            isLock: false
         }]
         handleUpdateElementList(newBoardElement);
         dispatch(selectElementId(newBoardElement.at(-1)?.id ?? ""));
         dispatch(closeModal({ type: "" }));
-    }, [dispatch, draggingBox, elements, handleUpdateElementList])
+    }, [dispatch, elements, handleUpdateElementList])
 
     const handleAddImageBox = useCallback(({ name, content, position: { left, top }, size: { width, height } }: INewImageBoxProps) => {
         const id = `element_${uuidv4()}`;
@@ -210,10 +231,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 // console.log("draggingBox", draggingBox)
                 if (!draggingBox) return;
                 // console.log("ㄟ")
-                handleAddTextBox({
+                handleAddBox({
+                    type: draggingBox,
                     content: getContent(draggingBox),
-                    position: { left: e.clientX - distenceToLeftTop.left, top: e.clientY - distenceToLeftTop.top }
-                });
+                    position: { left: e.clientX - distenceToLeftTop.left, top: e.clientY - distenceToLeftTop.top },
+                    size: { width: draggingBoxWidth[draggingBox as keyof typeof draggingBoxWidth], height: draggingBoxHeight[draggingBox as keyof typeof draggingBoxHeight] }
+                })
                 handleSetDirty();
             }
             // console.log((e.target as HTMLElement))
@@ -222,14 +245,14 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }
         document.addEventListener("mouseup", handleMouse);
         return () => document.removeEventListener("mouseup", handleMouse);
-    }, [draggingBox, handleAddImageBox, handleAddTextBox, handleMouseUp, handleSetDirty]);
+    }, [draggingBox, handleAddBox, handleMouseUp, handleSetDirty]);
 
     // paste
     useEffect(() => {
         async function handlePaste(e: ClipboardEvent) {
             console.log("e.target", e.target)
             if ((e.target as HTMLElement).classList.contains("imagebox")) return;
-            if (!(e.target as HTMLElement).classList.contains("boardElement")) return;
+            if ((e.target as HTMLElement).classList.contains("textInput")) return;
 
             const pastedFiles = e.clipboardData?.files[0];
             const pastedText = e.clipboardData?.getData("text/plain") || "";
@@ -242,16 +265,18 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 imageUpload(file);
             }
             else {
-                handleAddTextBox({
+                handleAddBox({
+                    type: "text",
                     content: pastedText,
-                    position: { left: pointerRef.current.x, top: pointerRef.current.y }
-                });
+                    position: { left: pointerRef.current.x, top: pointerRef.current.y },
+                    size: { width: draggingBoxWidth[draggingBox as keyof typeof draggingBoxWidth], height: draggingBoxHeight[draggingBox as keyof typeof draggingBoxHeight] }
+                })
             }
             handleSetDirty();
         }
         document.addEventListener("paste", handlePaste);
         return () => document.removeEventListener("paste", handlePaste);
-    }, [handleAddTextBox, handleSetDirty, imageUpload])
+    }, [draggingBox, handleAddBox, handleSetDirty, imageUpload])
 
     function handleDelete(id: string) {
         if (!id) return;
@@ -360,8 +385,38 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             }}
                         />
                     )
+                    if (item.type === "code") return (
+                        <CodeBox key={item.id}
+                            isLocked={isLock}
+                            handleUpdateElement={(data: IBoardElement) => {
+                                handleUpdateElementList(elements.map((item) => {
+                                    if (item.id === data.id) return data;
+                                    return item;
+                                }))
+                            }}
+                            textData={item}
+                            isSelected={selectedElementId === item.id}
+                            handleClick={() => {
+                                // 拉到DOM最上方
+                                const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                if (!updatedElements) return;
+                                handleUpdateElementList(updatedElements);
+                                handleSetDirty();
+                            }}
+                            handleDelete={handleDelete}
+                            handleSetDirty={handleSetDirty}
+                            handleChangeZIndex={() => {
+                                // 拉到DOM最下方
+                                const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                if (!updatedElements) return;
+                                handleUpdateElementList(updatedElements);
+                                handleSetDirty();
+                            }}
+                        />
+                    )
                     return <></>
                 })}
+
                 {draggingBox === "text" && <TextBox
                     isLocked={isLock}
                     handleUpdateElement={() => { }}
@@ -394,6 +449,28 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         content: "dragging_image",
                         width: 500,
                         height: 30,
+                        rotation: 0,
+                        left: window.outerWidth,
+                        top: window.outerHeight,
+                        radius: 0
+                    }}
+                    isSelected={true}
+                    handleClick={() => { }}
+                    handleSetDirty={() => { }}
+                    handleDelete={() => { }}
+                    isShadow={true}
+                    handleChangeZIndex={() => { }}
+                />}
+                {draggingBox === "code" && <CodeBox
+                    isLocked={isLock}
+                    handleUpdateElement={() => { }}
+                    textData={{
+                        id: "dragging_code",
+                        type: "code",
+                        name: "",
+                        content: "code",
+                        width: 500,
+                        height: 300,
                         rotation: 0,
                         left: window.outerWidth,
                         top: window.outerHeight,
