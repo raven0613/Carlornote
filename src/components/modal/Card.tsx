@@ -12,6 +12,9 @@ import { INewImageBoxProps } from "@/components/Board";
 import { removeCard, updateCards } from "@/redux/reducers/card";
 import { useDispatch } from "react-redux";
 import { closeModal } from "@/redux/reducers/modal";
+import { ImageLoading } from "../ImageLoading";
+import DeleteIcon from "../svg/Delete";
+import OKIcon from "../svg/OK";
 
 interface ICardModal {
     isSelected: boolean;
@@ -23,6 +26,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
     const [name, setName] = useState(cardData.name);
     const [inputUrl, setInputUrl] = useState("");
     const [url, setUrl] = useState(cardData.imageUrl);
+    const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     return (
         <>
@@ -31,7 +35,12 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                     ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-10"}`}
             >
                 {/* display image */}
-                <div className={`row-span-6 flex items-center justify-center relative overflow-hidden rounded-md`}>
+                {<div className={`row-span-6 flex items-center justify-center relative overflow-hidden rounded-md`}>
+
+                    {isLoading && <div className="absolute inset-0 z-10">
+                        <ImageLoading />
+                    </div>}
+
                     {!url && <EmptyImageIcon classProps="absolute inset-0" />}
                     <input id="board_input" name="board_input" type="file" className="w-full h-full opacity-0 absolute inset-0"
                         onChange={async (e) => {
@@ -40,6 +49,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                             e.stopPropagation();
                             if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
 
+                            setIsLoading(true);
                             const file = e.currentTarget.files[0];
                             // console.log("file", file)
                             const formData = new FormData();
@@ -58,20 +68,22 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                         onDrop={(e) => {
                         }}
                     />
-                    {url && <Image
+                    {(url) && <Image
                         className={`rounded-md`} width={200} height={220} src={url}
                         alt={`${cardData.name} image`}
                         style={{
                             objectFit: 'cover', // cover, contain, none
                             width: '100%', height: '100%',
+                            opacity: isLoading ? 0 : 200
                         }}
                         onLoad={(e) => {
                             console.log("onLoad")
+                            setIsLoading(false);
                         }}
                         onError={() => {
                         }}
                     />}
-                </div>
+                </div>}
 
                 {/* url input */}
                 <div className="relative">
@@ -83,14 +95,17 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                         }}
                         placeholder="輸入圖片網址或拖曳圖片"
                     />
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 hover:scale-125 duration-150"
+                    <button className="absolute right-2 top-1/2 -translate-y-1/2 hover:scale-125 duration-150 w-5 h-5"
                         onClick={(e) => {
                             console.log("image url ok")
                             e.preventDefault()
                             e.stopPropagation()
                             setUrl(inputUrl);
+                            setIsLoading(true);
                         }}
-                    >v</button>
+                    >
+                        <OKIcon classProps="stroke-slate-600" />
+                    </button>
                 </div>
 
                 {/* name input */}
@@ -112,9 +127,11 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                             dispatch(removeCard(cardData.id));
                             handleDelete();
                         }}
-                        className={`w-5 h-5 rounded-full border border-slate-100 bg-red-500 cursor-pointer hover:scale-125 duration-200
+                        className={`w-6 h-6 p-[3px] rounded-full  bg-red-500 cursor-pointer hover:scale-125 duration-200 
                 `}
-                    ></div>
+                    >
+                        <DeleteIcon classProps="stroke-slate-800 stroke-1" />
+                    </div>
                     {/* share */}
                     <div
                         onClick={async (e) => {
@@ -131,19 +148,21 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                             navigator.clipboard.writeText(`${url}card/${cardData.id.split("_")[1]}`);
                             return true;
                         }}
-                        className={`w-5 h-5 p-[3px] rounded-full border border-slate-500 bg-slate-100 cursor-pointer hover:scale-125 duration-200
+                        className={`w-6 h-6 p-[4px] rounded-full border border-slate-500 bg-slate-100 cursor-pointer hover:scale-125 duration-200
                 `}
                     ><ShareIcon classProps="fill-none stroke-slate-500" /></div>
 
                     {/* OK button */}
-                    <button className="bg-green-400 w-5 h-5 rounded-full text-slate-100" onClick={async () => {
+                    <button className="bg-green-400 w-6 h-6 p-[4px] rounded-full text-slate-100 hover:scale-125 duration-200" onClick={async () => {
                         const response = await handleUpdateCard([{ ...cardData, imageUrl: url, name }]);
                         if (response.status === "FAIL") return;
                         const resData = JSON.parse(response.data);
                         console.log("resData", resData)
                         dispatch(updateCards(resData));
                         dispatch(closeModal({ type: "", data: null }));
-                    }} >v</button>
+                    }} >
+                        <OKIcon classProps="stroke-slate-600" />
+                    </button>
                 </div>
             </div>
         </>

@@ -229,6 +229,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         async function handlePaste(e: ClipboardEvent) {
             console.log("e.target", e.target)
             if ((e.target as HTMLElement).classList.contains("imagebox")) return;
+            if (!(e.target as HTMLElement).classList.contains("boardElement")) return;
 
             const pastedFiles = e.clipboardData?.files[0];
             const pastedText = e.clipboardData?.getData("text/plain") || "";

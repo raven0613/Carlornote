@@ -152,7 +152,7 @@ export default function ElementModal({ }: IElementModal) {
                                             save(updatedCard);
                                             dispatch(selectElementId(""));
                                         }} classProps="bg-red-400" >
-                                        <DeleteIcon />
+                                        <DeleteIcon classProps="stroke-2 stroke-slate-700" />
                                     </Button>
                                 </section>}
                                 {item.type === "text" && <>
