@@ -1,10 +1,11 @@
 "use client"
 import { IBoardElement } from "@/type/card";
-import React, { useEffect, useRef, useState, DragEvent } from "react";
+import React, { useEffect, useRef, useState, DragEvent, ReactNode } from "react";
 import Box from "./Box";
 import Image from "next/image";
 import { v4 as uuidv4 } from 'uuid';
 import { ImageLoading } from "../ImageLoading";
+import UrlLoading from "../UrlLoading";
 
 interface IImageCore {
     imageData: IBoardElement;
@@ -12,19 +13,20 @@ interface IImageCore {
 }
 
 export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
-    // console.log("imageData", imageData)
+    console.log("imageData", imageData)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(imageData.content);
     const [showingBlock, setShowingBlock] = useState<"image" | "input" | "none">("none");
-    const [imageLoadState, setImageLoadState] = useState<"fail" | "success" | "loading" | "none">("loading")
+    const [imageLoadState, setImageLoadState] = useState<"fail" | "success" | "loading" | "url-loading" | "none">("loading")
     const inputValueRef = useRef<string>("");
 
     // console.log("url", url)
-    // console.log("imageSentState", imageLoadState)
-    // console.log("showingBlock", showingBlock)
+    console.log("imageSentState", imageLoadState)
+    console.log("showingBlock", showingBlock)
     useEffect(() => {
         if (imageData.content === "dragging_image" || imageData.content === "image") {
             setShowingBlock("input");
+            setImageLoadState("none")
         }
         if (!imageData.name || !imageData.content) return;
         // console.log("有內容了")
@@ -32,9 +34,14 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
         setUrl(imageData.content);
     }, [imageData])
 
+
     return (
         <>
             {(imageLoadState === "loading") && <ImageLoading />}
+            {(imageLoadState === "url-loading") && <div className="absolute -bottom-6 left-0 w-full border">
+                <UrlLoading isCompleted={imageData.name !== ""} />
+            </div>}
+
 
             {showingBlock === "image" && <Image id={imageData.id}
                 className={`boardElement imagebox ${(imageLoadState === "success") ? "opacity-100" : "opacity-0"}`}
@@ -88,12 +95,12 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
                             setImageLoadState("fail")
                             return;
                         }
-                        setImageLoadState("loading")
+                        setImageLoadState("url-loading");
                         setShowingBlock("image");
                         setUrl(inputValueRef.current);
                     }}
                 >
-                    {imageLoadState === "loading" ? "o" : "v"}
+                    {imageLoadState === "url-loading" ? "o" : "v"}
                 </button>
             </>}
         </>
@@ -122,6 +129,7 @@ export default function ImageBox({ imageData, handleUpdateElement, handleClick, 
     // console.log("imageData", imageData)
     return (
         <Box
+            handleMove={() => { }}
             isLocked={isLocked}
             isShadowElement={isShadow}
             handleUpdate={handleUpdateElement}

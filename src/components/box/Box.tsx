@@ -36,7 +36,8 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [isLock, setIsLock] = useState(false);
-    console.log("isDragging", isDragging)
+
+    // console.log("isDragging", isDragging)
     // console.log("isEditMode", isEditMode)
     // console.log("isLock", isLock)
     // console.log("clickedRef", clickedRef)
@@ -73,7 +74,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 className={`boardElement absolute min-h-5 min-w-12 border hover:border-slate-400 
             ${isEditMode ? "border-slate-400" : "border-transparent"} 
             ${isShadowElement ? "opacity-50" : "opacity-100"}
-            ${data.isLock ? "pointer-events-none" : ""}
+            ${isLock ? "pointer-events-none" : ""}
             ${(isSelected || isEditMode) ? "shadow-md shadow-black/30" : ""}
             `}
                 style={{
