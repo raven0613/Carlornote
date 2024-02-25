@@ -48,6 +48,7 @@ export default function Header({ }: IHeader) {
                     }]}
                         isOpen={openPopup === "setting"}
                         handleClose={() => setOpenPopup(null)}
+                        classPorops="top-10 right-2/4"
                     />
                 </button>
 

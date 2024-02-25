@@ -72,7 +72,7 @@ interface IBoard {
 }
 
 export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
-    console.log("Board elements", elements)
+    // console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     console.log("selectedElementId", selectedElementId)
     const pointerRef = useRef({ x: 0, y: 0 });
@@ -171,23 +171,34 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }))
     }, [handleAddImageBox, handleUpdateElementList])
 
-    // click
+    // click：檢查點擊的元素是否是 board 上面的，是的話紀錄 id，否的話移除 id
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             console.log("click", (e.target as HTMLElement))
             if (e.target instanceof HTMLElement) {
                 console.log("click", e.target.id)
+                const boardElements = document.querySelectorAll(".boardElement");
+                console.log(boardElements.length)
                 if (e.target.classList.contains("boardElement") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) {
                     if (e.target.id) dispatch(selectElementId(e.target.id));
+                    return;
                 }
-                else dispatch(selectElementId(""))
+                console.time("檢查")
+                for (let item of boardElements) {
+                    if (item.contains(e.target as HTMLElement)) {
+                        console.log("在 board 裡面")
+                        return;
+                    };
+                }
+                console.timeEnd("檢查")
+                dispatch(selectElementId(""))
             }
         }
         document.addEventListener("click", handleClick);
         return () => document.removeEventListener("click", handleClick);
     }, [dispatch]);
 
-    // mouse up
+    // mouse up 拖曳後放開：drop 時加入資料
     useEffect(() => {
         // if (!draggingBox) return;
         function handleMouse(e: MouseEvent) {
@@ -198,9 +209,9 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             if (!(e.target instanceof HTMLElement)) return;
             // drop 時加入資料
             if (e.target.classList.contains("boardElement")) {
-                console.log("draggingBox", draggingBox)
+                // console.log("draggingBox", draggingBox)
                 if (!draggingBox) return;
-                console.log("ㄟ")
+                // console.log("ㄟ")
                 handleAddTextBox({
                     content: getContent(draggingBox),
                     position: { left: e.clientX - distenceToLeftTop.left, top: e.clientY - distenceToLeftTop.top }

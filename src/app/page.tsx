@@ -25,8 +25,8 @@ export default function Home() {
     // console.log("session", session)
 
     // console.log("allCards page", allCards)
-    console.log("dirtyState", dirtyState)
-    console.log("dirtyCards", dirtyCards)
+    // console.log("dirtyState", dirtyState)
+    // console.log("dirtyCards", dirtyCards)
     // console.log("selectedCardId", selectedCardId)
     // console.log("selectedCard page", allCards.find(item => item.id === selectedCardId))
 

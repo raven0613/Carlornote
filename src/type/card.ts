@@ -12,8 +12,8 @@ export interface IBoardElement {
     top: number,
     radius: number,
     textColor?: string,
-    fontSize?: number,
-    fontWeight?: number,
+    fontSize?: "base" | "xs" | "xl" | "2xl",
+    fontWeight?: "normal" | "extraLight" | "semiBold" | "extraBold",
     opacity?: number,
     isLock?: boolean
 }

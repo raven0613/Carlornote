@@ -19,13 +19,15 @@ interface IBox {
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
     isImage?: boolean;
+    handleMove: (position: { left: number, top: number }) => void;
 }
 
-export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected }: IBox) {
+export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove }: IBox) {
 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
     const boxRef = useRef<HTMLDivElement>(null);
+    const clickedRef = useRef<EventTarget | null>(null);
     const [isEditMode, setIsEditMode] = useState(false);
     const [deg, setDeg] = useState(rotation);
     const [size, setSize] = useState({ width, height });
@@ -34,8 +36,10 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [isLock, setIsLock] = useState(false);
+    console.log("isDragging", isDragging)
     // console.log("isEditMode", isEditMode)
-    console.log("isLock", isLock)
+    // console.log("isLock", isLock)
+    // console.log("clickedRef", clickedRef)
     // const isSelected = isShadowElement ? true : selectedElementId === data.id;
 
     useEffect(() => {
@@ -53,6 +57,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
         setPosition({ left: data.left, top: data.top });
     }, [data, isLocked, isShadowElement]);
 
+    // 紀錄拖曳時的殘影位置
     useEffect(() => {
         if (!isShadowElement) return;
         function handleMouse(e: MouseEvent) {
@@ -69,7 +74,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
             ${isEditMode ? "border-slate-400" : "border-transparent"} 
             ${isShadowElement ? "opacity-50" : "opacity-100"}
             ${data.isLock ? "pointer-events-none" : ""}
-            ${(isSelected || isDragging) ? "shadow-md shadow-black/30" : ""}
+            ${(isSelected || isEditMode) ? "shadow-md shadow-black/30" : ""}
             `}
                 style={{
                     left: `${position.left}px`,
@@ -86,8 +91,11 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                         toBoxLeft: e.clientX - distenceToLeftTop.left - e.currentTarget.offsetLeft,
                         toBoxTop: e.clientY - distenceToLeftTop.top - e.currentTarget.offsetTop
                     };
+                    clickedRef.current = e.target;
+                    // setIsDragging(true);
                 }}
                 onDragStart={(e: DragEvent) => {
+                    console.log("box drag start", e.target)
                     console.log("box drag start", e.currentTarget)
                     // 設定游標 iconvar image = new Image();
                     const image = new Image();
@@ -101,18 +109,28 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     // 這時候才存資料
                     console.log("box drag end")
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
-                    setIsEditMode(false);
                     handleSetDirty();
                     setIsDragging(false);
+                    // 如果是 selected狀態，移動完不要關閉 edit mode
+                    if (isSelected) return;
+                    setIsEditMode(false);
                 }}
                 onDragOver={(e) => {
                     e.preventDefault();
                     // setIsLock(true);
                 }}
                 onDrag={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
                     if (!leftTopRef.current) return;
                     if (!e.clientX && !e.clientY) return;
+                    // console.log("clientY", e.clientY + distenceToLeftTop.top)
+                    // console.log("top", position.top)
                     setPosition({
+                        left: e.clientX - distenceToLeftTop.left - leftTopRef.current.toBoxLeft,
+                        top: e.clientY - distenceToLeftTop.top - leftTopRef.current.toBoxTop
+                    })
+                    handleMove({
                         left: e.clientX - distenceToLeftTop.left - leftTopRef.current.toBoxLeft,
                         top: e.clientY - distenceToLeftTop.top - leftTopRef.current.toBoxTop
                     })
@@ -125,7 +143,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 }}
                 draggable={true}
             >
-                <div className={`boardElement w-full h-full overflow-hidden`} style={{ borderRadius: `${radius}px` }}>
+                <div className={`boardElement w-full h-full`} style={{ borderRadius: `${radius}px` }}>
                     {children}
                 </div>
                 {/* size */}

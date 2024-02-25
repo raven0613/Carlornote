@@ -71,7 +71,7 @@ export const setDirtyCardId = (payload: string) => ({ type: SET_DIRTY_CARD, payl
 export const clearDirtyCardId = () => ({ type: CLEAR_DIRTY_CARD });
 
 export function dirtyCardsIdReducer(state: string[] = initDirtyCardsIdState, action: IAction<string>) {
-    console.log("dirtyCards payload", action.payload)
+    // console.log("dirtyCards payload", action.payload)
     switch (action.type) {
         case SET_DIRTY_CARD: {
             const set = new Set([...state]);
@@ -92,7 +92,7 @@ const SET_DIRTY_STATE = "SET_DIRTY_STATE";
 export const setDirtyState = (payload: dirtyStateType) => ({ type: SET_DIRTY_STATE, payload });
 
 export function dirtyReducer(state: dirtyStateType = initDirtyState, action: IAction<dirtyStateType>) {
-    console.log("dirtyState payload", action.payload)
+    // console.log("dirtyState payload", action.payload)
     switch (action.type) {
         case SET_DIRTY_STATE: {
             return action.payload;

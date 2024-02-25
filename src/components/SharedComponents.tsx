@@ -18,9 +18,9 @@ const SharedComponents = (props: IProps) => {
     const selectedCard = useSelector((state: IState) => state.selectedCard);
     const { type: openModalType, data: modalProp } = useSelector((state: IState) => state.modal)
     // console.log("modalProp", modalProp)
-    console.log("selectedCard", selectedCard)
+    // console.log("selectedCard", selectedCard)
     // console.log("status", status)
-    console.log("openModalType", openModalType)
+    // console.log("openModalType", openModalType)
 
     return (
         <>

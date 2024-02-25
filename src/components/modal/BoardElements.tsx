@@ -69,18 +69,6 @@ export default function ElementModal({ }: IElementModal) {
                                 {<section className={`boardElement w-full  flex gap-2 items-center justify-center overflow-hidden duration-150 ${selectedElementId === item.id ? "h-10 opacity-100" : "h-0 opacity-0"}`}>
                                     <Button
                                         handleClick={() => {
-                                            const newElements = selectedCard.boardElement.filter(ele => ele.id !== item.id);
-                                            const updatedCard: ICard = {
-                                                ...selectedCard,
-                                                boardElement: newElements
-                                            }
-                                            save(updatedCard);
-                                            dispatch(selectElementId(""));
-                                        }} classProps="bg-red-500" >
-                                        <DeleteIcon />
-                                    </Button>
-                                    <Button
-                                        handleClick={() => {
                                             const updatedCard: ICard = {
                                                 ...selectedCard,
                                                 boardElement: selectedCard.boardElement.map(ele => {
@@ -153,6 +141,18 @@ export default function ElementModal({ }: IElementModal) {
                                         }} classProps="bg-slate-300"
                                     >
                                         <StackArrowIcon />
+                                    </Button>
+                                    <Button
+                                        handleClick={() => {
+                                            const newElements = selectedCard.boardElement.filter(ele => ele.id !== item.id);
+                                            const updatedCard: ICard = {
+                                                ...selectedCard,
+                                                boardElement: newElements
+                                            }
+                                            save(updatedCard);
+                                            dispatch(selectElementId(""));
+                                        }} classProps="bg-red-400" >
+                                        <DeleteIcon />
                                     </Button>
                                 </section>}
                                 {item.type === "text" && <>

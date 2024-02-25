@@ -1,9 +1,9 @@
 "use client"
 import { IAction } from "../store";
 
-export interface IModalPayload { 
-    type: string, 
-    data?: any 
+export interface IModalPayload {
+    type: string,
+    data?: any
 }
 
 export const initModalState = { type: "" };
@@ -14,7 +14,7 @@ export const openModal = (payload: IModalPayload) => ({ type: OPEN_MODAL, payloa
 export const closeModal = (payload?: IModalPayload) => ({ type: CLOSE_MODAL, payload });
 
 export function modalReducer(state: IModalPayload = initModalState, action: IAction<IModalPayload>) {
-    console.log("payload", action.payload)
+    // console.log("payload", action.payload)
     switch (action.type) {
         case OPEN_MODAL: {
             return action.payload;

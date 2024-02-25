@@ -119,7 +119,7 @@ interface IImageBox {
 }
 
 export default function ImageBox({ imageData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: IImageBox) {
-    console.log("imageData", imageData)
+    // console.log("imageData", imageData)
     return (
         <Box
             isLocked={isLocked}
