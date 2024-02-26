@@ -31,31 +31,31 @@ export default function Home() {
     // console.log("selectedCard page", allCards.find(item => item.id === selectedCardId))
 
     // 有修改的話 5 秒存檔一次
-    useEffect(() => {
-        let time: NodeJS.Timeout | null = null;
-        if (dirtyState !== "dirty" || time) return;
-        time = setInterval(async () => {
-            // console.log("dirtyCards in time", dirtyCards);
-            const idSet = new Set([...dirtyCards]);
-            // console.log("idSet", idSet);
-            const data = allCards.filter(item => idSet.has(item.id));
-            if (data.length === 0) return;
+    // useEffect(() => {
+    //     let time: NodeJS.Timeout | null = null;
+    //     if (dirtyState !== "dirty" || time) return;
+    //     time = setInterval(async () => {
+    //         // console.log("dirtyCards in time", dirtyCards);
+    //         const idSet = new Set([...dirtyCards]);
+    //         // console.log("idSet", idSet);
+    //         const data = allCards.filter(item => idSet.has(item.id));
+    //         if (data.length === 0) return;
 
-            const response = await handleUpdateCard(data);
-            console.log("存檔", response);
-            const resData = JSON.parse(response.data);
-            const failedData = response.failedData && JSON.parse(response.failedData);
-            if (failedData) console.log("failedData", failedData);
-            // dispatch(updateCards(JSON.parse(response.data)));
+    //         const response = await handleUpdateCard(data);
+    //         console.log("存檔", response);
+    //         const resData = JSON.parse(response.data);
+    //         const failedData = response.failedData && JSON.parse(response.failedData);
+    //         if (failedData) console.log("failedData", failedData);
+    //         // dispatch(updateCards(JSON.parse(response.data)));
 
-            dispatch(setDirtyState("clear"))
-            dispatch(clearDirtyCardId());
-            if (time) clearInterval(time);
-        }, 5000);
-        return () => {
-            if (time) clearInterval(time);
-        }
-    }, [allCards, dirtyCards, dirtyState, dispatch]);
+    //         dispatch(setDirtyState("clear"))
+    //         dispatch(clearDirtyCardId());
+    //         if (time) clearInterval(time);
+    //     }, 5000);
+    //     return () => {
+    //         if (time) clearInterval(time);
+    //     }
+    // }, [allCards, dirtyCards, dirtyState, dispatch]);
 
     return (
         <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
@@ -70,7 +70,7 @@ export default function Home() {
                     <main className="w-full h-full border border-slate-500 overflow-hidden">
                         <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
                             handleUpdateElementList={(allElement: IBoardElement[]) => {
-                                console.log("update allElement list", allElement)
+                                // console.log("update allElement list", allElement)
                                 const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
                                 const updatedCard: ICard = {
                                     ...newCard,

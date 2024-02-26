@@ -42,7 +42,7 @@ export function getResizedSize(originWidth: number, originHeight: number) {
 
 export function handleChangeZIndex(id: string, to: "top" | "bottom", elements: IBoardElement[]) {
     // 被點選到的 element 要拉到第一個
-    console.log("id", id)
+    // console.log("id", id)
     const filteredElements = elements.filter(item => item.id !== id);
     const selectedElement = elements.find(item => item.id === id);
     if (!selectedElement) return;
@@ -95,8 +95,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const dropPointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
     const dispatch = useDispatch();
-
-    console.log("selectedId", selectedElementId)
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
     // console.log("isLock", isLock)
@@ -191,31 +189,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             return item;
         }))
     }, [handleAddImageBox, handleUpdateElementList])
-
-    // click：檢查點擊的元素是否是 board 上面的，是的話紀錄 id，否的話移除 id
-    useEffect(() => {
-        function handleClick(e: MouseEvent) {
-            console.log("click", (e.target as HTMLElement))
-            if (e.target instanceof HTMLElement) {
-                console.log("click", e.target.id)
-                if (e.target.classList.contains("boardElement") || e.target.classList.contains("textbox_textarea") || e.target.classList.contains("imagebox")) {
-                    if (e.target.id) dispatch(selectElementId(e.target.id));
-                    return;
-                }
-                const boardElements = document.querySelectorAll(".boardElement");
-                // console.log(boardElements.length)
-                for (let item of boardElements) {
-                    if (item.contains(e.target as HTMLElement)) {
-                        // 為了點擊套件裡面的元素不要取消選取
-                        return;
-                    };
-                }
-                dispatch(selectElementId(""))
-            }
-        }
-        document.addEventListener("click", handleClick);
-        return () => document.removeEventListener("click", handleClick);
-    }, [dispatch]);
 
     // mouse up 拖曳後放開：drop 時加入資料
     useEffect(() => {
@@ -318,8 +291,10 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         pointerRef.current = { x: e.clientX - distenceToLeftTop.left, y: e.clientY - distenceToLeftTop.top };
                     }}
                     onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
+                        e.preventDefault();
+                        // e.stopPropagation();
+                        console.log("按按按")
+                        dispatch(selectElementId(""));
                     }}
                     onDrop={(e) => {
                         dropPointerRef.current = { x: e.clientX - distenceToLeftTop.left, y: e.clientY - distenceToLeftTop.top };
@@ -339,6 +314,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             textData={item}
                             isSelected={selectedElementId === item.id}
                             handleClick={() => {
+                                dispatch(selectElementId(item.id));
                                 // 拉到DOM最上方
                                 const updatedElements = handleChangeZIndex(item.id, "top", elements);
                                 if (!updatedElements) return;
@@ -368,6 +344,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             imageData={item}
                             isSelected={selectedElementId === item.id}
                             handleClick={() => {
+                                dispatch(selectElementId(item.id));
                                 // 拉到DOM最上方
                                 const updatedElements = handleChangeZIndex(item.id, "top", elements);
                                 if (!updatedElements) return;
@@ -397,6 +374,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             textData={item}
                             isSelected={selectedElementId === item.id}
                             handleClick={() => {
+                                dispatch(selectElementId(item.id));
                                 // 拉到DOM最上方
                                 const updatedElements = handleChangeZIndex(item.id, "top", elements);
                                 if (!updatedElements) return;

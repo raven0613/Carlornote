@@ -32,7 +32,7 @@ interface ITextBox {
     textData: IBoardElement;
     handleUpdateElement: (data: IBoardElement) => void;
     isSelected: boolean;
-    handleClick: (id: string) => void;
+    handleClick: () => void;
     isShadow?: boolean;
     isLocked: boolean;
     handleDelete: (id: string) => void;
@@ -42,8 +42,7 @@ interface ITextBox {
 
 export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: ITextBox) {
     // console.log(textData)
-    // console.log("isSelected", isSelected)
-    const textRef = useRef<HTMLTextAreaElement>(null);
+    console.log("isSelected", isSelected)
     const [value, setValue] = useState(textData.content);
     const [isFontWeightOpen, setIsFontWeightOpen] = useState(false);
     const [isFontSizeOpen, setIsFontSizeOpen] = useState(false);
@@ -99,7 +98,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                 handleSetDirty={handleSetDirty}
                 handleChangeZIndex={handleChangeZIndex}
             >
-                <textarea id={textData.id} ref={textRef}
+                <textarea id={textData.id}
                     onChange={(e) => {
                         setValue(e.target.value);
                         handleUpdateElement({ ...textData, content: e.target.value });

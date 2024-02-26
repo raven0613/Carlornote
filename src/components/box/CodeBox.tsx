@@ -2,7 +2,7 @@
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { nord, vs2015, foundation, anOldHope, androidstudio, atelierDuneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { IBoardElement, ICard } from "@/type/card";
-import React, { RefObject, useEffect, useRef, useState, DragEvent } from "react";
+import React, { RefObject, useEffect, useRef, useState, DragEvent, ReactNode } from "react";
 import Box from "./Box";
 import Popup from "../Popup";
 import { ColorResult, SwatchesPicker, SliderPicker } from 'react-color';
@@ -25,7 +25,7 @@ interface ICodeBox {
     textData: IBoardElement;
     handleUpdateElement: (data: IBoardElement) => void;
     isSelected: boolean;
-    handleClick: (id: string) => void;
+    handleClick: () => void;
     isShadow?: boolean;
     isLocked: boolean;
     handleDelete: (id: string) => void;
@@ -34,8 +34,8 @@ interface ICodeBox {
 }
 
 export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: ICodeBox) {
-    console.log(textData)
-    console.log("CodeBox isSelected", isSelected)
+    // console.log(textData)
+    // console.log("CodeBox isSelected", isSelected)
     const textRef = useRef<HTMLTextAreaElement>(null);
     const [value, setValue] = useState(textData.content);
     const [isLanguageOpen, setIsLanguageOpen] = useState(false);
@@ -86,7 +86,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                     <SyntaxHighlighter
                         customStyle={{
                             width: "100%", height: "100%", borderRadius: "1rem",
-                            pointerEvents: "none"
+                            // pointerEvents: "none"
                         }} language="javascript" style={androidstudio} wrapLongLines>
                         {value}
                     </SyntaxHighlighter></div>}

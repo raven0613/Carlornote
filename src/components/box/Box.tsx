@@ -4,14 +4,15 @@ import { IBoardElement } from "@/type/card";
 import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } from "react";
 import RotateIcon from "../svg/Rotate";
 import { distenceToLeftTop } from "@/components/Board";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IState } from "@/redux/store";
+import { selectElementId } from "@/redux/reducers/boardElement";
 
 interface IBox {
     data: IBoardElement;
     handleUpdate: (data: IBoardElement) => void;
     isSelected: boolean;
-    handleClick: (id: string) => void;
+    handleClick: () => void;
     children: ReactNode;
     isShadowElement?: boolean;
     isLocked: boolean;
@@ -24,7 +25,7 @@ interface IBox {
 
 export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove }: IBox) {
 
-    console.log(data.name, isSelected)
+    // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
     const boxRef = useRef<HTMLDivElement>(null);
     const clickedRef = useRef<EventTarget | null>(null);
@@ -92,8 +93,8 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                         toBoxLeft: e.clientX - distenceToLeftTop.left - e.currentTarget.offsetLeft,
                         toBoxTop: e.clientY - distenceToLeftTop.top - e.currentTarget.offsetTop
                     };
-                    clickedRef.current = e.target;
                     // setIsDragging(true);
+                    clickedRef.current = e.target;
                 }}
                 onDragStart={(e: DragEvent) => {
                     console.log("box drag start", e.target)
@@ -139,7 +140,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleClick(data.id);
+                    handleClick();
                     setIsEditMode(true);
                 }}
                 draggable={true}

@@ -40,7 +40,7 @@ export default function ElementModal({ }: IElementModal) {
     const { type: openModalType, data: modalProp } = useSelector((state: IState) => state.modal)
     const dispatch = useDispatch();
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
-    console.log("selectedCard", selectedCard)
+    // console.log("selectedCard", selectedCard)
 
     function save(updatedCard: ICard) {
         dispatch(updateCards([updatedCard]));
