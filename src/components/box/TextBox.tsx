@@ -67,11 +67,11 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
 
     return (
         <>
-            {isColorOpen && <div className="boardElement absolute" ref={nodeRef}
+            {isColorOpen && <div className=" absolute" ref={nodeRef}
                 style={{ top: position.top - 275 <= 0 ? position.top + 100 : position.top - 275, left: position.left }}
             >
                 <SwatchesPicker
-                    className={`boardElement w-full h-full`}
+                    className={` w-full h-full`}
                     color={`${textData.textColor ?? "#555555"}`}
                     onChangeComplete={(result: ColorResult) => {
                         console.log("onChangeComplete", result)
@@ -104,7 +104,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
                     }}
-                    className={`textInput boardElement textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700 
+                    className={`textInput textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700 
                     ${fontWeightMap[textData.fontWeight ?? "normal"]}
                     ${fontSizeMap[textData.fontSize ?? "base"]}
                     `}
@@ -114,7 +114,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
 
             </Box>
             {/* buttons */}
-            {isSelected && <div className="boardElement bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
+            {isSelected && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
                 style={{ top: position.top - 30, left: position.left }}
             >
                 <button type="button" className={`bg-slate-200 w-5 h-5 rounded-full font-semibold relative`}
@@ -133,7 +133,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                                 if (textData.fontWeight === "extraLight") return;
                                 save({ ...textData, fontWeight: "extraLight" });
                             },
-                            classProps: `font-extralight ${fontSizeMap[textData.fontSize ?? "base"]} boardElement`
+                            classProps: `font-extralight ${fontSizeMap[textData.fontSize ?? "base"]}`
                         }, {
                             content: "text",
                             handleClick: (e) => {
@@ -143,7 +143,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                                 if (textData.fontWeight === "normal") return;
                                 save({ ...textData, fontWeight: "normal" });
                             },
-                            classProps: `font-normal ${fontSizeMap[textData.fontSize ?? "base"]} boardElement`
+                            classProps: `font-normal ${fontSizeMap[textData.fontSize ?? "base"]}`
                         }, {
                             content: "text",
                             handleClick: (e) => {
@@ -153,7 +153,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                                 if (textData.fontWeight === "semiBold") return;
                                 save({ ...textData, fontWeight: "semiBold" });
                             },
-                            classProps: `font-semibold ${fontSizeMap[textData.fontSize ?? "base"]} boardElement`
+                            classProps: `font-semibold ${fontSizeMap[textData.fontSize ?? "base"]}`
                         }, {
                             content: "text",
                             handleClick: (e) => {
@@ -163,15 +163,15 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                                 if (textData.fontWeight === "extraBold") return;
                                 save({ ...textData, fontWeight: "extraBold" });
                             },
-                            classProps: `font-extrabold ${fontSizeMap[textData.fontSize ?? "base"]} boardElement`
+                            classProps: `font-extrabold ${fontSizeMap[textData.fontSize ?? "base"]}`
                         }]}
                         handleClose={() => {
                             setIsFontWeightOpen(false);
                         }}
-                        classPorops={`boardElement bottom-full left-1/2 -translate-x-1/2`}
+                        classPorops={`bottom-full left-1/2 -translate-x-1/2`}
                     />
                 </button>
-                <button type="button" className={`boardElement bg-slate-200 w-5 h-5 rounded-full font-semibold relative`}
+                <button type="button" className={`bg-slate-200 w-5 h-5 rounded-full font-semibold relative`}
                     onClick={() => {
                         setIsFontSizeOpen(true);
                     }}
@@ -187,7 +187,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                                 if (textData.fontSize === "xs") return;
                                 save({ ...textData, fontSize: "xs" });
                             },
-                            classProps: `text-xs ${fontWeightMap[textData.fontWeight ?? "normal"]} boardElement`
+                            classProps: `text-xs ${fontWeightMap[textData.fontWeight ?? "normal"]}`
                         }, {
                             content: "text",
                             handleClick: (e) => {
@@ -197,7 +197,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                                 if (textData.fontSize === "base") return;
                                 save({ ...textData, fontSize: "base" });
                             },
-                            classProps: `text-base ${fontWeightMap[textData.fontWeight ?? "normal"]} boardElement`
+                            classProps: `text-base ${fontWeightMap[textData.fontWeight ?? "normal"]}`
                         }, {
                             content: "text",
                             handleClick: (e) => {
@@ -207,7 +207,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                                 if (textData.fontSize === "xl") return;
                                 save({ ...textData, fontSize: "xl" });
                             },
-                            classProps: `text-xl ${fontWeightMap[textData.fontWeight ?? "normal"]} boardElement`
+                            classProps: `text-xl ${fontWeightMap[textData.fontWeight ?? "normal"]}`
                         }, {
                             content: "text",
                             handleClick: (e) => {
@@ -217,16 +217,16 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                                 if (textData.fontSize === "2xl") return;
                                 save({ ...textData, fontSize: "2xl" });
                             },
-                            classProps: `text-2xl ${fontWeightMap[textData.fontWeight ?? "normal"]} boardElement`
+                            classProps: `text-2xl ${fontWeightMap[textData.fontWeight ?? "normal"]}`
                         }]}
                         handleClose={() => {
                             setIsFontSizeOpen(false);
                         }}
-                        classPorops={`bottom-full left-1/2 -translate-x-1/2 boardElement`}
+                        classPorops={`bottom-full left-1/2 -translate-x-1/2`}
                     />
                 </button>
 
-                <button type="button" className={`boardElement w-5 h-5 rounded-full border-4 border-slate-200`} style={{ backgroundColor: textData.textColor ?? "#FFFFFF" }}
+                <button type="button" className={`w-5 h-5 rounded-full border-4 border-slate-200`} style={{ backgroundColor: textData.textColor ?? "#FFFFFF" }}
                     onClick={() => {
                         setIsColorOpen(true);
                     }}

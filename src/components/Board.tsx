@@ -88,6 +88,7 @@ interface IBoard {
 }
 
 export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
+    const boardRef = useRef<HTMLDivElement>(null)
     // console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     console.log("selectedElementId", selectedElementId)
@@ -200,10 +201,10 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             console.log((e.target as HTMLElement))
             if (!(e.target instanceof HTMLElement)) return;
             // drop 時加入資料
-            if (e.target.classList.contains("boardElement")) {
-                // console.log("draggingBox", draggingBox)
-                if (!draggingBox) return;
-                // console.log("ㄟ")
+            // console.log("draggingBox", draggingBox)
+            if (!draggingBox) return;
+            // console.log("ㄟ")
+            if (boardRef.current?.contains(e.target)) {
                 handleAddBox({
                     type: draggingBox,
                     content: getContent(draggingBox),
@@ -224,7 +225,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     useEffect(() => {
         async function handlePaste(e: ClipboardEvent) {
             console.log("e.target", e.target)
-            if ((e.target as HTMLElement).classList.contains("imagebox")) return;
+            // 是一般的 input 的話不要新增 box
             if ((e.target as HTMLElement).classList.contains("textInput")) return;
 
             const pastedFiles = e.clipboardData?.files[0];
@@ -262,7 +263,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     return (
         <>
-            <div className="boardElement relative w-full h-full"
+            <div className="boardElement relative w-full h-full" ref={boardRef}
                 // style={{ scale: "70%" }}
                 onDragOver={(e) => {
                     // 為了防止在圖片上方 drop 的時候變成在瀏覽器打開圖片的行為，需要將圖片設定成 pointer-events-none

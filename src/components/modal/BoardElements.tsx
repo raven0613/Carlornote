@@ -24,7 +24,7 @@ interface IButton {
 
 function Button({ children, handleClick, classProps }: IButton) {
     return (
-        <button type="button" className={`boardElement w-8 h-8 rounded-full p-1.5 ${classProps}`}
+        <button type="button" className={`w-8 h-8 rounded-full p-1.5 ${classProps}`}
             onClick={() => {
                 handleClick();
             }}
@@ -60,13 +60,13 @@ export default function ElementModal({ }: IElementModal) {
                     {/* elements */}
                     {selectedCard && selectedCard.boardElement.map((item: IBoardElement) => {
                         return (
-                            <div key={item.id} className={`boardElement w-full h-auto mb-2 rounded-md border-slate-300 border relative`}
+                            <div key={item.id} className={`w-full h-auto mb-2 rounded-md border-slate-300 border relative`}
                                 onClick={() => {
                                     dispatch(selectElementId(item.id));
                                 }}
                             >
                                 {/* buttons */}
-                                {<section className={`boardElement w-full  flex gap-2 items-center justify-center overflow-hidden duration-150 ${selectedElementId === item.id ? "h-10 opacity-100" : "h-0 opacity-0"}`}>
+                                {<section className={`w-full  flex gap-2 items-center justify-center overflow-hidden duration-150 ${selectedElementId === item.id ? "h-10 opacity-100" : "h-0 opacity-0"}`}>
                                     <Button
                                         handleClick={() => {
                                             const updatedCard: ICard = {
@@ -170,7 +170,7 @@ export default function ElementModal({ }: IElementModal) {
                                     onClick={() => {
                                         dispatch(selectElementId(item.id));
                                     }}
-                                    className={`imagebox flex items-center justify-center relative overflow-hidden ${item.name ? "" : "h-7 pointer-events-none grayscale"}`}
+                                    className={`flex items-center justify-center relative overflow-hidden ${item.name ? "" : "h-7 pointer-events-none grayscale"}`}
                                 >
                                     <ImageCore imageData={item} handleOnLoad={() => { }}
                                     />

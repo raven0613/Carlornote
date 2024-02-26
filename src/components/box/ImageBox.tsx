@@ -45,7 +45,7 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
 
 
             {showingBlock === "image" && <Image id={imageData.id}
-                className={`boardElement imagebox ${(imageLoadState === "success") ? "opacity-100" : "opacity-0"}`}
+                className={`${(imageLoadState === "success") ? "opacity-100" : "opacity-0"}`}
                 width={imageData.width}
                 height={imageData.height}
                 src={url}
@@ -73,7 +73,7 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
             />}
             {(imageLoadState !== "success" && showingBlock === "input") && <>
                 <input id={imageData.id}
-                    className={`boardElement imagebox outline-none border px-2 absolute inset-y-0 left-0 right-16 ${imageLoadState === "fail" ? "border border-red-500" : ""}
+                    className={`textInput outline-none border px-2 absolute inset-y-0 left-0 right-16 ${imageLoadState === "fail" ? "border border-red-500" : ""}
         `}
                     onChange={(e) => {
                         e.preventDefault();
@@ -86,7 +86,7 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
                     }}
                 />
                 <button
-                    className={`boardElement imagebox w-6 h-6 bg-green-500 absolute right-6 top-1/2 -translate-y-1/2 rounded-full leading-5 text-white p-1
+                    className={`w-6 h-6 bg-green-500 absolute right-6 top-1/2 -translate-y-1/2 rounded-full leading-5 text-white p-1
         `}
                     onClick={(e) => {
                         e.preventDefault();
@@ -118,7 +118,7 @@ interface IImageBox {
     imageData: IBoardElement;
     handleUpdateElement: (data: IBoardElement) => void;
     isSelected: boolean;
-    handleClick: (id: string) => void;
+    handleClick: () => void;
     isShadow?: boolean;
     isLocked: boolean;
     handleDelete: (id: string) => void;

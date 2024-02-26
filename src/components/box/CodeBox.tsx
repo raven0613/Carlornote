@@ -76,12 +76,12 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
                     }}
-                    className={`boardElement textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700
+                    className={`textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700
                     `}
                     style={{ color: textData.textColor ?? "#FFFFFF" }}
                     value={value}>
                 </textarea>}
-                {mode === "read" && <div id={textData.id} className="boardElement textInput absolute inset-0"
+                {mode === "read" && <div id={textData.id} className="textInput absolute inset-0"
                 >
                     <SyntaxHighlighter
                         customStyle={{
@@ -93,7 +93,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
             </Box>
 
             {/* buttons */}
-            {isSelected && <div className="boardElement bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
+            {isSelected && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
                 style={{ top: position.top - 30, left: position.left }}
             >
                 <button type="button" className={`bg-slate-200 w-5 h-5 rounded-full font-semibold relative`}

@@ -145,7 +145,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 }}
                 draggable={true}
             >
-                <div className={`boardElement w-full h-full`} style={{ borderRadius: `${radius}px` }}>
+                <div className={`w-full h-full`} style={{ borderRadius: `${radius}px` }}>
                     {children}
                 </div>
                 {/* size */}
