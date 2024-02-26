@@ -15,7 +15,8 @@ export interface IBoardElement {
     fontSize?: "base" | "xs" | "xl" | "2xl",
     fontWeight?: "normal" | "extraLight" | "semiBold" | "extraBold",
     opacity?: number,
-    isLock?: boolean
+    isLock?: boolean,
+    programmingLanguage?: string
 }
 
 export interface ICard {
