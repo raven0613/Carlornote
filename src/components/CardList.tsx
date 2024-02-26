@@ -1,5 +1,5 @@
 import { handleAddCard, handleDeleteCard, handleUpdateCard, handleGetCards } from "@/api/card";
-import Card from "@/components/Card";
+import Card, { CardWithHover } from "@/components/Card";
 import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/card";
 import { openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
@@ -109,7 +109,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                             allCards.length <= showCardAmounts ? allCards.length : wheelPx + showCardAmounts
                         )
                             .map((item) =>
-                                <Card key={item.id}
+                                <CardWithHover key={item.id}
                                     name={item.name}
                                     url={item.imageUrl}
                                     isSelected={selectedCardId === item.id}

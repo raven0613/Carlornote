@@ -26,6 +26,11 @@ export default function ControlPanel({ handleDrag }: IControlPanel) {
                         handleDrag("code");
                     }}
                 ><CodeIcon classProps="stroke-slate-700" /></button>
+                <button className="p-1  pl-1.5 pt-1.5 w-10 h-10 bg-transparent border border-slate-500 rounded-md"
+                    onMouseDown={() => {
+                        handleDrag("markdown");
+                    }}
+                ><CodeIcon classProps="stroke-slate-700" /></button>
             </main>
         </>
     )

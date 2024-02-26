@@ -41,6 +41,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
     // console.log("CodeBox isSelected", isSelected)
     const [title, setTitle] = useState(textData.name);
     const [value, setValue] = useState(textData.content);
+    const [isLanguageOpen, setIsLanguageOpen] = useState(false);
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
