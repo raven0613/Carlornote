@@ -36,12 +36,11 @@ interface ICodeBox {
     handleChangeZIndex: (id: string) => void;
 }
 
-export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: ICodeBox) {
+export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: ICodeBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
     const [title, setTitle] = useState(textData.name);
     const [value, setValue] = useState(textData.content);
-    const [isLanguageOpen, setIsLanguageOpen] = useState(false);
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
@@ -73,7 +72,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                 handleSetDirty={handleSetDirty}
                 handleChangeZIndex={handleChangeZIndex}
             >
-                {mode === "edit" && <div className="flex flex-col h-full w-full rounded-xl p-4 bg-[#282b2e] gap-2 text-slate-400">
+                {mode === "edit" && <div className="flex flex-col h-full w-full rounded-xl p-4 bg-[#2c2e28] gap-2 text-slate-400">
                     <input className="textInput h-8 w-full bg-white/5 rounded-md outline-none px-2" value={title}
                         onChange={(e) => {
                             setTitle(e.target.value);
@@ -91,39 +90,18 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                         value={value}>
                     </textarea>
                 </div>}
-                {mode === "read" && <div className="w-full h-full relative pl-2 pt-11 bg-[#1C1D21] rounded-lg"
+                {mode === "read" && <div className="w-full h-full relative px-3 pb-3 pt-10 bg-[#d3d0c5] rounded-lg"
                 >
-                    <div className="w-full h-8 absolute top-0 inset-x-0 bg-slate-700 rounded-t-xl z-10 leading-8 pl-4 pr-8 text-slate-400 flex items-center justify-between " >
+                    <section className="w-full h-8 absolute top-0 inset-x-0 bg-[#a7a397] rounded-t-xl z-10 leading-8 pl-4 pr-8 text-slate-400 flex items-center justify-between " >
                         <span className='truncate pr-2'>{title}</span>
                         <div className='flex items-center gap-2'>
-                            <select name="programmingLanguage" id="programmingLanguage" className="outline-none bg-slate-700 border-b px-1 border-slate-400" value={textData.programmingLanguage}
-                                onChange={(e) => {
-                                    if (e.target.value === textData.programmingLanguage) return;
-                                    handleUpdateElement({ ...textData, programmingLanguage: e.target.value });
-                                    handleSetDirty();
-                                }}>
-                                {supportedLanguage.map(item => {
-                                    return (
-                                        <option className='px-1' value={item} key={item}>{item}</option>
-                                    )
-                                })}
-                            </select>
-                            <button className='w-6 h-6 leading-5 rounded-[3px] border border-white/30 shrink-0 p-0.5 group hover:border-white/50 duration-150 hover:bg-white/10'
-                                onClick={() => {
-                                    navigator.clipboard.writeText(value);
-                                }}
-                            >
-                                <CopyIcon classProps="stroke-white/50 group-hover:stroke-white/80  duration-150" />
-                            </button>
+
                         </div>
-                    </div>
-                    <SyntaxHighlighter
-                        customStyle={{
-                            width: "100%", height: "100%", borderRadius: "1rem",
-                            fontSize: "0.9rem"
-                        }} language={textData.programmingLanguage} style={anOldHope} wrapLongLines>
-                        {value}
-                    </SyntaxHighlighter></div>}
+                    </section>
+                    <textarea className="w-full h-full bg-[#a59e87]/30 outline-none p-2 text-slate-700 placeholder:text-slate-700/30" placeholder='write down your note'>
+
+                    </textarea>
+                </div>}
             </Box>
 
             {/* buttons */}

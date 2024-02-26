@@ -10,19 +10,26 @@ import { selectElementId } from "@/redux/reducers/boardElement";
 import { IState } from "@/redux/store";
 import { closeModal } from "@/redux/reducers/modal";
 import CodeBox from "./box/CodeBox";
+import MarkdownBox from "./box/MarkdownBox";
 
 export const distenceToLeftTop = { left: 64, top: 64 };
 
-const draggingBoxWidth = {
+const draggingBoxWidth: Record<boxType, number> = {
     text: 200,
-    image: 500, // for url box
-    code: 500
+    image: 500,
+    code: 500,
+    markdown: 500,
+    card: 0,
+    "": 0
 }
 
-const draggingBoxHeight = {
+const draggingBoxHeight: Record<boxType, number> = {
     text: 60,
-    image: 30, // for url box
-    code: 300
+    image: 30,
+    code: 300,
+    markdown: 300,
+    card: 0,
+    "": 0
 }
 
 export function getResizedSize(originWidth: number, originHeight: number) {
@@ -75,6 +82,7 @@ function getContent(type: boxType) {
     switch (type) {
         case "text": return "text";
         case "image": return "image";
+        case "markdown": return "";
         default: return "text";
     }
 }
@@ -393,6 +401,36 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             }}
                         />
                     )
+                    if (item.type === "markdown") return (
+                        <MarkdownBox key={item.id}
+                            isLocked={isLock}
+                            handleUpdateElement={(data: IBoardElement) => {
+                                handleUpdateElementList(elements.map((item) => {
+                                    if (item.id === data.id) return data;
+                                    return item;
+                                }))
+                            }}
+                            textData={item}
+                            isSelected={selectedElementId === item.id}
+                            handleClick={() => {
+                                dispatch(selectElementId(item.id));
+                                // 拉到DOM最上方
+                                const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                if (!updatedElements) return;
+                                handleUpdateElementList(updatedElements);
+                                handleSetDirty();
+                            }}
+                            handleDelete={handleDelete}
+                            handleSetDirty={handleSetDirty}
+                            handleChangeZIndex={() => {
+                                // 拉到DOM最下方
+                                const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                if (!updatedElements) return;
+                                handleUpdateElementList(updatedElements);
+                                handleSetDirty();
+                            }}
+                        />
+                    )
                     return <></>
                 })}
 
@@ -448,6 +486,28 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         type: "code",
                         name: "",
                         content: "code",
+                        width: 500,
+                        height: 300,
+                        rotation: 0,
+                        left: window.outerWidth,
+                        top: window.outerHeight,
+                        radius: 0
+                    }}
+                    isSelected={true}
+                    handleClick={() => { }}
+                    handleSetDirty={() => { }}
+                    handleDelete={() => { }}
+                    isShadow={true}
+                    handleChangeZIndex={() => { }}
+                />}
+                {draggingBox === "markdown" && <MarkdownBox
+                    isLocked={isLock}
+                    handleUpdateElement={() => { }}
+                    textData={{
+                        id: "dragging_code",
+                        type: "markdown",
+                        name: "",
+                        content: "write down your note",
                         width: 500,
                         height: 300,
                         rotation: 0,
