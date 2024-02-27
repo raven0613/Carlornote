@@ -47,7 +47,7 @@ export default function Popup({ options = [], isOpen, handleClose, classPorops }
                             onClick={(e) => {
                                 item.handleClick(e);
                             }}
-                            className={`px-4 py-1.5 flex items-center gap-4 hover:bg-slate-200 text-sm ${item.classProps}`}
+                            className={`px-4 py-1.5 flex items-center gap-4 hover:bg-slate-200 ${item.classProps}`}
                         >
                             {item.icon && <div className="">{item.icon}</div>}
                             {item.content}

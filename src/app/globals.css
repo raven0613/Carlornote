@@ -39,7 +39,7 @@ body {
 
 *::-webkit-scrollbar-track {
   /* background: var(--primary); */
-  background-color: white;
+  background-color: transparent;
   border-radius: 3px;
   margin: 6px 0px;
 }

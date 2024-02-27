@@ -4,12 +4,14 @@ import { nord, vs2015, foundation, anOldHope, androidstudio, atelierDuneDark } f
 import { IBoardElement, ICard } from "@/type/card";
 import React, { RefObject, useEffect, useRef, useState, DragEvent, ReactNode } from "react";
 import Box from "./Box";
+import markdownit from 'markdown-it'
 import Popup from "../Popup";
 import { ColorResult, SwatchesPicker, SliderPicker } from 'react-color';
 import useClickOutside from "@/hooks/useClickOutside";
 import CopyIcon from '../svg/Copy';
 import EditIcon from '../svg/Edit';
 import OKIcon from '../svg/OK';
+const md = markdownit();
 
 // foundation 淺
 // androidstudio 深
@@ -44,6 +46,13 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
+    const result = md.render(
+        `
+        #  ㄟㄟ
+        ## 你好嗎
+        ### 上班好玩嗎
+        `);
+
     // console.log("supportedLanguages", SyntaxHighlighter.supportedLanguages)
     console.log("mode", mode)
     function save(updatedData: IBoardElement) {
@@ -72,35 +81,23 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
                 handleSetDirty={handleSetDirty}
                 handleChangeZIndex={handleChangeZIndex}
             >
-                {mode === "edit" && <div className="flex flex-col h-full w-full rounded-xl p-4 bg-[#2c2e28] gap-2 text-slate-400">
-                    <input className="textInput h-8 w-full bg-white/5 rounded-md outline-none px-2" value={title}
-                        onChange={(e) => {
-                            setTitle(e.target.value);
-                            handleUpdateElement({ ...textData, name: e.target.value });
-                            handleSetDirty();
-                        }} />
+                {mode === "edit" && <div className="h-full w-full rounded-xl p-4 bg-[#2c2e28] text-slate-400">
                     <textarea
                         onChange={(e) => {
                             setValue(e.target.value);
                             handleUpdateElement({ ...textData, content: e.target.value });
                             handleSetDirty();
                         }}
-                        className={`textbox_textarea textInput w-full flex-1 p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5
+                        className={`textbox_textarea textInput w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5
                     `}
                         value={value}>
                     </textarea>
+                    <article className="prose max-w-none w-full h-full bg-[#a59e87] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30" dangerouslySetInnerHTML={{ __html: md.render(value) }} />
                 </div>}
-                {mode === "read" && <div className="w-full h-full relative px-3 pb-3 pt-10 bg-[#d3d0c5] rounded-lg"
+
+                {mode === "read" && <div className="w-full h-full relative bg-[#d3d0c5] rounded-lg"
                 >
-                    <section className="w-full h-8 absolute top-0 inset-x-0 bg-[#a7a397] rounded-t-xl z-10 leading-8 pl-4 pr-8 text-slate-400 flex items-center justify-between " >
-                        <span className='truncate pr-2'>{title}</span>
-                        <div className='flex items-center gap-2'>
-
-                        </div>
-                    </section>
-                    <textarea className="w-full h-full bg-[#a59e87]/30 outline-none p-2 text-slate-700 placeholder:text-slate-700/30" placeholder='write down your note'>
-
-                    </textarea>
+                    <article className="prose max-w-none w-full h-full text-slate-700 overflow-y-scroll p-4" dangerouslySetInnerHTML={{ __html: md.render(value) }} />                    
                 </div>}
             </Box>
 

@@ -67,8 +67,8 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
 
     return (
         <>
-            {isColorOpen && <div className=" absolute" ref={nodeRef}
-                style={{ top: position.top - 275 <= 0 ? position.top + 100 : position.top - 275, left: position.left }}
+            {isColorOpen && <div className="absolute z-10" ref={nodeRef}
+                style={{ top: position.top - 275 <= 0 ? position.top + 10 : position.top - 275, left: position.left }}
             >
                 <SwatchesPicker
                     className={` w-full h-full`}
