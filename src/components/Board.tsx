@@ -12,7 +12,8 @@ import { closeModal } from "@/redux/reducers/modal";
 import CodeBox from "./box/CodeBox";
 import MarkdownBox from "./box/MarkdownBox";
 
-export const distenceToLeftTop = { left: 64, top: 64 };
+// 看 board 離螢幕左和上有多少 px
+export const distenceToLeftTop = { left: 0, top: 0 };
 
 const draggingBoxWidth: Record<boxType, number> = {
     text: 200,
@@ -101,6 +102,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     console.log("selectedElementId", selectedElementId)
     const pointerRef = useRef({ x: 0, y: 0 });
+    const clickedPointRef = useRef({ startX: 0, startY: 0, endX: 0, endY: 0 });
     const dropPointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
     const dispatch = useDispatch();
@@ -271,7 +273,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     return (
         <>
-            <div className="boardElement relative w-full h-full" ref={boardRef}
+            <div className="boardElement relative w-full h-full " ref={boardRef}
                 // style={{ scale: "70%" }}
                 onDragOver={(e) => {
                     // 為了防止在圖片上方 drop 的時候變成在瀏覽器打開圖片的行為，需要將圖片設定成 pointer-events-none
@@ -283,6 +285,24 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     setIsLock(false);
                     // console.log("left", e.clientX)
                     // console.log("top", e.clientY)
+                }}
+                onMouseDown={(e) => {
+                    clickedPointRef.current = { 
+                        startX: e.clientX - distenceToLeftTop.left, 
+                        startY: e.clientY - distenceToLeftTop.top, 
+                        endX: 0, 
+                        endY: 0
+                    }
+                }}
+                onMouseUp={(e) => {
+                    console.log("ㄟㄟ123ㄟ")
+                    clickedPointRef.current = { 
+                        startX: e.clientX - distenceToLeftTop.left, 
+                        startY: e.clientY - distenceToLeftTop.top, 
+                        endX: e.clientX - distenceToLeftTop.left, 
+                        endY: e.clientY - distenceToLeftTop.top
+                    }
+
                 }}
             >
                 <input id="board_input" name="board_input" type="file" className="boardElement w-full h-full opacity-0"

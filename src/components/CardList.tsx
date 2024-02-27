@@ -1,5 +1,6 @@
 import { handleAddCard, handleDeleteCard, handleUpdateCard, handleGetCards } from "@/api/card";
 import Card, { CardWithHover } from "@/components/Card";
+import useWindowSize from "@/hooks/useWindowSize";
 import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/card";
 import { openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
@@ -37,8 +38,11 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
     const dispatch = useDispatch();
     const allCards = useSelector((state: IState) => state.card);
     const [wheelPx, setWheelPx] = useState(0);
+    const [showCardAmounts, setSowCardAmounts] = useState(3);
     const [cardState, setCardState] = useState<"loading" | "ok" | "error">("loading");
     const [addCardState, setAddCardState] = useState<"loading" | "ok" | "error">("ok");
+    const [cardLize, setCardSize] = useState<"hidden" | "sm" | "lg">("lg");
+    const { width: windowWidth } = useWindowSize();
 
     useEffect(() => {
         if (!user) return;
@@ -53,14 +57,31 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
         handleFetchCard();
     }, [dispatch, user]);
 
+    useEffect(() => {
+        if (!windowWidth) return;
+        if (windowWidth <= 700) setSowCardAmounts(3);
+        else if (windowWidth <= 900) setSowCardAmounts(5);
+        else if (windowWidth <= 1000) setSowCardAmounts(7);
+        else if (windowWidth <= 1100) setSowCardAmounts(10);
+        else if (windowWidth <= 1200) setSowCardAmounts(12);
+        else if (windowWidth <= 1400) setSowCardAmounts(15);
+        else setSowCardAmounts(18);
+    }, [windowWidth]);
+
+
     return (
         <>
-            <section className="w-full h-[16rem] px-28 flex items-center justify-center relative"
+            <section className={`w-full px-28 flex items-center justify-center relative
+                border-t-slate-200/70
+                ${cardLize === "lg"? "h-[10rem]" : `${ cardLize === "sm"? "h-[7rem]" : "h-[2rem]" }`}
+                ${cardLize === "hidden"? "bg-[#f8f8f8] border-t-[1px]" : "border-t-[3px]"}
+                duration-150
+            `}
                 onClick={() => {
                     handleSetSelectedCard("");
                 }}
             >
-                <button disabled={addCardState === "loading" || !user?.id} type="button" className={`w-16 h-16 bg-slate-400 rounded-full absolute left-10 text-white font-semibold text-3xl disabled:bg-slate-200`}
+                <button disabled={addCardState === "loading" || !user?.id} type="button" className={`w-16 h-16 bg-slate-200/80 rounded-full absolute left-10 text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150 ${cardLize === "hidden"? "opacity-0 pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
                         // 之後再新增公開匿名卡片
                         if (!user?.id) return;
@@ -87,7 +108,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                     }}
                 >+</button>
 
-                <div className="w-auto h-full flex items-end pb-4"
+                <div className={`w-auto h-full flex items-end ${cardLize === "lg"? "pb-4" : "pb-2"}`}
                     onWheel={(e) => {
                         // console.log(e.deltaX)
                         // console.log(e.deltaY)
@@ -113,26 +134,10 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                                     name={item.name}
                                     url={item.imageUrl}
                                     isSelected={selectedCardId === item.id}
+                                    cardLize={cardLize}
                                     handleClick={() => {
                                         handleSetSelectedCard(item.id);
                                         // setDirtyState("none");
-                                    }}
-                                    handleDelete={async () => {
-                                        const response = await handleDeleteCard(selectedCardId);
-                                        if (response.status === "FAIL") return;
-                                        dispatch(removeCard(selectedCardId));
-                                    }}
-                                    handleShare={async () => {
-                                        const updatedData = [{ ...item, visibility: "public" }] as ICard[];
-                                        const response = await handleUpdateCard(updatedData);
-                                        // console.log("response", response)
-                                        if (response.status === "FAIL") return false;
-                                        // console.log("data", JSON.parse(response.data))
-
-                                        dispatch(updateCards(updatedData));
-                                        const url = process.env.NODE_ENV === "production" ? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
-                                        navigator.clipboard.writeText(`${url}card/${item.id.split("_")[1]}`);
-                                        return true;
                                     }}
                                     handleClickEdit={() => {
                                         dispatch(openModal({ type: "card", data: item }));
@@ -141,6 +146,29 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                             )}
                 </div>
 
+                <div className={`absolute right-2 flex  text-xs gap-2 ${cardLize === "hidden"? "" : "flex-col"}`}>
+                    <button className="w-5 h-5 bg-slate-200 rounded-full hover:scale-125 duration-150"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setCardSize("lg");
+                        }}
+                    >L</button>
+                    <button className="w-5 h-5 bg-slate-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setCardSize("sm");
+                        }}
+                    >S</button>
+                    <button className="w-5 h-5 bg-slate-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setCardSize("hidden");
+                        }}
+                    ></button>
+                </div>
 
             </section>
         </>

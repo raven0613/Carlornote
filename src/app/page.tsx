@@ -31,43 +31,43 @@ export default function Home() {
     // console.log("selectedCard page", allCards.find(item => item.id === selectedCardId))
 
     // 有修改的話 5 秒存檔一次
-    // useEffect(() => {
-    //     let time: NodeJS.Timeout | null = null;
-    //     if (dirtyState !== "dirty" || time) return;
-    //     time = setInterval(async () => {
-    //         // console.log("dirtyCards in time", dirtyCards);
-    //         const idSet = new Set([...dirtyCards]);
-    //         // console.log("idSet", idSet);
-    //         const data = allCards.filter(item => idSet.has(item.id));
-    //         if (data.length === 0) return;
+    useEffect(() => {
+        let time: NodeJS.Timeout | null = null;
+        if (dirtyState !== "dirty" || time) return;
+        time = setInterval(async () => {
+            // console.log("dirtyCards in time", dirtyCards);
+            const idSet = new Set([...dirtyCards]);
+            // console.log("idSet", idSet);
+            const data = allCards.filter(item => idSet.has(item.id));
+            if (data.length === 0) return;
 
-    //         const response = await handleUpdateCard(data);
-    //         console.log("存檔", response);
-    //         const resData = JSON.parse(response.data);
-    //         const failedData = response.failedData && JSON.parse(response.failedData);
-    //         if (failedData) console.log("failedData", failedData);
-    //         // dispatch(updateCards(JSON.parse(response.data)));
+            const response = await handleUpdateCard(data);
+            console.log("存檔", response);
+            const resData = JSON.parse(response.data);
+            const failedData = response.failedData && JSON.parse(response.failedData);
+            if (failedData) console.log("failedData", failedData);
+            // dispatch(updateCards(JSON.parse(response.data)));
 
-    //         dispatch(setDirtyState("clear"))
-    //         dispatch(clearDirtyCardId());
-    //         if (time) clearInterval(time);
-    //     }, 5000);
-    //     return () => {
-    //         if (time) clearInterval(time);
-    //     }
-    // }, [allCards, dirtyCards, dirtyState, dispatch]);
+            dispatch(setDirtyState("clear"))
+            dispatch(clearDirtyCardId());
+            if (time) clearInterval(time);
+        }, 5000);
+        return () => {
+            if (time) clearInterval(time);
+        }
+    }, [allCards, dirtyCards, dirtyState, dispatch]);
 
     return (
-        <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
+        <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
 
-            <section className="w-full h-full px-16 pt-16 relative flex items-center">
+            <section className="w-full flex-1 px-0 pt-0 relative flex items-center">
                 {dirtyCards.length > 0 && <p className=" cursor-default absolute top-10 left-16">改動尚未儲存，請勿離開本頁</p>}
                 {dirtyState === "clear" && <p className={`cursor-default absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
 
                 {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ? "請先登入" : "請選擇一張卡片"}</p>}
                 {selectedCard && <>
 
-                    <main className="w-full h-full border border-slate-500 overflow-hidden">
+                    <main className="w-full h-full overflow-scroll bg-white/85 ">
                         <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
                             handleUpdateElementList={(allElement: IBoardElement[]) => {
                                 // console.log("update allElement list", allElement)

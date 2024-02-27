@@ -33,7 +33,7 @@ export default function Modal({ isOpen, handleClose, children, position }: IModa
     )
     if (position === "aside") return (
         <>
-            <div ref={nodeRef} className={`flex-col fixed top-14 w-fit h-fit  duration-300 ease-in-out rounded-xl right-0 shadow-md shadow-black/30
+            <div ref={nodeRef} className={`flex-col fixed z-30 top-2 w-fit h-fit  duration-300 ease-in-out rounded-xl right-0 shadow-md shadow-black/30
             ${isOpen ? "-translate-x-[0.55rem]" : "translate-x-full"}
             `}
                 style={{

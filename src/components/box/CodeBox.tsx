@@ -93,9 +93,9 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                 {mode === "read" && <div className="w-full h-full relative pl-2 pt-11 bg-[#1C1D21] rounded-lg"
                 >
                     <div className="w-full h-8 absolute top-0 inset-x-0 bg-slate-700 rounded-t-xl z-10 leading-8 pl-4 pr-8 text-slate-400 flex items-center justify-between " >
-                        <span className='truncate pr-2'>{title}</span>
+                        <span className='truncate pr-2 text-sm'>{title}</span>
                         <div className='flex items-center gap-2'>
-                            <select name="programmingLanguage" id="programmingLanguage" className="outline-none bg-slate-700 border-b px-1 border-slate-400" value={textData.programmingLanguage}
+                            <select name="programmingLanguage" id="programmingLanguage" className="outline-none bg-slate-700 border-b px-1 border-slate-400 text-sm" value={textData.programmingLanguage}
                                 onChange={(e) => {
                                     if (e.target.value === textData.programmingLanguage) return;
                                     handleUpdateElement({ ...textData, programmingLanguage: e.target.value });
@@ -107,7 +107,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                                     )
                                 })}
                             </select>
-                            <button className='w-6 h-6 leading-5 rounded-[3px] border border-white/30 shrink-0 p-0.5 group hover:border-white/50 duration-150 hover:bg-white/10'
+                            <button className='w-5 h-5 leading-5 rounded-[3px] border border-white/30 shrink-0 p-1 group hover:border-white/50 duration-150 hover:bg-white/10'
                                 onClick={() => {
                                     navigator.clipboard.writeText(value);
                                 }}
