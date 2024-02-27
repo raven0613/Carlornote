@@ -51,7 +51,7 @@ export default function ElementModal({ }: IElementModal) {
     return (
         <>
             {/* panel */}
-            <div className="w-80 h-[97vh] rounded-xl bg-white relative z-10 overflow-y-scroll py-2 pl-2 pr-2" onClick={(e) => {
+            <div className="hidden sm:block w-80 h-[97vh] rounded-xl bg-white relative z-10 overflow-y-scroll py-2 pl-2 pr-2" onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
             }}>
@@ -181,12 +181,12 @@ export default function ElementModal({ }: IElementModal) {
                 </div>
             </div>
             {/* 小耳朵 */}
-            <div className={`absolute top-0 bg-white w-10 h-24 rounded-lg cursor-pointer -z-10  shadow-black/30 duration-150
-                ${openModalType === "boardElements"? "left-0" : "-left-6 shadow-md"}
+            <div className={`hidden sm:block absolute top-0 bg-white w-10 h-24 rounded-lg cursor-pointer -z-10  shadow-black/30 duration-150
+                ${openModalType === "boardElements" ? "left-0" : "-left-6 shadow-md"}
             `} onClick={() => {
-                if (openModalType === "boardElements") return dispatch(closeModal({ type: "" }));
-                dispatch(openModal({ type: "boardElements", data: selectedCard?.boardElement }));
-            }}></div>
+                    if (openModalType === "boardElements") return dispatch(closeModal({ type: "" }));
+                    dispatch(openModal({ type: "boardElements", data: selectedCard?.boardElement }));
+                }}></div>
         </>
     )
 }

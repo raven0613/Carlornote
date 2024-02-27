@@ -49,15 +49,15 @@ export default function CardPage() {
             const data = JSON.parse(response.data) as ICard;
             console.log("data", data)
             // return;
-            if (data.visibility === "private") {
-                router.push("/")
+            if (data.visibility === "private" && data.authorId !== user?.id && !data.userId.includes(user?.id ?? "")) {
+                router.push("/");
                 return;
             }
             dispatch(setCards([data]));
         }
         if (!cardId) return;
         handleCard(cardId);
-    }, [dispatch, pathname, router])
+    }, [dispatch, pathname, router, user?.id])
 
     // 有修改的話 5 秒存檔一次
     useEffect(() => {

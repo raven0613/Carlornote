@@ -21,7 +21,7 @@ export default function Header({ }: IHeader) {
     const [openPopup, setOpenPopup] = useState<"setting" | null>(null);
     // 先 hidden 之後看怎麼改
     return (
-        <header className="hidden fixed inset-x-0 top-0 h-10 bg-transparent grid-cols-6 z-40">
+        <header className="grid sm:hidden fixed inset-x-0 top-0 h-12 bg-white grid-cols-6 z-40">
             <div className="w-60 h-full col-span-4 pl-3 leading-10">Deck Crafter</div>
             <div className="w-full h-full col-span-2 flex items-center justify-end px-2">
                 <button type="button" className="w-6 h-6 bg-slate-100 rounded-full relative"

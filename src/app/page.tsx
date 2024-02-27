@@ -4,11 +4,50 @@ import { useEffect, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import ControlPanel from "@/components/ControlPanel";
 import { handleUpdateCard } from "@/api/card";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { IState } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { clearDirtyCardId, selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
 import CardList from "@/components/CardList";
+import Popup from "@/components/Popup";
+import { removeUser } from "@/redux/reducers/user";
+
+function ControlBar() {
+    const [openPopup, setOpenPopup] = useState<"setting" | null>(null);
+    const dispatch = useDispatch();
+    const user = useSelector((state: IState) => state.user);
+    return (
+        <div className="hidden sm:flex fixed top-2 right-10 z-50">
+            <button type="button" className="w-6 h-6 bg-slate-100 rounded-full relative"
+                onClick={() => {
+                    setOpenPopup("setting");
+                }}
+            >
+                <Popup options={[{
+                    icon: <div className="w-2 h-2 bg-slate-600 rounded-full"></div>,
+                    isLink: true,
+                    content: "setting",
+                    handleClick: () => { }
+                }, {
+                    icon: <div className="w-2 h-2 bg-slate-600 rounded-full"></div>,
+                    content: user ? "Logout" : "Login",
+                    isLink: true,
+                    href: user ? "" : "/login",
+                    // hrefAs: user ? "" : "/login",
+                    handleClick: user ? async () => {
+                        // logout
+                        await signOut();
+                        dispatch(removeUser());
+                    } : () => { }
+                }]}
+                    isOpen={openPopup === "setting"}
+                    handleClose={() => setOpenPopup(null)}
+                    classPorops="top-6 right-2/4"
+                />
+            </button>
+        </div>
+    )
+}
 
 export default function Home() {
     const { data: session, status } = useSession();
@@ -59,11 +98,8 @@ export default function Home() {
 
     return (
         <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
-
-            <section className="w-full flex-1 px-0 pt-0 relative flex items-center">
-                {dirtyCards.length > 0 && <p className=" cursor-default absolute top-10 left-16">改動尚未儲存，請勿離開本頁</p>}
-                {dirtyState === "clear" && <p className={`cursor-default absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
-
+            <ControlBar />
+            <section className="hidden sm:flex w-full flex-1 px-0 pt-0 relative items-center">
                 {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ? "請先登入" : "請選擇一張卡片"}</p>}
                 {selectedCard && <>
 
@@ -97,12 +133,19 @@ export default function Home() {
                     }}
                 />
             </section>
-            <CardList selectedCardId={selectedCard?.id}
-                handleSetSelectedCard={(id: string) => {
-                    console.log("id", id)
-                    dispatch(selectCard(allCards.find(item => item.id === id) || null));
-                }}
-            />
+
+            <div className="w-full h-full sm:h-auto relative">
+                {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}
+                {dirtyState === "clear" && <p className={`cursor-default absolute top-1.5 left-2 animate-hide opacity-0 text-sm text-slate-500 z-20`}>已成功儲存</p>}
+                <CardList selectedCardId={selectedCard?.id}
+                    handleSetSelectedCard={(id: string) => {
+                        console.log("id", id)
+                        dispatch(selectCard(allCards.find(item => item.id === id) || null));
+                    }}
+                />
+            </div>
+
+
         </main>
     );
 }

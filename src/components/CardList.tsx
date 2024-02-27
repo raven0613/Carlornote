@@ -5,6 +5,7 @@ import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/car
 import { openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { ICard } from "@/type/card";
+import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -62,26 +63,27 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
         if (windowWidth <= 700) setSowCardAmounts(3);
         else if (windowWidth <= 900) setSowCardAmounts(5);
         else if (windowWidth <= 1000) setSowCardAmounts(7);
-        else if (windowWidth <= 1100) setSowCardAmounts(10);
-        else if (windowWidth <= 1200) setSowCardAmounts(12);
-        else if (windowWidth <= 1400) setSowCardAmounts(15);
-        else setSowCardAmounts(18);
+        else setSowCardAmounts(10);
     }, [windowWidth]);
 
-
+    // 手機版 list 佔整頁
     return (
         <>
-            <section className={`w-full px-28 flex items-center justify-center relative
+            <section className={`w-full h-full sm:px-28 flex sm:items-center sm:justify-center relative 
+                
                 border-t-slate-200/70
-                ${cardLize === "lg"? "h-[10rem]" : `${ cardLize === "sm"? "h-[7rem]" : "h-[2rem]" }`}
-                ${cardLize === "hidden"? "bg-[#f8f8f8] border-t-[1px]" : "border-t-[3px]"}
+                ${cardLize === "lg" ? "sm:h-[10rem]" : `${cardLize === "sm" ? "sm:h-[7rem]" : "sm:h-[2rem]"}`}
+                ${cardLize === "hidden" ? "bg-[#f8f8f8] border-t-[1px]" : "border-t-[3px]"}
                 duration-150
             `}
                 onClick={() => {
                     handleSetSelectedCard("");
                 }}
             >
-                <button disabled={addCardState === "loading" || !user?.id} type="button" className={`w-16 h-16 bg-slate-200/80 rounded-full absolute left-10 text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150 ${cardLize === "hidden"? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                <button disabled={addCardState === "loading" || !user?.id} type="button"
+                    className={`w-14 h-14 bg-slate-200/80 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 
+                sm:left-10 sm:bottom-1/2 sm:translate-y-1/2 
+                text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150 ${cardLize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
                         // 之後再新增公開匿名卡片
                         if (!user?.id) return;
@@ -108,7 +110,23 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                     }}
                 >+</button>
 
-                <div className={`w-auto h-full flex items-end ${cardLize === "lg"? "pb-4" : "pb-2"}`}
+                {/* mobile */}
+                <div className="fixed inset-x-0 top-16 bottom-0 pb-10
+                grid grid-cols-1 min-[320px]:grid-cols-2 min-[560px]:grid-cols-3 auto-rows-[16rem] min-[320px]:auto-rows-[12rem] min-[450px]:auto-rows-[14rem] min-[500px]:auto-rows-[16rem] min-[560px]:auto-rows-[12rem]
+                px-8 min-[400px]:px-12 min-[560px]:px-14
+                sm:hidden overflow-scroll gap-4 justify-items-center"
+                >
+                    {allCards.map(item => {
+                        return (
+                            <Link key={item.id} href={`/card/${item.id.split("card_")[1]}`} className="w-full h-full">
+                                <Card url={item.imageUrl} name={item.name} classProps={""} cardLize={cardLize}></Card>
+                            </Link>
+                        )
+                    })}
+                </div>
+
+                {/* pc */}
+                <div className={`hidden sm:flex w-auto h-full items-end ${cardLize === "lg" ? "pb-4" : "pb-2"}`}
                     onWheel={(e) => {
                         // console.log(e.deltaX)
                         // console.log(e.deltaY)
@@ -145,8 +163,8 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                                 />
                             )}
                 </div>
-
-                <div className={`absolute right-2 flex  text-xs gap-2 ${cardLize === "hidden"? "" : "flex-col"}`}>
+                {/* pc control button */}
+                <div className={`hidden sm:flex absolute right-2 text-xs gap-2 ${cardLize === "hidden" ? "" : "flex-col"}`}>
                     <button className="w-5 h-5 bg-slate-200 rounded-full hover:scale-125 duration-150"
                         onClick={(e) => {
                             e.preventDefault();
