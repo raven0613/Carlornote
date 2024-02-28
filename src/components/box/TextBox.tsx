@@ -48,7 +48,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
     const [isFontSizeOpen, setIsFontSizeOpen] = useState(false);
     const [isColorOpen, setIsColorOpen] = useState(false);
     const nodeRef = useClickOutside<HTMLDivElement>({
-        handleMouseDown: () => {
+        handleMouseDownOutside: () => {
             setIsColorOpen(false);
         }
     })
@@ -104,7 +104,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
                     }}
-                    className={`textInput textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700 
+                    className={`textInput textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700 overflow-hidden
                     ${fontWeightMap[textData.fontWeight ?? "normal"]}
                     ${fontSizeMap[textData.fontSize ?? "base"]}
                     `}

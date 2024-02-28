@@ -24,7 +24,7 @@ interface IPopup {
 
 export default function Popup({ options = [], isOpen, handleClose, classPorops }: IPopup) {
     const nodeRef = useClickOutside<HTMLDivElement>({
-        handleMouseDown: () => {
+        handleMouseDownOutside: () => {
             handleClose();
         }
     })

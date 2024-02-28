@@ -16,7 +16,7 @@ interface IModal {
 
 export default function Modal({ isOpen, handleClose, children, position }: IModal) {
     const nodeRef = useClickOutside<HTMLDivElement>({
-        handleMouseDown: () => {
+        handleMouseDownOutside: () => {
             handleClose();
         }
     })

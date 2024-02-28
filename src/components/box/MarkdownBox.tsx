@@ -1,16 +1,12 @@
 "use client"
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { nord, vs2015, foundation, anOldHope, androidstudio, atelierDuneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { IBoardElement, ICard } from "@/type/card";
 import React, { RefObject, useEffect, useRef, useState, DragEvent, ReactNode } from "react";
 import Box from "./Box";
 import markdownit from 'markdown-it'
-import Popup from "../Popup";
-import { ColorResult, SwatchesPicker, SliderPicker } from 'react-color';
-import useClickOutside from "@/hooks/useClickOutside";
-import CopyIcon from '../svg/Copy';
 import EditIcon from '../svg/Edit';
 import OKIcon from '../svg/OK';
+import ExpandIcon from "../svg/Expand";
+import ShrinkIcon from "../svg/Shrink";
 const md = markdownit();
 
 // foundation 淺
@@ -24,9 +20,54 @@ console.error = (...args: any) => {
     error(...args);
 };
 
-const supportedLanguage = ["css", "c", "csharp", "django", "dockerfile", "go", "http", "java", "javascript", "json", "jsx", "kotlin", "markdown", "nginx", "objectivec", "php-template", "php", "powershell", "python", "r", "scss", "sql", "swift", "typescript", "tsx", "xml"]
+interface IMarkdownCore {
+    textData: IBoardElement;
+    handleUpdateElement: (data: IBoardElement) => void;
+    handleSetDirty: () => void;
+    articleMode: "read" | "edit";
+    needFull?: boolean;
+}
 
-interface ICodeBox {
+export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, articleMode, needFull }: IMarkdownCore) {
+    const [value, setValue] = useState(textData.content);
+    const [isFull, setIsFull] = useState(false);
+    return (
+        <>
+            {articleMode === "edit" && <div className="h-full w-full rounded-xl p-4 bg-[#282c2e] text-slate-400 relative">
+                <textarea
+                    onChange={(e) => {
+                        setValue(e.target.value);
+                        handleUpdateElement({ ...textData, content: e.target.value });
+                        handleSetDirty();
+                    }}
+                    className={`textbox_textarea textInput w-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5
+                    ${needFull ? (isFull ? "min-h-[30rem]" : "h-60") : "h-full"} 
+                    `}
+                    value={value}>
+                </textarea>
+                <article className="prose dark:prose-invert max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30" dangerouslySetInnerHTML={{ __html: md.render(value) }} />
+            </div>}
+
+            {articleMode === "read" && <div className={`w-full relative bg-[#e9e6e2] rounded-lg overflow-y-scroll
+            ${needFull ? (isFull ? "h-full max-h-[80vh] min-h-48" : "h-48") : "h-full"}
+            `}
+            >
+                <article className={`prose dark:prose-invert marker:text-slate-500 max-w-none w-full h-full
+                text-slate-700  p-4`} dangerouslySetInnerHTML={{ __html: md.render(value) }} />
+            </div>}
+
+            {needFull && <button className="absolute top-4 right-4 z-20 w-8 h-8 hover:scale-110 duration-150"
+                onClick={() => {
+                    setIsFull(pre => !pre);
+                }}
+            >
+                {isFull ? <ShrinkIcon classProps="stroke-slate-600" /> : <ExpandIcon classProps="stroke-slate-600" />}
+            </button>}
+        </>
+    )
+}
+
+interface IMarkdownBox {
     textData: IBoardElement;
     handleUpdateElement: (data: IBoardElement) => void;
     isSelected: boolean;
@@ -38,27 +79,15 @@ interface ICodeBox {
     handleChangeZIndex: (id: string) => void;
 }
 
-export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: ICodeBox) {
+export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: IMarkdownBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
-    const [title, setTitle] = useState(textData.name);
     const [value, setValue] = useState(textData.content);
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
-    const result = md.render(
-        `
-        #  ㄟㄟ
-        ## 你好嗎
-        ### 上班好玩嗎
-        `);
-
     // console.log("supportedLanguages", SyntaxHighlighter.supportedLanguages)
     console.log("mode", mode)
-    function save(updatedData: IBoardElement) {
-        handleUpdateElement(updatedData);
-        handleSetDirty();
-    }
 
     useEffect(() => {
         if (!textData) return;
@@ -81,24 +110,11 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
                 handleSetDirty={handleSetDirty}
                 handleChangeZIndex={handleChangeZIndex}
             >
-                {mode === "edit" && <div className="h-full w-full rounded-xl p-4 bg-[#2c2e28] text-slate-400">
-                    <textarea
-                        onChange={(e) => {
-                            setValue(e.target.value);
-                            handleUpdateElement({ ...textData, content: e.target.value });
-                            handleSetDirty();
-                        }}
-                        className={`textbox_textarea textInput w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5
-                    `}
-                        value={value}>
-                    </textarea>
-                    <article className="prose max-w-none w-full h-full bg-[#a59e87] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30" dangerouslySetInnerHTML={{ __html: md.render(value) }} />
-                </div>}
-
-                {mode === "read" && <div className="w-full h-full relative bg-[#d3d0c5] rounded-lg"
-                >
-                    <article className="prose max-w-none w-full h-full text-slate-700 overflow-y-scroll p-4" dangerouslySetInnerHTML={{ __html: md.render(value) }} />                    
-                </div>}
+                <MarkdownCore
+                    handleUpdateElement={handleUpdateElement}
+                    handleSetDirty={handleSetDirty}
+                    textData={textData} articleMode={mode}
+                />
             </Box>
 
             {/* buttons */}

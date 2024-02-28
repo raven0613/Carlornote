@@ -15,7 +15,7 @@ import MarkdownBox from "./box/MarkdownBox";
 // 看 board 離螢幕左和上有多少 px
 export const distenceToLeftTop = { left: 0, top: 0 };
 
-const draggingBoxWidth: Record<boxType, number> = {
+export const draggingBoxWidth: Record<boxType, number> = {
     text: 200,
     image: 500,
     code: 500,
@@ -24,7 +24,7 @@ const draggingBoxWidth: Record<boxType, number> = {
     "": 0
 }
 
-const draggingBoxHeight: Record<boxType, number> = {
+export const draggingBoxHeight: Record<boxType, number> = {
     text: 60,
     image: 30,
     code: 300,
@@ -94,9 +94,10 @@ interface IBoard {
     draggingBox: boxType;
     handleMouseUp: () => void;
     handleSetDirty: () => void;
+    permission: "editable" | "readable" | "none";
 }
 
-export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty }: IBoard) {
+export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission }: IBoard) {
     const boardRef = useRef<HTMLDivElement>(null)
     // console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
@@ -109,6 +110,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
     // console.log("isLock", isLock)
+
+    useEffect(() => {
+        if (permission !== "editable") {
+            setIsLock(true);
+        }
+    }, [permission])
 
     // add box
     const handleAddBox = useCallback(({ type, content, position: { left, top }, size: { width, height } }: INewBoxProps) => {
@@ -219,7 +226,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     type: draggingBox,
                     content: getContent(draggingBox),
                     position: { left: e.clientX - distenceToLeftTop.left, top: e.clientY - distenceToLeftTop.top },
-                    size: { width: draggingBoxWidth[draggingBox as keyof typeof draggingBoxWidth], height: draggingBoxHeight[draggingBox as keyof typeof draggingBoxHeight] }
+                    size: { width: draggingBoxWidth[draggingBox], height: draggingBoxHeight[draggingBox] }
                 })
                 handleSetDirty();
             }
@@ -253,7 +260,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     type: "text",
                     content: pastedText,
                     position: { left: pointerRef.current.x, top: pointerRef.current.y },
-                    size: { width: draggingBoxWidth[draggingBox as keyof typeof draggingBoxWidth], height: draggingBoxHeight[draggingBox as keyof typeof draggingBoxHeight] }
+                    size: { width: draggingBoxWidth["text"], height: draggingBoxHeight["text"] }
                 })
             }
             handleSetDirty();
@@ -287,25 +294,25 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     // console.log("top", e.clientY)
                 }}
                 onMouseDown={(e) => {
-                    clickedPointRef.current = { 
-                        startX: e.clientX - distenceToLeftTop.left, 
-                        startY: e.clientY - distenceToLeftTop.top, 
-                        endX: 0, 
+                    clickedPointRef.current = {
+                        startX: e.clientX - distenceToLeftTop.left,
+                        startY: e.clientY - distenceToLeftTop.top,
+                        endX: 0,
                         endY: 0
                     }
                 }}
                 onMouseUp={(e) => {
                     console.log("ㄟㄟ123ㄟ")
-                    clickedPointRef.current = { 
-                        startX: e.clientX - distenceToLeftTop.left, 
-                        startY: e.clientY - distenceToLeftTop.top, 
-                        endX: e.clientX - distenceToLeftTop.left, 
+                    clickedPointRef.current = {
+                        startX: e.clientX - distenceToLeftTop.left,
+                        startY: e.clientY - distenceToLeftTop.top,
+                        endX: e.clientX - distenceToLeftTop.left,
                         endY: e.clientY - distenceToLeftTop.top
                     }
 
                 }}
             >
-                <input id="board_input" name="board_input" type="file" className="boardElement w-full h-full opacity-0"
+                <input id="board_input" name="board_input" type="file" className="boardElement board_input w-full h-full opacity-0"
                     onChange={async (e) => {
                         console.log("image drop")
                         e.preventDefault()

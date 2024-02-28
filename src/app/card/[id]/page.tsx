@@ -14,10 +14,15 @@ import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleD
 import { IState, store } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { addUser, removeUser } from "@/redux/reducers/user";
-import { setCards, updateCards } from "@/redux/reducers/card";
+import { clearDirtyCardId, selectCard, setCards, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
 import Board from "@/components/Board";
 import ControlPanel from "@/components/ControlPanel";
 import Link from "next/link";
+import { openModal } from "@/redux/reducers/modal";
+import ElementModal from "@/components/modal/BoardElements";
+import CardList from "@/components/CardList";
+import ControlBar from "@/components/ControlBar";
+import useWindowSize from "@/hooks/useWindowSize";
 // import login from "@/api/user";
 
 export default function CardPage() {
@@ -28,13 +33,18 @@ export default function CardPage() {
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
     const allCards = useSelector((state: IState) => state.card);
+    const selectedCard = useSelector((state: IState) => state.selectedCard);
     const [draggingBox, setDraggingBox] = useState<boxType>("");
-    const [dirtyState, setDirtyState] = useState<"dirty" | "clear" | "none">("none");
+    const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
+    const dirtyState = useSelector((state: IState) => state.dirtyState);
+    const { type: openModalType, data: modalProp } = useSelector((state: IState) => state.modal)
+    const [userPermission, setUserPermission] = useState<"editable" | "readable" | "none">("readable");
+    const { width: windowWidth } = useWindowSize();
     // console.log("session", session)
-    console.log("status", status)
+    // console.log("status", status)
     // console.log("user", user)
-    console.log("pathname", pathname)
-    console.log("allCards", allCards)
+    console.log("openModalType", openModalType)
+    // console.log("allCards", allCards)
 
     useEffect(() => {
         const cardId = pathname.split("/").at(-1);
@@ -53,7 +63,8 @@ export default function CardPage() {
                 router.push("/");
                 return;
             }
-            dispatch(setCards([data]));
+            dispatch(selectCard(data));
+            setUserPermission("editable")
         }
         if (!cardId) return;
         handleCard(cardId);
@@ -64,71 +75,78 @@ export default function CardPage() {
         let time: NodeJS.Timeout | null = null;
         if (dirtyState !== "dirty" || time) return;
         time = setInterval(async () => {
-            console.log("修改")
-            if (!allCards[0]) return;
+            // console.log("dirtyCards in time", dirtyCards);
+            const idSet = new Set([...dirtyCards]);
+            // console.log("idSet", idSet);
+            const data = allCards.filter(item => idSet.has(item.id));
+            if (data.length === 0) return;
 
-            const response = await handleUpdateCard(allCards);
+            const response = await handleUpdateCard(data);
             console.log("存檔", response);
             const resData = JSON.parse(response.data);
             const failedData = response.failedData && JSON.parse(response.failedData);
             if (failedData) console.log("failedData", failedData);
-
             // dispatch(updateCards(JSON.parse(response.data)));
-            setDirtyState("clear");
+
+            dispatch(setDirtyState("clear"))
+            dispatch(clearDirtyCardId());
             if (time) clearInterval(time);
         }, 5000);
         return () => {
             if (time) clearInterval(time);
         }
-    }, [allCards, dirtyState]);
+    }, [allCards, dirtyCards, dirtyState, dispatch]);
 
     return (
-        <main className="flex h-screen flex-col gap-2 items-center justify-between overflow-hidden">
+        <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
+            {(windowWidth && windowWidth < 640) && <ElementModal permission={userPermission} />}
 
-            <header className="fixed inset-x-0 top-0 h-10 bg-zinc-500 grid grid-cols-6 z-50">
-                <div className="w-60 h-full col-span-4">{user && `Hi! ${user.name}`}</div>
-                <div className="w-full h-full bg-zinc-700 col-span-2">
-                    {!user && <Link href={`/login`} scroll={false}>Login</Link>}
-                    {user && <button onClick={async () => {
-                        await signOut();
-                        dispatch(removeUser());
-                    }}>Logout</button>}
-                </div>
-            </header>
+            <ControlBar />
+            <section className="hidden sm:flex w-full flex-1 px-0 pt-0 relative items-center">
+                {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ? "請先登入" : "請選擇一張卡片"}</p>}
+                {selectedCard && <>
 
-            <section className="w-full h-full px-16 py-16 relative flex items-center">
-                {dirtyState === "dirty" && <p className="absolute top-10 left-16">改動尚未儲存，請勿離開本頁</p>}
-                {dirtyState === "clear" && <p className={`absolute top-10 left-16 animate-hide opacity-0`}>已儲存全部改動</p>}
-
-                {!allCards[0] && <p className="text-center w-full">{user ? "請選擇一張卡片" : "請先登入"}</p>}
-                {allCards[0] && <>
-                    <main className="w-full h-full border border-slate-500 overflow-hidden">
-                        <Board elements={allCards[0].boardElement}
-                            handleUpdateElementList={(allElement) => {
-                                const selectedCard: ICard = allCards[0];
+                    <main className="w-full h-full overflow-scroll bg-white/85 ">
+                        <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
+                            handleUpdateElementList={(allElement: IBoardElement[]) => {
+                                // console.log("update allElement list", allElement)
+                                const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
                                 const updatedCard: ICard = {
-                                    ...selectedCard,
+                                    ...newCard,
                                     boardElement: allElement
                                 }
                                 dispatch(updateCards([updatedCard]));
+                                dispatch(selectCard(updatedCard));
                             }}
                             draggingBox={draggingBox}
                             handleMouseUp={() => {
                                 setDraggingBox("");
                             }}
                             handleSetDirty={() => {
-                                setDirtyState("dirty");
+                                dispatch(setDirtyState("dirty"))
+                                dispatch(setDirtyCardId(selectedCard.id));
                             }}
+                            permission={userPermission}
                         />
                     </main>
                 </>}
                 <ControlPanel
                     handleDrag={(type) => {
-                        if (!allCards[0]) return;
+                        if (!selectedCard) return;
                         setDraggingBox(type);
                     }}
                 />
             </section>
+            <div className="w-full h-full sm:h-auto relative">
+                {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}
+                {dirtyState === "clear" && <p className={`cursor-default absolute top-1.5 left-2 animate-hide opacity-0 text-sm text-slate-500 z-20`}>已成功儲存</p>}
+                {(windowWidth && windowWidth >= 640) && <CardList selectedCardId={selectedCard?.id}
+                    handleSetSelectedCard={(id: string) => {
+                        console.log("id", id)
+                        dispatch(selectCard(allCards.find(item => item.id === id) || null));
+                    }}
+                />}
+            </div>
         </main>
     )
 }

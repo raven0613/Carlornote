@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-export default function useAutosizedTextarea(ref: React.RefObject<HTMLTextAreaElement>, value: string, idEditing: boolean) {
+export default function useAutosizedTextarea<T extends HTMLElement>(value: string, idEditing: boolean) {
+    const textRef = useRef<T>(null)
     useEffect(() => {
-        if (!ref.current || !value || !idEditing) return;
-        const scrollHeight = ref.current?.scrollHeight;
-        ref.current.style.height = scrollHeight + "px";
-    }, [ref, value, idEditing])
+        if (!textRef.current || !value || !idEditing) return;
+        const scrollHeight = textRef.current?.scrollHeight;
+        textRef.current.style.height = scrollHeight + "px";
+    }, [value, idEditing])
+    return textRef;
 }

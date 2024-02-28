@@ -102,7 +102,7 @@ export async function handleUpdateUser(data: IUser[]): Promise<IResponse> {
         await Promise.all(data.map(async item => {
             const userRef = doc(db, "user", item.id);
             await updateDoc(userRef, {
-                // boardElement: item.boardElement
+                updatedAt: new Date().toUTCString(),
             });
         }))
     } catch (error) {

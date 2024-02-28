@@ -1,11 +1,12 @@
 import { handleAddCard, handleDeleteCard, handleUpdateCard, handleGetCards } from "@/api/card";
 import Card, { CardWithHover } from "@/components/Card";
 import useWindowSize from "@/hooks/useWindowSize";
-import { addCard, removeCard, setCards, updateCards } from "@/redux/reducers/card";
+import { addCard, removeCard, selectCard, setCards, updateCards } from "@/redux/reducers/card";
 import { openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { ICard } from "@/type/card";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -39,11 +40,12 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
     const dispatch = useDispatch();
     const allCards = useSelector((state: IState) => state.card);
     const [wheelPx, setWheelPx] = useState(0);
-    const [showCardAmounts, setSowCardAmounts] = useState(3);
+    const [showCardAmounts, setSowCardAmounts] = useState(5);
     const [cardState, setCardState] = useState<"loading" | "ok" | "error">("loading");
     const [addCardState, setAddCardState] = useState<"loading" | "ok" | "error">("ok");
     const [cardLize, setCardSize] = useState<"hidden" | "sm" | "lg">("lg");
     const { width: windowWidth } = useWindowSize();
+    const pathname = usePathname();
 
     useEffect(() => {
         if (!user) return;
@@ -60,9 +62,8 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
 
     useEffect(() => {
         if (!windowWidth) return;
-        if (windowWidth <= 700) setSowCardAmounts(3);
-        else if (windowWidth <= 900) setSowCardAmounts(5);
-        else if (windowWidth <= 1000) setSowCardAmounts(7);
+        if (windowWidth <= 700) setSowCardAmounts(5);
+        else if (windowWidth <= 900) setSowCardAmounts(7);
         else setSowCardAmounts(10);
     }, [windowWidth]);
 
@@ -77,9 +78,12 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                 duration-150
             `}
                 onClick={() => {
+                    const cardId = pathname.split("/").at(-1);
+                    if (cardId) return;
                     handleSetSelectedCard("");
                 }}
             >
+                {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
                     className={`w-14 h-14 bg-slate-200/80 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 
                 sm:left-10 sm:bottom-1/2 sm:translate-y-1/2 
@@ -104,7 +108,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                         dispatch(addCard(card));
                         setAddCardState("ok");
                         // 新增的卡片要被選取並且卡片欄位要顯示
-                        handleSetSelectedCard(card.id);
+                        dispatch(selectCard(card));
                         if (allCards.length - showCardAmounts + 1 >= 0) setWheelPx(allCards.length - showCardAmounts + 1);
                         else setWheelPx(0);
                     }}

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 
-export default function useClickOutside<T extends HTMLElement>({ handleMouseDown }: { handleMouseDown: () => void }) {
+export default function useClickOutside<T extends HTMLElement>({ handleMouseDownOutside, handleMouseDownInside }: { handleMouseDownOutside: () => void, handleMouseDownInside?: () => void }) {
     const nodeRef = useRef<T>(null);
     useEffect(() => {
         function handleMouse(e: MouseEvent) {
@@ -11,13 +11,15 @@ export default function useClickOutside<T extends HTMLElement>({ handleMouseDown
             if (e.target instanceof HTMLElement) {
                 if (!nodeRef.current?.contains(e.target)) {
                     console.log("handleMouseDown")
-                    handleMouseDown();
+                    handleMouseDownOutside();
                 }
-                else console.log("在裡面")
+                else {
+                    handleMouseDownInside && handleMouseDownInside();
+                }
             }
         }
         document.addEventListener("mousedown", handleMouse);
         return () => document.removeEventListener("mousedown", handleMouse);
-    }, [handleMouseDown]);
+    }, [handleMouseDownOutside, handleMouseDownInside]);
     return nodeRef;
 }

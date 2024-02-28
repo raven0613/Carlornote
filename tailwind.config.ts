@@ -22,8 +22,8 @@ const config: Config = {
           '75%': { opacity: "1" },
           '100%': { opacity: '0' },
         }
-      }
-    },
+      },
+    }
   },
   plugins: [
     require('@tailwindcss/typography'),
