@@ -184,7 +184,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
     // console.log("supportedLanguages", SyntaxHighlighter.supportedLanguages)
-    console.log("mode", mode)
+    // console.log("mode", mode)
     return (
         <>
             <Box

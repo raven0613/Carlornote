@@ -101,7 +101,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const boardRef = useRef<HTMLDivElement>(null)
     // console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
-    console.log("selectedElementId", selectedElementId)
+    // console.log("selectedElementId", selectedElementId)
     const pointerRef = useRef({ x: 0, y: 0 });
     const clickedPointRef = useRef({ startX: 0, startY: 0, endX: 0, endY: 0 });
     const dropPointerRef = useRef({ x: 0, y: 0 });
@@ -110,6 +110,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
     // console.log("isLock", isLock)
+    // console.log("permission", permission)
 
     useEffect(() => {
         if (permission !== "editable") {
@@ -184,14 +185,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     position: { left: pointerRef.current.x, top: pointerRef.current.y },
                     size: { width, height }
                 }) ?? [];
-                console.log("newBoardElement", newBoardElement)
+                // console.log("newBoardElement", newBoardElement)
             };
         };
         reader.readAsDataURL(file);
-
-
         const res = await handlePostImgur(formData);
-        console.log("res", res)
+        // console.log("res", res)
 
         if (res.success === false) return;
         if (!newBoardElement) return;
@@ -212,10 +211,10 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     useEffect(() => {
         // if (!draggingBox) return;
         function handleMouse(e: MouseEvent) {
-            console.log("mouseup")
+            // console.log("mouseup")
             e.stopPropagation();
             e.preventDefault();
-            console.log((e.target as HTMLElement))
+            // console.log((e.target as HTMLElement))
             if (!(e.target instanceof HTMLElement)) return;
             // drop 時加入資料
             // console.log("draggingBox", draggingBox)
@@ -241,14 +240,14 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // paste
     useEffect(() => {
         async function handlePaste(e: ClipboardEvent) {
-            console.log("e.target", e.target)
+            // console.log("e.target", e.target)
             // 是一般的 input 的話不要新增 box
             if ((e.target as HTMLElement).classList.contains("textInput")) return;
 
             const pastedFiles = e.clipboardData?.files[0];
             const pastedText = e.clipboardData?.getData("text/plain") || "";
-            console.log("pastedFiles", pastedFiles)
-            console.log("pastedText", pastedText)
+            // console.log("pastedFiles", pastedFiles)
+            // console.log("pastedText", pastedText)
 
             if (!pastedFiles && !pastedText) return;
             if (pastedFiles) {
@@ -288,7 +287,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     setIsLock(true);
                 }}
                 onDragEnd={(e) => {
-                    console.log("end")
+                    // console.log("end")
                     setIsLock(false);
                     // console.log("left", e.clientX)
                     // console.log("top", e.clientY)
@@ -302,7 +301,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     }
                 }}
                 onMouseUp={(e) => {
-                    console.log("ㄟㄟ123ㄟ")
                     clickedPointRef.current = {
                         startX: e.clientX - distenceToLeftTop.left,
                         startY: e.clientY - distenceToLeftTop.top,
@@ -314,7 +312,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             >
                 <input id="board_input" name="board_input" type="file" className="boardElement board_input w-full h-full opacity-0"
                     onChange={async (e) => {
-                        console.log("image drop")
+                        // console.log("image drop")
                         e.preventDefault()
                         e.stopPropagation()
 
@@ -329,7 +327,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     onClick={(e) => {
                         e.preventDefault();
                         // e.stopPropagation();
-                        console.log("按按按")
                         dispatch(selectElementId(""));
                     }}
                     onDrop={(e) => {
@@ -534,7 +531,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         id: "dragging_code",
                         type: "markdown",
                         name: "",
-                        content: "write down your note",
+                        content: "",
                         width: 500,
                         height: 300,
                         rotation: 0,

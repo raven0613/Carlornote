@@ -21,11 +21,11 @@ export async function handleGetCards(userId: string): Promise<IResponse> {
             return { code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS" };
         } else {
             // docSnap.data() will be undefined in this case
-            console.log("No such document!");
+            // console.log("No such document!");
             return { code: 404, status: "FAIL", data: null, message: "No such document!" };
         }
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     }
 }
@@ -43,11 +43,11 @@ export async function handleGetCard(id: string): Promise<IResponse> {
             return { code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS" };
         } else {
             // docSnap.data() will be undefined in this case
-            console.log("No such document!");
+            // console.log("No such document!");
             return { code: 404, status: "FAIL", data: null, message: "No such document!" };
         }
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     }
 }
@@ -58,11 +58,11 @@ export async function handleAddCard(data: ICard): Promise<IResponse> {
     try {
         const db = await handleGetFirebaseDB();
         const cardCollection = collection(db, 'card');
-        console.log("addData", addData)
+        // console.log("addData", addData)
         await setDoc(doc(cardCollection, id), addData);
         // await setDoc(doc(cardCollection, `${id}/boardElement`, id), addData);
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     } finally {
         return {
@@ -72,7 +72,7 @@ export async function handleAddCard(data: ICard): Promise<IResponse> {
 }
 
 export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
-    console.log("UpdateCard data", data)
+    // console.log("UpdateCard data", data)
     const failedFetch = [];
     try {
         const db = await handleGetFirebaseDB();
@@ -88,7 +88,7 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
             });
         }))
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         // return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
         failedFetch.push(JSON.stringify(error));
     } finally {
@@ -99,12 +99,12 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
 }
 
 export async function handleDeleteCard(id: string): Promise<IResponse> {
-    console.log("DeleteCard data", id)
+    // console.log("DeleteCard data", id)
     try {
         const db = await handleGetFirebaseDB();
         await deleteDoc(doc(db, "card", id));
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     } finally {
         return {

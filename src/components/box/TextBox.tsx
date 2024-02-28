@@ -42,7 +42,7 @@ interface ITextBox {
 
 export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: ITextBox) {
     // console.log(textData)
-    console.log("isSelected", isSelected)
+    // console.log("isSelected", isSelected)
     const [value, setValue] = useState(textData.content);
     const [isFontWeightOpen, setIsFontWeightOpen] = useState(false);
     const [isFontSizeOpen, setIsFontSizeOpen] = useState(false);
@@ -74,13 +74,13 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                     className={` w-full h-full`}
                     color={`${textData.textColor ?? "#555555"}`}
                     onChangeComplete={(result: ColorResult) => {
-                        console.log("onChangeComplete", result)
+                        // console.log("onChangeComplete", result)
                         setIsColorOpen(false);
                         if (textData.textColor === result.hex) return;
                         save({ ...textData, textColor: result.hex });
                     }}
                     onChange={(e) => {
-                        console.log("onChange", e)
+                        // console.log("onChange", e)
                     }}
                 />
             </div>}

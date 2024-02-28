@@ -10,18 +10,13 @@ export default function ControlBar() {
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
     return (
-        <div className="hidden sm:flex fixed top-2 right-10 z-50">
+        <div className="hidden sm:flex fixed top-2 right-10 z-30">
             <button type="button" className="w-6 h-6 bg-slate-100 rounded-full relative"
                 onClick={() => {
                     setOpenPopup("setting");
                 }}
             >
                 <Popup options={[{
-                    icon: <div className="w-2 h-2 bg-slate-600 rounded-full"></div>,
-                    isLink: true,
-                    content: "setting",
-                    handleClick: () => { }
-                }, {
                     icon: <div className="w-2 h-2 bg-slate-600 rounded-full"></div>,
                     content: user ? "Logout" : "Login",
                     isLink: true,

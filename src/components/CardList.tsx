@@ -122,7 +122,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                 >
                     {allCards.map(item => {
                         return (
-                            <Link key={item.id} href={`/card/${item.id.split("card_")[1]}`} className="w-full h-full">
+                            <Link scroll={false} key={item.id} href={`/card/${item.id.split("card_")[1]}`} className="w-full h-full">
                                 <Card url={item.imageUrl} name={item.name} classProps={""} cardLize={cardLize}></Card>
                             </Link>
                         )

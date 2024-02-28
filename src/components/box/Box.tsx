@@ -97,8 +97,8 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     clickedRef.current = e.target;
                 }}
                 onDragStart={(e: DragEvent) => {
-                    console.log("box drag start", e.target)
-                    console.log("box drag start", e.currentTarget)
+                    // console.log("box drag start", e.target)
+                    // console.log("box drag start", e.currentTarget)
                     // 設定游標 iconvar image = new Image();
                     const image = new Image();
                     image.src = 'https://static.thenounproject.com/png/617175-200.png';
@@ -109,7 +109,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 }}
                 onDragEnd={(e: DragEvent) => {
                     // 這時候才存資料
-                    console.log("box drag end")
+                    // console.log("box drag end")
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
                     handleSetDirty();
                     setIsDragging(false);
@@ -184,7 +184,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     draggable={true}
                     onDrag={(e) => {
                         e.stopPropagation();
-                        console.log("Rotate")
+                        // console.log("Rotate")
                         if (!boxRef.current) return;
                         setIsEditMode(true);
                         const centerX = boxRef.current.offsetLeft + boxRef.current.offsetWidth / 2;
@@ -212,7 +212,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     draggable={true}
                     onDrag={(e) => {
                         e.stopPropagation();
-                        console.log("Radius")
+                        // console.log("Radius")
                         if (!boxRef.current) return;
                         setIsEditMode(true);
                         const nowX = e.clientX - distenceToLeftTop.left;
@@ -241,7 +241,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 <div
                     onClick={(e) => {
                         e.stopPropagation();
-                        console.log("Delete")
+                        // console.log("Delete")
                         handleDelete(data.id);
                     }}
                     className={`w-[14px] h-[14px] rounded-full border border-slate-500 bg-slate-100 absolute cursor-pointer -top-3.5 -right-3.5 z-20 
@@ -254,7 +254,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 <div
                     onClick={(e) => {
                         e.stopPropagation();
-                        console.log("BackForward")
+                        // console.log("BackForward")
                         handleChangeZIndex(data.id);
                     }}
                     className={`w-[14px] h-[14px] rounded-full bg-slate-200 absolute bottom-1 right-1 z-20 cursor-pointer duration-100 shadow-md

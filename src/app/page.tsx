@@ -12,6 +12,7 @@ import CardList from "@/components/CardList";
 import Popup from "@/components/Popup";
 import { removeUser } from "@/redux/reducers/user";
 import ControlBar from "@/components/ControlBar";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -65,7 +66,12 @@ export default function Home() {
         <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
             <ControlBar />
             <section className="hidden sm:flex w-full flex-1 px-0 pt-0 relative items-center">
-                {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ? "請先登入" : "請選擇一張卡片"}</p>}
+                {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ?
+                    <>
+                        {"請先"}
+                        <Link scroll={false} href={"./login"} className="border border-slate-400 px-1.5 py-1 rounded-md ml-1.5">登入</Link>
+                    </>
+                    : "請選擇一張卡片"}</p>}
                 {selectedCard && <>
 
                     <main className="w-full h-full overflow-scroll bg-white/85 ">
@@ -105,7 +111,7 @@ export default function Home() {
                 {dirtyState === "clear" && <p className={`cursor-default absolute top-1.5 left-2 animate-hide opacity-0 text-sm text-slate-500 z-20`}>已成功儲存</p>}
                 <CardList selectedCardId={selectedCard?.id}
                     handleSetSelectedCard={(id: string) => {
-                        console.log("id", id)
+                        // console.log("id", id)
                         dispatch(selectCard(allCards.find(item => item.id === id) || null));
                     }}
                 />

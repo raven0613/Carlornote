@@ -14,7 +14,7 @@ interface IImageCore {
 }
 
 export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
-    console.log("imageData", imageData)
+    // console.log("imageData", imageData)
     // console.log("isSelected", isSelected)
     const [url, setUrl] = useState(imageData.content);
     const [showingBlock, setShowingBlock] = useState<"image" | "input" | "none">("none");
@@ -22,8 +22,8 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
     const inputValueRef = useRef<string>("");
 
     // console.log("url", url)
-    console.log("imageSentState", imageLoadState)
-    console.log("showingBlock", showingBlock)
+    // console.log("imageSentState", imageLoadState)
+    // console.log("showingBlock", showingBlock)
     useEffect(() => {
         if (imageData.content === "dragging_image" || imageData.content === "image") {
             setShowingBlock("input");
@@ -91,7 +91,7 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        console.log("OKOK")
+                        // console.log("OKOK")
                         if (!getUrlIsValid(inputValueRef.current)) {
                             setImageLoadState("fail")
                             return;

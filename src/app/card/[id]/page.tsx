@@ -14,10 +14,9 @@ import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleD
 import { IState, store } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { addUser, removeUser } from "@/redux/reducers/user";
-import { clearDirtyCardId, selectCard, setCards, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
+import { addCard, clearDirtyCardId, selectCard, setCards, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
 import Board from "@/components/Board";
 import ControlPanel from "@/components/ControlPanel";
-import Link from "next/link";
 import { openModal } from "@/redux/reducers/modal";
 import ElementModal from "@/components/modal/BoardElements";
 import CardList from "@/components/CardList";
@@ -43,26 +42,29 @@ export default function CardPage() {
     // console.log("session", session)
     // console.log("status", status)
     // console.log("user", user)
-    console.log("openModalType", openModalType)
+    // console.log("openModalType", openModalType)
     // console.log("allCards", allCards)
+    // console.log("card access: ", selectedCard.visibility)
 
     useEffect(() => {
         const cardId = pathname.split("/").at(-1);
         async function handleCard(cardId: string) {
             const response = await handleGetCard(`card_${cardId}`);
-            console.log("res", response)
+            // console.log("res", response)
             // if (response.status === "FAIL") return await handleCard(cardId);
             if (response.status === "FAIL") {
                 router.push("/")
                 return;
             }
             const data = JSON.parse(response.data) as ICard;
-            console.log("data", data)
+            // console.log("data", data)
             // return;
             if (data.visibility === "private" && data.authorId !== user?.id && !data.userId.includes(user?.id ?? "")) {
                 router.push("/");
                 return;
             }
+            // 公開卡片就算不登入也可編輯
+            if (!user?.id) dispatch(setCards([data]));
             dispatch(selectCard(data));
             setUserPermission("editable")
         }
@@ -75,9 +77,7 @@ export default function CardPage() {
         let time: NodeJS.Timeout | null = null;
         if (dirtyState !== "dirty" || time) return;
         time = setInterval(async () => {
-            // console.log("dirtyCards in time", dirtyCards);
             const idSet = new Set([...dirtyCards]);
-            // console.log("idSet", idSet);
             const data = allCards.filter(item => idSet.has(item.id));
             if (data.length === 0) return;
 
@@ -142,7 +142,7 @@ export default function CardPage() {
                 {dirtyState === "clear" && <p className={`cursor-default absolute top-1.5 left-2 animate-hide opacity-0 text-sm text-slate-500 z-20`}>已成功儲存</p>}
                 {(windowWidth && windowWidth >= 640) && <CardList selectedCardId={selectedCard?.id}
                     handleSetSelectedCard={(id: string) => {
-                        console.log("id", id)
+                        // console.log("id", id)
                         dispatch(selectCard(allCards.find(item => item.id === id) || null));
                     }}
                 />}

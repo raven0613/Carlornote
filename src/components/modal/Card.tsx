@@ -44,7 +44,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                     {!url && <EmptyImageIcon classProps="absolute inset-0" />}
                     <input id="board_input" name="board_input" type="file" className="w-full h-full opacity-0 absolute inset-0"
                         onChange={async (e) => {
-                            console.log("image drop")
+                            // console.log("image drop")
                             e.preventDefault();
                             e.stopPropagation();
                             if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
@@ -57,7 +57,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                             e.target.value = "";
 
                             const res = await handlePostImgur(formData);
-                            console.log("res", res)
+                            // console.log("res", res)
                             if (res.success === false) return;
                             setUrl(res.data.link);
                         }}
@@ -97,7 +97,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                     />
                     <button className="absolute right-2 top-1/2 -translate-y-1/2 hover:scale-125 duration-150 w-5 h-5"
                         onClick={(e) => {
-                            console.log("image url ok")
+                            // console.log("image url ok")
                             e.preventDefault()
                             e.stopPropagation()
                             setUrl(inputUrl);
@@ -121,7 +121,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                         onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log("Delete")
+                            // console.log("Delete")
                             const response = await handleDeleteCard(cardData.id);
                             if (response.status === "FAIL") return;
                             dispatch(removeCard(cardData.id));
@@ -157,7 +157,7 @@ export default function CardModal({ isSelected, cardData, handleDelete }: ICardM
                         const response = await handleUpdateCard([{ ...cardData, imageUrl: url, name }]);
                         if (response.status === "FAIL") return;
                         const resData = JSON.parse(response.data);
-                        console.log("resData", resData)
+                        // console.log("resData", resData)
                         dispatch(updateCards(resData));
                         dispatch(closeModal({ type: "", data: null }));
                     }} >

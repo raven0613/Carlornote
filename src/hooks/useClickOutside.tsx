@@ -10,7 +10,7 @@ export default function useClickOutside<T extends HTMLElement>({ handleMouseDown
             if (!e.target) return;
             if (e.target instanceof HTMLElement) {
                 if (!nodeRef.current?.contains(e.target)) {
-                    console.log("handleMouseDown")
+                    // console.log("handleMouseDown")
                     handleMouseDownOutside();
                 }
                 else {

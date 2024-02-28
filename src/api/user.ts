@@ -21,11 +21,11 @@ export async function handleGetUsers(): Promise<IResponse> {
             return { code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS" };
         } else {
             // docSnap.data() will be undefined in this case
-            console.log("No such document!");
+            // console.log("No such document!");
             return { code: 404, status: "FAIL", data: null, message: "No such document!" };
         }
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     }
 }
@@ -42,11 +42,11 @@ export async function handleGetUserById(id: string): Promise<IResponse> {
             return { code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS" };
         } else {
             // docSnap.data() will be undefined in this case
-            console.log("No such document!");
+            // console.log("No such document!");
             return { code: 404, status: "FAIL", data: null, message: "No such document!" };
         }
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     }
 }
@@ -66,26 +66,26 @@ export async function handleGetUserByEmail(email: string): Promise<IResponse> {
         }
         else {
             // docSnap.data() will be undefined in this case
-            console.log("No such document!");
+            // console.log("No such document!");
             return { code: 404, status: "FAIL", data: null, message: "No such document!" };
         }
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     }
 }
 
 export async function handleAddUser(data: IUser): Promise<IResponse> {
-    console.log("handleAddUser")
+    // console.log("handleAddUser")
     const id = `user_${uuidv4()}`;
     const addData = { ...data, id };
     try {
         const db = await handleGetFirebaseDB();
         const userCollection = collection(db, 'user');
-        console.log("addData", addData)
+        // console.log("addData", addData)
         await setDoc(doc(userCollection, id), addData);
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     } finally {
         return {
@@ -95,7 +95,7 @@ export async function handleAddUser(data: IUser): Promise<IResponse> {
 }
 
 export async function handleUpdateUser(data: IUser[]): Promise<IResponse> {
-    console.log("UpdateUser data", data)
+    // console.log("UpdateUser data", data)
     const failedFetch = [];
     try {
         const db = await handleGetFirebaseDB();
@@ -106,7 +106,7 @@ export async function handleUpdateUser(data: IUser[]): Promise<IResponse> {
             });
         }))
     } catch (error) {
-        console.log("error", error)
+        // console.log("error", error)
         // return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
         failedFetch.push(JSON.stringify(error));
     } finally {

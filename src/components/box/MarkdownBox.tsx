@@ -87,7 +87,7 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
     // console.log("supportedLanguages", SyntaxHighlighter.supportedLanguages)
-    console.log("mode", mode)
+    // console.log("mode", mode)
 
     useEffect(() => {
         if (!textData) return;

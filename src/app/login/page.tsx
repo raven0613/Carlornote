@@ -19,24 +19,24 @@ export default function Login() {
     // const [page, setPage] = useState("login");
 
 
-    console.log("path", path)
-    console.log("query", query)
+    // console.log("path", path)
+    // console.log("query", query)
     // console.log("page", page)
-    console.log("session", session)
-    console.log("status", status)
-    console.log("user", user)
+    // console.log("session", session)
+    // console.log("status", status)
+    // console.log("user", user)
 
     useEffect(() => {
         if (user) return;
         async function handleUser() {
             if (status === "authenticated") {
-                console.log("HEEYYYYYYYYY")
+                // console.log("HEEYYYYYYYYY")
                 const getUserRes = await handleGetUserByEmail(session.user?.email || "")
                 const registeredUser = JSON.parse(getUserRes.data);
-                console.log("registeredUser", registeredUser)
+                // console.log("registeredUser", registeredUser)
 
                 if (registeredUser.length > 0) {
-                    console.log("already registered")
+                    // console.log("already registered")
                     dispatch(addUser(registeredUser[0]));
                     router.push("./");
                     return;
@@ -54,7 +54,7 @@ export default function Login() {
                     updatedAt: new Date().toUTCString(),
                     lastLogin: new Date().toUTCString()
                 })
-                console.log("addUserRes", addUserRes)
+                // console.log("addUserRes", addUserRes)
                 dispatch(addUser(JSON.parse(addUserRes.data)));
                 router.push("./");
             }
@@ -63,24 +63,28 @@ export default function Login() {
     }, [dispatch, router, session, status, user])
 
     return (
-        <main className="w-[40rem] h-[30rem] fixed left-1/2 -translate-x-1/2 bg-gray-100 shadow-gray-400 shadow-lg top-1/2 -translate-y-1/2 rounded-xl z-50 flex gap-2 overflow-hidden">
-            <div className={`w-60 h-full bg-slate-500 absolute duration-500 ease-in-out z-20
+        <main className="w-10/12 sm:w-[40rem] h-[30rem] fixed left-1/2 -translate-x-1/2 bg-gray-100 shadow-gray-400 shadow-lg top-1/2 -translate-y-1/2 rounded-xl z-50 flex gap-2 overflow-hidden">
+
+            {/* box */}
+            <div className={`hidden sm:block w-60 h-full bg-slate-500 absolute duration-500 ease-in-out z-20
                 ${path === "/login" ? "right-0" : ""}
                 ${path === "/signup" ? "right-[25rem]" : ""}
             `}></div>
+
             {/* Login */}
             <section
-                className={`h-full w-[25rem]  absolute duration-500 ease-in-out bg-white
+                className={`h-full w-full sm:w-[25rem]  absolute duration-500 ease-in-out bg-white
                     ${path === "/login" ? "left-0 z-10" : ""}
-                    ${path === "/signup" ? "left-[15rem] -z-10" : ""}
+                    ${path === "/signup" ? "sm:left-[15rem] -z-10" : ""}
                 `}
             >
                 <SignPanel type="login" />
             </section>
+
             {/* Signup */}
-            <section className={`h-full w-[25rem] border  absolute duration-500 ease-in-out bg-white
+            <section className={`h-full w-full sm:w-[25rem] border  absolute duration-500 ease-in-out bg-white
                 ${path === "/login" ? "left-0 z-0" : ""}
-                ${path === "/signup" ? "left-[15rem] z-10" : ""}
+                ${path === "/signup" ? "sm:left-[15rem] z-10" : ""}
             `}>
                 <SignPanel type="signup" />
             </section>

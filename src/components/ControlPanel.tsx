@@ -36,16 +36,16 @@ export default function ControlPanel({ handleDrag }: IControlPanel) {
         <>
             <main className="absolute left-5 top-8 grid grid-cols-1 grid-rows-4 gap-1.5 p-3 shadow-md shadow-black/40 rounded-lg bg-white">
                 <Button handleDrag={handleDrag} type="text">
-                    <TextIcon classProps="fill-slate-700" />
+                    <TextIcon classProps="fill-slate-600" />
                 </Button>
                 <Button handleDrag={handleDrag} type="image">
-                    <ImageIcon classProps="stroke-slate-700" />
+                    <ImageIcon classProps="stroke-slate-600" />
                 </Button>
                 <Button handleDrag={handleDrag} type="code">
-                    <CodeIcon classProps="stroke-slate-700" />
+                    <CodeIcon classProps="text-slate-600" />
                 </Button>
                 <Button handleDrag={handleDrag} type="markdown">
-                    <NoteIcon classProps="stroke-slate-700" />
+                    <NoteIcon classProps="text-slate-600" />
                 </Button>
             </main>
         </>

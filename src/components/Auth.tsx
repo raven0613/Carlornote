@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { ImageLoading } from "./ImageLoading";
 
 interface IProps {
     children: ReactNode;
@@ -15,8 +16,8 @@ const Auth = (props: IProps) => {
     const { data: session, status } = useSession();
     const dispatch = useDispatch();
     const pathname = usePathname();
-    console.log("Auth status", status)
-    console.log("Auth session", session)
+    // console.log("Auth status", status)
+    // console.log("Auth session", session)
 
     useEffect(() => {
         if (status !== "authenticated") return;
@@ -34,7 +35,7 @@ const Auth = (props: IProps) => {
     }, [dispatch, session?.user?.email, status])
 
     if (["login", "signup"].includes(pathname)) return <>{props.children}</>
-    if (status === "loading") return <main className="w-full h-full">確認身分中</main>
+    if (status === "loading") return <main className="w-full h-screen"><ImageLoading /></main>
 
     return (
         <>{props.children}</>

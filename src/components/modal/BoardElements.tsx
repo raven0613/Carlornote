@@ -78,7 +78,7 @@ export default function ElementModal({ permission }: IElementModal) {
     return (
         <>
             {/* panel */}
-            <main className="fixed inset-x-0 bottom-0 top-12 sm:top-0 w-full sm:relative sm:w-80 sm:h-[97vh] sm:rounded-xl bg-white overflow-y-scroll pt-4 sm:py-2 pl-2 pr-2 z-30" onClick={(e) => {
+            <main className="fixed inset-x-0 bottom-0 top-12 sm:top-0 w-full sm:relative sm:w-80 sm:h-[97vh] sm:rounded-xl bg-white overflow-y-scroll pt-4 sm:py-2 pl-2 pr-2 z-20 sm:z-50" onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 dispatch(selectElementId(""));
@@ -198,7 +198,7 @@ export default function ElementModal({ permission }: IElementModal) {
                                     <div
                                         className="textbox_textarea w-full h-fit p-2 rounded-md overflow-hidden whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700"
                                         onClick={() => {
-                                            console.log(item.id)
+                                            // console.log(item.id)
                                             dispatch(selectElementId(item.id));
                                         }}
                                     >
@@ -345,7 +345,7 @@ export default function ElementModal({ permission }: IElementModal) {
                                 const formData = new FormData();
                                 formData.append("image", file);
                                 const res = await handlePostImgur(formData);
-                                console.log("res", res)
+                                // console.log("res", res)
 
                                 if (res.success === false) return;
                                 const { width, height } = getResizedSize(res.data.width, res.data.height);

@@ -1,10 +1,6 @@
 "use client"
 import React, { useEffect, useRef, useState, DragEvent, ReactNode, useTransition } from "react";
-
-import Image from "next/image";
-import { v4 as uuidv4 } from 'uuid';
 import useClickOutside from "@/hooks/useClickOutside";
-import Link from "next/link";
 
 
 interface IModal {

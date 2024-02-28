@@ -14,7 +14,7 @@ export async function handleGetAllImage() {
         method: "POST",
         headers: { Authorization: `Client-ID ${process.env.IMGUR_CLIENT_ID}` }
     })
-    console.log("response", response)
+    // console.log("response", response)
     // const res = await response.json();
     // return res;
 }

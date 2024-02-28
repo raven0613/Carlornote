@@ -32,7 +32,7 @@ export default function Card({ url, name, children, classProps, cardLize }: ICar
                             width: '80%', height: '80%',
                         }}
                         onLoad={(e) => {
-                            console.log("onLoad")
+                            // console.log("onLoad")
                         }}
                         onError={() => {
                         }}
@@ -67,7 +67,7 @@ export function CardWithHover({ handleClick, isSelected, url, name, handleClickE
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log("Select")
+                    // console.log("Select")
                     handleClick();
                 }}>
                 <Card url={url} name={name} cardLize={cardLize}
