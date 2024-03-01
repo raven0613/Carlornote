@@ -43,7 +43,8 @@ export default function CardPage() {
     // console.log("status", status)
     // console.log("user", user)
     // console.log("openModalType", openModalType)
-    // console.log("allCards", allCards)
+    // console.log("allCards card page", allCards)
+    // console.log("allCards card selectedCard", selectedCard)
     // console.log("card access: ", selectedCard.visibility)
 
     useEffect(() => {
@@ -51,18 +52,20 @@ export default function CardPage() {
         async function handleCard(cardId: string) {
             const response = await handleGetCard(`card_${cardId}`);
             // console.log("res", response)
+            // console.log("user", user)
             // if (response.status === "FAIL") return await handleCard(cardId);
             if (response.status === "FAIL") {
                 router.push("/")
                 return;
             }
             const data = JSON.parse(response.data) as ICard;
-            // console.log("data", data)
+            console.log("data", data)
             // return;
             if (data.visibility === "private" && data.authorId !== user?.id && !data.userId.includes(user?.id ?? "")) {
                 router.push("/");
                 return;
             }
+            console.log("access")
             // 公開卡片就算不登入也可編輯
             if (!user?.id) dispatch(setCards([data]));
             dispatch(selectCard(data));
@@ -70,7 +73,7 @@ export default function CardPage() {
         }
         if (!cardId) return;
         handleCard(cardId);
-    }, [dispatch, pathname, router, user?.id])
+    }, [dispatch, pathname, router, user])
 
     // 有修改的話 5 秒存檔一次
     useEffect(() => {
@@ -96,6 +99,12 @@ export default function CardPage() {
             if (time) clearInterval(time);
         }
     }, [allCards, dirtyCards, dirtyState, dispatch]);
+
+    // 如果點選卡片要切換網址，以下為了按上一頁時也能抓到資料
+    // useEffect(() => {
+    //     const cardId = pathname.split("/").at(-1);
+    //     dispatch(selectCard(allCards.find(item => item.id === `card_${cardId}`) || null));
+    // }, [allCards, dispatch, pathname])
 
     return (
         <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
@@ -140,10 +149,12 @@ export default function CardPage() {
             <div className="w-full h-full sm:h-auto relative">
                 {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}
                 {dirtyState === "clear" && <p className={`cursor-default absolute top-1.5 left-2 animate-hide opacity-0 text-sm text-slate-500 z-20`}>已成功儲存</p>}
+
                 {(windowWidth && windowWidth >= 640) && <CardList selectedCardId={selectedCard?.id}
                     handleSetSelectedCard={(id: string) => {
                         // console.log("id", id)
-                        dispatch(selectCard(allCards.find(item => item.id === id) || null));
+                        // dispatch(selectCard(allCards.find(item => item.id === id) || null));
+                        window && window.history.pushState(null, 'cardId', `/card/${id.split("_").at(-1)}`);
                     }}
                 />}
             </div>

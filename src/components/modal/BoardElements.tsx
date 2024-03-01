@@ -70,6 +70,7 @@ export default function ElementModal({ permission }: IElementModal) {
     // console.log("isLock", isLock)
 
     function save(updatedCard: ICard) {
+        // console.log("updatedCard", updatedCard)
         dispatch(updateCards([updatedCard]));
         dispatch(selectCard(updatedCard));
         dispatch(setDirtyCardId(selectedCard.id));
@@ -270,6 +271,7 @@ export default function ElementModal({ permission }: IElementModal) {
                                 >
                                     <MarkdownCore
                                         handleUpdateElement={(data: IBoardElement) => {
+                                            // console.log("data!!!", data)
                                             const updatedCard: ICard = {
                                                 ...selectedCard,
                                                 boardElement: selectedCard.boardElement.map(ele => {
@@ -291,18 +293,12 @@ export default function ElementModal({ permission }: IElementModal) {
                     })}
                 </div>
             </main>
-            {/* 小耳朵 */}
-            <div className={`hidden sm:block absolute top-0 bg-white w-10 h-24 rounded-lg cursor-pointer -z-10  shadow-black/30 duration-150
-                ${openModalType === "boardElements" ? "left-0" : "-left-6 shadow-md"}
-            `} onClick={() => {
-                    if (openModalType === "boardElements") return dispatch(closeModal({ type: "" }));
-                    dispatch(openModal({ type: "boardElements", data: selectedCard?.boardElement }));
-                }}>
-            </div>
+
             {/* mobile add button */}
             {!isLock && <>
-                <div className={`absolute duration-150
-                ${isAddPanelOpen ? "bottom-24 opacity-100" : "-bottom-0 opacity-0"}
+                {/* add panel */}
+                <div className={`fixed duration-150 overflow-hidden
+                ${isAddPanelOpen ? "top-[80%] opacity-100" : "top-[100%] opacity-0"}
                 left-1/2 -translate-x-1/2 bg-slate-100 shadow-md shadow-black/30 flex gap-2 p-2 z-40 rounded-xl`}>
                     <AddBoxButton
                         handleClick={() => {
@@ -427,8 +423,9 @@ export default function ElementModal({ permission }: IElementModal) {
                         <NoteIcon classProps="text-slate-600" />
                     </AddBoxButton>
                 </div>
+                {/* add button */}
                 <button ref={nodeRef} type="button"
-                    className={`w-14 h-14 bg-slate-100 rounded-full absolute z-50 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-slate-100 rounded-full absolute z-50 top-[90%] left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:hidden
                 text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150`}
                     onClick={async (e) => {

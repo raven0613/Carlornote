@@ -17,7 +17,7 @@ export default function Card({ url, name, children, classProps, cardLize }: ICar
     // console.log("name", name, url)
     return (
         <>
-            <div className={`w-full h-full sm:w-24 bg-zinc-300 rounded-lg duration-200 shadow-md grid grid-rows-5
+            <div className={`card w-full h-full sm:w-24 bg-zinc-300 rounded-lg duration-200 shadow-md grid grid-rows-5
                     ${classProps} ${cardLize === "lg" ? "sm:h-32" : "sm:h-24"}
                 `}
             >
@@ -38,7 +38,7 @@ export default function Card({ url, name, children, classProps, cardLize }: ICar
                         }}
                     />}
                 </div>
-                {(name && cardLize === "lg") && <p className="row-span-1 text-white/90 w-full text-center text-sm">{name}</p>}
+                {(name && cardLize === "lg") && <p className="row-span-1 text-white/90 w-full text-center text-sm truncate px-2">{name}</p>}
 
                 {/* controllers */}
                 {children}

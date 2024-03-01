@@ -13,6 +13,7 @@ import Popup from "@/components/Popup";
 import { removeUser } from "@/redux/reducers/user";
 import ControlBar from "@/components/ControlBar";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 
 export default function Home() {
@@ -23,7 +24,8 @@ export default function Home() {
     const allCards = useSelector((state: IState) => state.card);
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
-
+    const pathname = usePathname();
+    const router = useRouter();
 
     // console.log("wheelPx", wheelPx)
     // console.log("user", user)
@@ -61,6 +63,12 @@ export default function Home() {
             if (time) clearInterval(time);
         }
     }, [allCards, dirtyCards, dirtyState, dispatch]);
+
+    // 為了按上一頁時也能抓到資料
+    // useEffect(() => {
+    //     const cardId = pathname.split("/").at(-1);
+    //     dispatch(selectCard(allCards.find(item => item.id === `card_${cardId}`) || null));
+    // }, [allCards, dispatch, pathname])
 
     return (
         <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
@@ -113,11 +121,11 @@ export default function Home() {
                     handleSetSelectedCard={(id: string) => {
                         // console.log("id", id)
                         dispatch(selectCard(allCards.find(item => item.id === id) || null));
+                        // window && window.history.pushState(null, 'cardId', `/card/${id.split("_").at(-1)}`);
+                        // router.push(`/card/${id.split("_").at(-1)}`);
                     }}
                 />
             </div>
-
-
         </main>
     );
 }

@@ -31,11 +31,28 @@ interface IMarkdownCore {
 export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, articleMode, needFull }: IMarkdownCore) {
     const [value, setValue] = useState(textData.content);
     const [isFull, setIsFull] = useState(false);
+    const scrollTopRef = useRef(0);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const articleRef = useRef<HTMLTitleElement>(null);
+
+    useEffect(() => {
+        if (textData.content === value) return;
+        setValue(textData.content);
+    }, [textData.content, value])
+
     return (
         <>
             {articleMode === "edit" && <div className="h-full w-full rounded-xl p-4 bg-[#282c2e] text-slate-400 relative">
-                <textarea
+                <textarea ref={textareaRef}
+                    onWheel={(e) => {
+                        // scrollTopRef.current = e.currentTarget.scrollTop;
+                        articleRef.current?.scrollTo({
+                            top: e.currentTarget.scrollTop,
+                            behavior: "smooth"
+                        });
+                    }}
                     onChange={(e) => {
+                        console.log("e.target.value", e.target.value)
                         setValue(e.target.value);
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
@@ -45,7 +62,15 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                     `}
                     value={value}>
                 </textarea>
-                <article className="prose dark:prose-invert max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30" dangerouslySetInnerHTML={{ __html: md.render(value) }} />
+                <article ref={articleRef} className="prose dark:prose-invert max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30"
+                    onWheel={(e) => {
+                        textareaRef.current?.scrollTo({
+                            top: e.currentTarget.scrollTop,
+                            behavior: "smooth"
+                        });
+                    }}
+                    dangerouslySetInnerHTML={{ __html: md.render(value) }}
+                />
             </div>}
 
             {articleMode === "read" && <div className={`w-full relative bg-[#e9e6e2] rounded-lg overflow-y-scroll

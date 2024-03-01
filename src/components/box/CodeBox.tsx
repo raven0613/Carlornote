@@ -40,9 +40,9 @@ export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMo
     const [isFull, setIsFull] = useState(false);
 
     useEffect(() => {
-        if (!textData) return;
+        if (textData.content === value) return;
         setValue(textData.content);
-    }, [textData])
+    }, [textData.content, value])
 
     return (
         <>

@@ -85,7 +85,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
             >
                 {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
-                    className={`w-14 h-14 bg-slate-200/80 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 
+                    className={`w-14 h-14 bg-slate-200 rounded-full absolute z-50 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:left-10 sm:bottom-1/2 sm:translate-y-1/2 
                 text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150 ${cardLize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
@@ -189,7 +189,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                             e.stopPropagation();
                             setCardSize("hidden");
                         }}
-                    ></button>
+                    >-</button>
                 </div>
 
             </section>
