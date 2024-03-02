@@ -81,6 +81,7 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
             await updateDoc(cardRef, {
                 boardElement: item.boardElement,
                 visibility: item.visibility,
+                editability: item.editability,
                 updatedAt: new Date().toUTCString(),
                 userId: item.userId,
                 imageUrl: item.imageUrl,

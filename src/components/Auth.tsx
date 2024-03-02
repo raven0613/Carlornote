@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ImageLoading } from "./ImageLoading";
 import { IState } from "@/redux/store";
 
-export const outerPage = ["/login", "/signup"];
+export const outerPage = ["/login", "/signup", "/logout"];
 
 interface IProps {
     children: ReactNode;
@@ -22,11 +22,13 @@ const Auth = (props: IProps) => {
     const user = useSelector((state: IState) => state.user);
     // console.log("Auth status", status)
     // console.log("Auth session", session)
+    // console.log("Auth user", user)
 
     useEffect(() => {
         if (status !== "authenticated") return;
         async function handleCheckUser(): Promise<void> {
             const getUserRes = await handleGetUserByEmail(session?.user?.email ?? "");
+            console.log("userRes", getUserRes)
             if (getUserRes.status === "FAIL") return handleCheckUser();
 
             const registeredUser = JSON.parse(getUserRes.data);

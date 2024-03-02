@@ -28,7 +28,7 @@ export default function Login() {
         if (user) return router.replace("./");
         async function handleUser() {
             if (status === "authenticated") {
-                // console.log("HEEYYYYYYYYY")
+                console.log("HEEYYYYYYYYY")
                 const getUserRes = await handleGetUserByEmail(session.user?.email || "")
                 const registeredUser = JSON.parse(getUserRes.data);
                 // console.log("registeredUser", registeredUser)

@@ -12,9 +12,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 const showCardAmounts = 10;
 
-function FakeCard() {
+function FakeCard({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
     return (
-        <main className={`w-14 h-36 rounded-lg relative group hover:z-50 duration-200`}
+        <main className={`w-14 rounded-lg relative group hover:z-50 duration-200 ${cardLize === "lg" ? "h-32" : `${cardLize === "sm" ? "h-24" : "h-0 opacity-0"}`}
+            `}
         >
             <div className={`w-28 h-36 bg-zinc-00 rounded-lg duration-200 shadow-lg  
         grid grid-rows-5 absolute top-0 left-1/2 -translate-x-1/2`}></div>
@@ -22,11 +23,11 @@ function FakeCard() {
     )
 }
 
-function CardLoading() {
+function CardLoading({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
     const list = Array.from({ length: showCardAmounts });
-    return (<div className="w-full h-full">
+    return (<div className="w-full h-full flex">
         {list.map((_item, index) => (
-            <FakeCard key={index} />
+            <FakeCard cardLize={cardLize} key={index} />
         ))}
     </div>)
 }
@@ -50,13 +51,13 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
     const pathname = usePathname();
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) return setCardSize("hidden");
         async function handleFetchCard() {
             const response = await handleGetCards(user?.id || "");
             if (response.status === "FAIL") return setCardState("error");
             setCardState("ok");
             dispatch(setCards(JSON.parse(response.data)));
-            // console.log("get data", JSON.parse(data.data))
+            // console.log("get data", JSON.parse(response.data))
         }
         setCardState("loading");
         handleFetchCard();
@@ -87,7 +88,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
             >
                 {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
-                    className={`w-14 h-14 bg-slate-200 rounded-full absolute z-50 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-slate-200 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:left-10 sm:bottom-1/2 sm:translate-y-1/2 
                 text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150 ${cardLize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
@@ -110,10 +111,10 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                         const card = JSON.parse(response.data) as ICard;
                         dispatch(addCard(card));
                         setAddCardState("ok");
-                        // 新增的卡片要被選取並且卡片欄位要顯示
-                        dispatch(selectCard(card));
-                        if (allCards.length - showCardAmounts + 1 >= 0) setWheelPx(allCards.length - showCardAmounts + 1);
-                        else setWheelPx(0);
+                        // 新增的卡片要被選取並且卡片欄位要顯示(先不要)
+                        // dispatch(selectCard(card));
+                        // if (allCards.length - showCardAmounts + 1 >= 0) setWheelPx(allCards.length - showCardAmounts + 1);
+                        // else setWheelPx(0);
                     }}
                 >+</button>
 
@@ -133,45 +134,48 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                 </div>
 
                 {/* pc */}
-                <div className={`hidden sm:flex w-auto h-full items-end ${cardLize === "lg" ? "pb-4" : "pb-2"}`}
-                    onWheel={(e) => {
-                        // console.log(e.deltaX)
-                        // console.log(e.deltaY)
-                        if (e.deltaY > 0) setWheelPx(pre => {
-                            if (pre + showCardAmounts >= allCards.length) return allCards.length - showCardAmounts;
-                            return pre + 1
-                        });
-                        else setWheelPx(pre => {
-                            if (pre <= 0) return 0;
-                            return pre - 1
-                        });
-                    }}
-                >
-                    {cardState === "loading" && <CardLoading />}
-                    {cardState === "error" && "Error"}
-                    {(cardState === "ok" && allCards) &&
-                        allCards.slice(
-                            allCards.length <= showCardAmounts ? 0 : wheelPx,
-                            allCards.length <= showCardAmounts ? allCards.length : wheelPx + showCardAmounts
-                        )
-                            .map((item) =>
-                                <CardWithHover key={item.id}
-                                    name={item.name}
-                                    url={item.imageUrl}
-                                    isSelected={selectedCardId === item.id}
-                                    cardLize={cardLize}
-                                    handleClick={() => {
-                                        handleSetSelectedCard(item.id);
-                                        // setDirtyState("none");
-                                    }}
-                                    handleClickEdit={() => {
-                                        dispatch(openModal({ type: "card", data: item }));
-                                    }}
-                                />
-                            )}
-                </div>
+                {allCards.length > 0 ?
+                    <div className={`hidden sm:flex w-auto h-full items-end ${cardLize === "lg" ? "pb-4" : "pb-2"}`}
+                        onWheel={(e) => {
+                            // console.log(e.deltaX)
+                            // console.log(e.deltaY)
+                            if (e.deltaY > 0) setWheelPx(pre => {
+                                if (pre + showCardAmounts >= allCards.length) return allCards.length - showCardAmounts;
+                                return pre + 1
+                            });
+                            else setWheelPx(pre => {
+                                if (pre <= 0) return 0;
+                                return pre - 1
+                            });
+                        }}
+                    >
+                        {cardState === "loading" && <CardLoading cardLize={cardLize} />}
+                        {cardState === "error" && "Error"}
+                        {(cardState === "ok" && allCards) &&
+                            allCards.slice(
+                                allCards.length <= showCardAmounts ? 0 : wheelPx,
+                                allCards.length <= showCardAmounts ? allCards.length : wheelPx + showCardAmounts
+                            )
+                                .map((item) =>
+                                    <CardWithHover key={item.id}
+                                        name={item.name}
+                                        url={item.imageUrl}
+                                        isSelected={selectedCardId === item.id}
+                                        cardLize={cardLize}
+                                        handleClick={() => {
+                                            handleSetSelectedCard(item.id);
+                                            // setDirtyState("none");
+                                        }}
+                                        handleClickEdit={() => {
+                                            dispatch(openModal({ type: "card", data: item }));
+                                        }}
+                                    />
+                                )}
+                    </div>
+                    :
+                    <p className="text-slate-600">{user && "卡片盒空空如也，新增一張卡片吧"}</p>}
                 {/* pc control button */}
-                <div className={`hidden sm:flex absolute right-2 text-xs gap-2 ${cardLize === "hidden" ? "" : "flex-col"}`}>
+                {user && <div className={`hidden sm:flex absolute right-2 text-xs gap-2 ${cardLize === "hidden" ? "" : "flex-col"}`}>
                     <button className="w-5 h-5 bg-slate-200 rounded-full hover:scale-125 duration-150"
                         onClick={(e) => {
                             e.preventDefault();
@@ -193,7 +197,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                             setCardSize("hidden");
                         }}
                     >-</button>
-                </div>
+                </div>}
 
             </section>
         </>

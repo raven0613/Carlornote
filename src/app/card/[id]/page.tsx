@@ -1,23 +1,17 @@
 "use client"
 // import { handleGoogleLogin } from "@/api/firebase_admin";
-import useAutosizedTextarea from "@/hooks/useAutosizedTextarea"
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import React, { RefObject, useEffect, useRef, useState, DragEvent, use } from "react";
-import { getFirestore } from "firebase/firestore";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 // import { firebaseConfig } from "@/api/firebase";
 import * as firebase from "firebase/app";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { handleAddUser, handleGetUserByEmail } from "@/api/user";
 import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleDeleteCard } from "@/api/card";
 import { IState, store } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
-import { addUser, removeUser } from "@/redux/reducers/user";
 import { addCard, clearDirtyCardId, selectCard, setCards, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
 import Board from "@/components/Board";
 import ControlPanel from "@/components/ControlPanel";
-import { openModal } from "@/redux/reducers/modal";
 import ElementModal from "@/components/modal/BoardElements";
 import CardList from "@/components/CardList";
 import ControlBar from "@/components/ControlBar";
@@ -43,8 +37,8 @@ export default function CardPage() {
     // console.log("status", status)
     // console.log("user", user)
     // console.log("openModalType", openModalType)
-    // console.log("allCards card page", allCards)
-    // console.log("allCards card selectedCard", selectedCard)
+    console.log("allCards card page", allCards)
+    console.log("allCards card selectedCard", selectedCard)
     // console.log("card access: ", selectedCard.visibility)
 
     useEffect(() => {
@@ -61,15 +55,27 @@ export default function CardPage() {
             const data = JSON.parse(response.data) as ICard;
             console.log("data", data)
             // return;
-            if (data.visibility === "private" && data.authorId !== user?.id && !data.userId.includes(user?.id ?? "")) {
+
+            // 閱讀權限閘門
+            if (data.visibility === "private" && data.authorId !== user?.id) {
+                router.push("/");
+                return;
+            }
+            else if (data.visibility === "limited" && data.authorId !== user?.id && !data.userId.includes(user?.email ?? "")) {
                 router.push("/");
                 return;
             }
             console.log("access")
-            // 公開卡片就算不登入也可編輯
-            if (!user?.id) dispatch(setCards([data]));
             dispatch(selectCard(data));
-            setUserPermission("editable")
+
+            // 如果是登入的 user 就不要動原本的卡片資料，否則就帶入網址這筆
+            if (!user) {
+                dispatch(setCards([data]));
+            }
+
+            // 編輯權限閘門
+            if (data.authorId === user?.id || data.editability === "open") setUserPermission("editable");
+            else if (data.editability === "limited" && data.userId.includes(user?.email ?? "")) setUserPermission("editable");
         }
         if (!cardId) return;
         handleCard(cardId);
@@ -116,7 +122,7 @@ export default function CardPage() {
                 {selectedCard && <>
 
                     <main className="w-full h-full overflow-scroll bg-white/85 ">
-                        <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
+                        <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement ?? selectedCard.boardElement}
                             handleUpdateElementList={(allElement: IBoardElement[]) => {
                                 // console.log("update allElement list", allElement)
                                 const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
@@ -139,12 +145,12 @@ export default function CardPage() {
                         />
                     </main>
                 </>}
-                <ControlPanel
+                {userPermission === "editable" && <ControlPanel
                     handleDrag={(type) => {
                         if (!selectedCard) return;
                         setDraggingBox(type);
                     }}
-                />
+                />}
             </section>
             <div className="w-full h-full sm:h-auto relative">
                 {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}
