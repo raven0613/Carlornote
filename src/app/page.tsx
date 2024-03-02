@@ -14,6 +14,7 @@ import { removeUser } from "@/redux/reducers/user";
 import ControlBar from "@/components/ControlBar";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { SignPanel } from "@/components/SignPanel";
 
 
 export default function Home() {
@@ -71,7 +72,15 @@ export default function Home() {
     // }, [allCards, dispatch, pathname])
 
     return (
-        <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
+        <main className="flex h-[100svh] flex-col items-center justify-between overflow-hidden">
+            {/* login panel */}
+            {status !== "authenticated" && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
+                <div className="w-[40rem] h-[30rem] bg-white rounded-xl">
+                    {(pathname === "/login" || pathname === "/") && <SignPanel type={"login"} />}
+                    {pathname === "/signup" && <SignPanel type={"signup"} />}
+                </div>
+            </div>}
+            
             <ControlBar />
             <section className="hidden sm:flex w-full flex-1 px-0 pt-0 relative items-center">
                 {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ?
@@ -106,12 +115,12 @@ export default function Home() {
                         />
                     </main>
                 </>}
-                <ControlPanel
+                {status === "authenticated" && <ControlPanel
                     handleDrag={(type) => {
                         if (!selectedCard) return;
                         setDraggingBox(type);
                     }}
-                />
+                />}
             </section>
 
             <div className="w-full h-full sm:h-auto relative">

@@ -1,4 +1,5 @@
 "use client"
+import { IUser } from "@/type/user";
 import { IAction } from "../store";
 
 export const initUserState = null;

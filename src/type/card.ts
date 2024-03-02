@@ -24,9 +24,10 @@ export interface ICard {
     authorId: string,
     userId: string[],
     boardElement: IBoardElement[],
-    visibility: "public" | "private" | "free",
+    visibility: "public" | "private" | "limited",
+    editability: "open" | "close" | "limited"
     createdAt: string,
     updatedAt: string,
     imageUrl: string,
-    name: string
+    name: string,
 }

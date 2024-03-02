@@ -62,7 +62,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                     `}
                     value={value}>
                 </textarea>
-                <article ref={articleRef} className="prose dark:prose-invert max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30"
+                <article ref={articleRef} className="prose max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30"
                     onWheel={(e) => {
                         textareaRef.current?.scrollTo({
                             top: e.currentTarget.scrollTop,
@@ -77,7 +77,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
             ${needFull ? (isFull ? "h-full max-h-[80vh] min-h-48" : "h-48") : "h-full"}
             `}
             >
-                <article className={`prose dark:prose-invert marker:text-slate-500 max-w-none w-full h-full
+                <article className={`prose marker:text-slate-500 max-w-none w-full h-full
                 text-slate-700  p-4`} dangerouslySetInnerHTML={{ __html: md.render(value) }} />
             </div>}
 

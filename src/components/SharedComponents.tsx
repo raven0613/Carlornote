@@ -9,6 +9,7 @@ import { IState } from "@/redux/store";
 import ElementModal from "./modal/BoardElements";
 import CardList from "./CardList";
 import { usePathname, useRouter } from "next/navigation";
+import { outerPage } from "./Auth";
 
 interface IProps {
     children: ReactNode;
@@ -22,6 +23,7 @@ const SharedComponents = (props: IProps) => {
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
     const user = useSelector((state: IState) => state.user);
+    const pathname = usePathname();
     // console.log("modalProp", modalProp)
     // console.log("selectedCard", selectedCard)
     // console.log("status", status)
@@ -39,7 +41,7 @@ const SharedComponents = (props: IProps) => {
         return () => document.removeEventListener("click", handleMouse);
     }, []);
 
-    if (status === "unauthenticated") return <>{props.children}</>;
+    if (status === "unauthenticated" || outerPage.includes(pathname)) return <>{props.children}</>;
     return (
         <>
             {props.children}
@@ -54,7 +56,7 @@ const SharedComponents = (props: IProps) => {
                 {openModalType === "card" && <Card
                     isSelected={false}
                     cardData={modalProp}
-                    handleDelete={() => {
+                    handleClose={() => {
                         if (openModalType === "card") dispatch(closeModal({ type: "", data: null }));
                     }}
                 />}

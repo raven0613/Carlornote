@@ -39,4 +39,5 @@ export default function Modal({ isOpen, handleClose, children, position }: IModa
             </div>
         </>
     )
+    return <></>
 }

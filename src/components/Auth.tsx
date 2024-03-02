@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { ImageLoading } from "./ImageLoading";
 import { IState } from "@/redux/store";
 
+export const outerPage = ["/login", "/signup"];
+
 interface IProps {
     children: ReactNode;
 }
@@ -23,7 +25,7 @@ const Auth = (props: IProps) => {
 
     useEffect(() => {
         if (status !== "authenticated") return;
-        async function handleCheckUser() {
+        async function handleCheckUser(): Promise<void> {
             const getUserRes = await handleGetUserByEmail(session?.user?.email ?? "");
             if (getUserRes.status === "FAIL") return handleCheckUser();
 
@@ -36,7 +38,7 @@ const Auth = (props: IProps) => {
         handleCheckUser();
     }, [dispatch, session?.user?.email, status])
 
-    if (["login", "signup"].includes(pathname)) return <>{props.children}</>
+    if (outerPage.includes(pathname)) return <>{props.children}</>
     if (status === "loading" || (status === "authenticated" && !user)) return <main className="w-full h-screen"><ImageLoading /></main>
 
     return (

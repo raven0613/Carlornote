@@ -13,8 +13,6 @@ export default function Login() {
     const router = useRouter();
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
-
-    const query = useSearchParams().get("page");
     const path = usePathname()
     // const [page, setPage] = useState("login");
 
@@ -22,12 +20,12 @@ export default function Login() {
     // console.log("path", path)
     // console.log("query", query)
     // console.log("page", page)
-    // console.log("session", session)
-    // console.log("status", status)
+    console.log("session", session)
+    console.log("status", status)
     // console.log("user", user)
 
     useEffect(() => {
-        if (user) return;
+        if (user) return router.replace("./");
         async function handleUser() {
             if (status === "authenticated") {
                 // console.log("HEEYYYYYYYYY")
@@ -36,9 +34,9 @@ export default function Login() {
                 // console.log("registeredUser", registeredUser)
 
                 if (registeredUser.length > 0) {
-                    // console.log("already registered")
+                    console.log("already registered")
                     dispatch(addUser(registeredUser[0]));
-                    router.push("./");
+                    router.replace("./");
                     return;
                 }
                 const addUserRes = await handleAddUser({

@@ -79,7 +79,7 @@ export default function ElementModal({ permission }: IElementModal) {
     return (
         <>
             {/* panel */}
-            <main className="fixed inset-x-0 bottom-0 top-12 sm:top-0 w-full sm:relative sm:w-80 sm:h-[97vh] sm:rounded-xl bg-white overflow-y-scroll pt-4 sm:py-2 pl-2 pr-2 z-20 sm:z-50" onClick={(e) => {
+            <main className="fixed inset-x-0 bottom-0 top-12 sm:top-0 w-full sm:relative sm:w-96 sm:h-[97vh] sm:rounded-xl bg-white overflow-y-scroll pt-4 sm:py-2 pl-2 pr-2 z-20 sm:z-50" onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 dispatch(selectElementId(""));

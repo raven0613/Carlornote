@@ -24,9 +24,11 @@ function FakeCard() {
 
 function CardLoading() {
     const list = Array.from({ length: showCardAmounts });
-    return list.map((_item, index) => (
-        <FakeCard key={index} />
-    ))
+    return (<div className="w-full h-full">
+        {list.map((_item, index) => (
+            <FakeCard key={index} />
+        ))}
+    </div>)
 }
 
 interface ICardList {
@@ -99,6 +101,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                             boardElement: [],
                             userId: [user.id],
                             visibility: "private",
+                            editability: "close",
                             imageUrl: "",
                             createdAt: new Date().toUTCString(),
                             updatedAt: new Date().toUTCString(),

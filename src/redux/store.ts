@@ -5,6 +5,7 @@ import { IBoardElement, ICard } from '@/type/card';
 import { cardsReducer, dirtyCardsIdReducer, selectedCardReducer, dirtyStateType, dirtyReducer } from './reducers/card';
 import { modalReducer, IModalPayload } from './reducers/modal';
 import { selectedElementIdReducer } from './reducers/boardElement';
+import { IUser } from '@/type/user';
 
 export interface IAction<T> { type: string, payload?: T }
 export interface IState { user: IUser | null, card: ICard[], modal: IModalPayload, selectedCard: ICard, selectedElementId: string, dirtyCardsId: string[], dirtyState: dirtyStateType }

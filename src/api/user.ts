@@ -4,6 +4,7 @@ import { handleGetFirebaseDB } from "./firebase";
 import { ICard } from "@/type/card";
 import { v4 as uuidv4 } from 'uuid';
 import { IResponse } from "@/type/response";
+import { IUser } from "@/type/user";
 
 // use server 一定要傳 async function 出來
 export async function handleGetUsers(): Promise<IResponse> {

@@ -17,7 +17,7 @@ export default function Logout() {
         async function handleSignOut() {
             await signOut();
             dispatch(removeUser());
-            router.push("/");
+            router.push("/login");
         }
         handleSignOut();
     }, [dispatch, router, user])
