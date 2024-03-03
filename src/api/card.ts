@@ -72,7 +72,7 @@ export async function handleAddCard(data: ICard): Promise<IResponse> {
 }
 
 export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
-    // console.log("UpdateCard data", data)
+    console.log("UpdateCard data", data)
     const failedFetch = [];
     try {
         const db = await handleGetFirebaseDB();
@@ -80,8 +80,8 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
             const cardRef = doc(db, "card", item.id);
             await updateDoc(cardRef, {
                 boardElement: item.boardElement,
-                visibility: item.visibility,
-                editability: item.editability,
+                visibility: item.visibility ?? "private",
+                editability: item.editability ?? "close",
                 updatedAt: new Date().toUTCString(),
                 userId: item.userId,
                 imageUrl: item.imageUrl,
