@@ -28,7 +28,7 @@ const Auth = (props: IProps) => {
         if (status !== "authenticated") return;
         async function handleCheckUser(): Promise<void> {
             const getUserRes = await handleGetUserByEmail(session?.user?.email ?? "");
-            console.log("userRes", getUserRes)
+            // console.log("userRes", getUserRes)
             if (getUserRes.status === "FAIL") return handleCheckUser();
 
             const registeredUser = JSON.parse(getUserRes.data);

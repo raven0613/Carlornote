@@ -52,7 +52,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                         });
                     }}
                     onChange={(e) => {
-                        console.log("e.target.value", e.target.value)
+                        // console.log("e.target.value", e.target.value)
                         setValue(e.target.value);
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
@@ -73,7 +73,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                 />
             </div>}
 
-            {articleMode === "read" && <div className={`w-full relative bg-[#e9e6e2] rounded-lg overflow-y-scroll
+            {articleMode === "read" && <div className={`w-full relative bg-[#e9e6e2] rounded-lg overflow-y-scroll pb-2
             ${needFull ? (isFull ? "h-full max-h-[80vh] min-h-48" : "h-48") : "h-full"}
             `}
             >
@@ -98,13 +98,14 @@ interface IMarkdownBox {
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;
-    isLocked: boolean;
+    isLocked?: boolean;
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
+    isPointerNone?: boolean;
 }
 
-export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: IMarkdownBox) {
+export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone }: IMarkdownBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
     const [value, setValue] = useState(textData.content);
@@ -134,6 +135,7 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
                 handleDelete={handleDelete}
                 handleSetDirty={handleSetDirty}
                 handleChangeZIndex={handleChangeZIndex}
+                isPointerNone={isPointerNone}
             >
                 <MarkdownCore
                     handleUpdateElement={handleUpdateElement}
@@ -143,7 +145,7 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
             </Box>
 
             {/* buttons */}
-            {isSelected && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
+            {(isSelected && !isLocked) && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
                 style={{ top: position.top - 30, left: position.left }}
             >
                 <button type="button" className={`bg-slate-200 w-5 h-5 rounded-full font-semibold relative p-1`}

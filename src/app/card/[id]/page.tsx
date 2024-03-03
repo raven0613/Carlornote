@@ -37,8 +37,8 @@ export default function CardPage() {
     // console.log("status", status)
     // console.log("user", user)
     // console.log("openModalType", openModalType)
-    console.log("allCards card page", allCards)
-    console.log("allCards card selectedCard", selectedCard)
+    // console.log("allCards card page", allCards)
+    // console.log("allCards card selectedCard", selectedCard)
     // console.log("card access: ", selectedCard.visibility)
 
     useEffect(() => {
@@ -53,7 +53,7 @@ export default function CardPage() {
                 return;
             }
             const data = JSON.parse(response.data) as ICard;
-            console.log("data", data)
+            // console.log("data", data)
             // return;
 
             // 閱讀權限閘門
@@ -65,7 +65,7 @@ export default function CardPage() {
                 router.push("/");
                 return;
             }
-            console.log("access")
+            // console.log("access")
             dispatch(selectCard(data));
 
             // 如果是登入的 user 就不要動原本的卡片資料，否則就帶入網址這筆
@@ -91,7 +91,7 @@ export default function CardPage() {
             if (data.length === 0) return;
 
             const response = await handleUpdateCard(data);
-            console.log("存檔", response);
+            // console.log("存檔", response);
             const resData = JSON.parse(response.data);
             const failedData = response.failedData && JSON.parse(response.failedData);
             if (failedData) console.log("failedData", failedData);

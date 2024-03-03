@@ -31,12 +31,13 @@ export default function Home() {
     // console.log("wheelPx", wheelPx)
     // console.log("user", user)
     // console.log("session", session)
+    // console.log("status", status)
 
     // console.log("allCards page", allCards)
     // console.log("dirtyState", dirtyState)
     // console.log("dirtyCards", dirtyCards)
     // console.log("selectedCardId", selectedCardId)
-    // console.log("selectedCard page", allCards.find(item => item.id === selectedCardId))
+    // console.log("selectedCard page", selectedCard)
 
     // 有修改的話 5 秒存檔一次
     useEffect(() => {
@@ -80,7 +81,7 @@ export default function Home() {
                     {pathname === "/signup" && <SignPanel type={"signup"} />}
                 </div>
             </div>}
-            
+
             <ControlBar />
             <section className="hidden sm:flex w-full flex-1 px-0 pt-0 relative items-center">
                 {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ?
@@ -111,7 +112,7 @@ export default function Home() {
                                 dispatch(setDirtyState("dirty"))
                                 dispatch(setDirtyCardId(selectedCard.id));
                             }}
-                            permission={status === "authenticated" ? "editable" : "none"}
+                            permission={"editable"}
                         />
                     </main>
                 </>}

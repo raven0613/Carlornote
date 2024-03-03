@@ -34,7 +34,7 @@ const authOptions: NextAuthOptions = {
                 // console.log("credentials", credentials)
                 // console.log("req", req)
                 const getUserRes = await handleGetUserByEmail(credentials?.email || "");
-                console.log("getUserRes", getUserRes)
+                // console.log("getUserRes", getUserRes)
                 if (getUserRes.status === "FAIL") return null;
                 const userData = JSON.parse(getUserRes.data)[0];
                 if (typeof userData !== "undefined") {
@@ -44,7 +44,7 @@ const authOptions: NextAuthOptions = {
                         lastLogin: new Date().toUTCString()
                     }
                     const updateUserRes = await handleUpdateUser([loginUser])
-                    console.log(updateUserRes)
+                    // console.log(updateUserRes)
                     return loginUser;
                 }
                 const addUserRes = await handleAddUser({

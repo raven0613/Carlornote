@@ -20,8 +20,8 @@ export default function Login() {
     // console.log("path", path)
     // console.log("query", query)
     // console.log("page", page)
-    console.log("session", session)
-    console.log("status", status)
+    // console.log("session", session)
+    // console.log("status", status)
     // console.log("user", user)
 
     useEffect(() => {

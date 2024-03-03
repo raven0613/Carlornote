@@ -33,8 +33,8 @@ const SharedComponents = (props: IProps) => {
     // dev: 顯示所點選的元素
     useEffect(() => {
         function handleMouse(e: MouseEvent) {
-            e.stopPropagation();
-            e.preventDefault();
+            // e.stopPropagation();
+            // e.preventDefault();
             // console.log((e.target as HTMLElement))
         }
         document.addEventListener("click", handleMouse);

@@ -106,10 +106,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const clickedPointRef = useRef({ startX: 0, startY: 0, endX: 0, endY: 0 });
     const dropPointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
+    // 
+    const [isPointerNone, setIsPointerNone] = useState(false);
     const dispatch = useDispatch();
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
-    // console.log("isLock", isLock)
+    // console.log("Board isLock", isLock)
     // console.log("permission", permission)
 
     useEffect(() => {
@@ -157,10 +159,11 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             rotation: 0,
             left,
             top,
-            radius: 0
+            radius: 0,
+            isLock: false
         }]
         handleUpdateElementList(newBoardElements);
-        setIsLock(false);
+        setIsPointerNone(false);
         dispatch(closeModal({ type: "" }));
         return newBoardElements;
     }, [dispatch, elements, handleUpdateElementList])
@@ -284,11 +287,11 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 onDragOver={(e) => {
                     // 為了防止在圖片上方 drop 的時候變成在瀏覽器打開圖片的行為，需要將圖片設定成 pointer-events-none
                     e.preventDefault();
-                    setIsLock(true);
+                    setIsPointerNone(true);
                 }}
                 onDragEnd={(e) => {
                     // console.log("end")
-                    setIsLock(false);
+                    setIsPointerNone(false);
                     // console.log("left", e.clientX)
                     // console.log("top", e.clientY)
                 }}
@@ -337,7 +340,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 {elements && elements.map(item => {
                     if (item.type === "text") return (
                         <TextBox key={item.id}
-                            isLocked={isLock}
+                            isLocked={isLock || item.isLock}
                             handleUpdateElement={(data: IBoardElement) => {
                                 handleUpdateElementList(elements.map((item) => {
                                     if (item.id === data.id) return data;
@@ -367,7 +370,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     )
                     if (item.type === "image") return (
                         <ImageBox key={item.id}
-                            isLocked={isLock}
+                            isLocked={isLock || item.isLock}
                             handleUpdateElement={(data: IBoardElement) => {
                                 handleUpdateElementList(elements.map((item) => {
                                     if (item.id === data.id) return data;
@@ -393,11 +396,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 handleUpdateElementList(updatedElements);
                                 handleSetDirty();
                             }}
+                            isPointerNone={isPointerNone}
                         />
                     )
                     if (item.type === "code") return (
                         <CodeBox key={item.id}
-                            isLocked={isLock}
+                            isLocked={isLock || item.isLock}
                             handleUpdateElement={(data: IBoardElement) => {
                                 handleUpdateElementList(elements.map((item) => {
                                     if (item.id === data.id) return data;
@@ -423,11 +427,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 handleUpdateElementList(updatedElements);
                                 handleSetDirty();
                             }}
+                            isPointerNone={isPointerNone}
                         />
                     )
                     if (item.type === "markdown") return (
                         <MarkdownBox key={item.id}
-                            isLocked={isLock}
+                            isLocked={isLock || item.isLock}
                             handleUpdateElement={(data: IBoardElement) => {
                                 handleUpdateElementList(elements.map((item) => {
                                     if (item.id === data.id) return data;
@@ -453,6 +458,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 handleUpdateElementList(updatedElements);
                                 handleSetDirty();
                             }}
+                            isPointerNone={isPointerNone}
                         />
                     )
                     return <></>

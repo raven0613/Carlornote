@@ -1,12 +1,8 @@
 "use client"
-import useAutosizedTextarea from "@/hooks/useAutosizedTextarea"
 import { IBoardElement } from "@/type/card";
 import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } from "react";
 import RotateIcon from "../svg/Rotate";
 import { distenceToLeftTop } from "@/components/Board";
-import { useDispatch, useSelector } from "react-redux";
-import { IState } from "@/redux/store";
-import { selectElementId } from "@/redux/reducers/boardElement";
 
 interface IBox {
     data: IBoardElement;
@@ -15,15 +11,16 @@ interface IBox {
     handleClick: () => void;
     children: ReactNode;
     isShadowElement?: boolean;
-    isLocked: boolean;
+    isLocked?: boolean;
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
     isImage?: boolean;
     handleMove: (position: { left: number, top: number }) => void;
+    isPointerNone?: boolean;
 }
 
-export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove }: IBox) {
+export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone }: IBox) {
 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -40,7 +37,9 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
 
     // console.log("isDragging", isDragging)
     // console.log("isEditMode", isEditMode)
+    // console.log("isLocked", isLocked)
     // console.log("isLock", isLock)
+    // console.log("data isLock", data.isLock)
     // console.log("clickedRef", clickedRef)
     // const isSelected = isShadowElement ? true : selectedElementId === data.id;
 
@@ -54,7 +53,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
         setDeg(data.rotation);
         setRadius(data.radius);
         setSize({ width: data.width, height: data.height });
-        setIsLock((isLocked || data.isLock) ?? false);
+        setIsLock(isLocked || (data.isLock ?? false));
         if (isShadowElement) return;
         setPosition({ left: data.left, top: data.top });
     }, [data, isLocked, isShadowElement]);
@@ -69,15 +68,53 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
         return () => document.removeEventListener("mousemove", handleMouse);
     }, [isShadowElement]);
 
+    const boxOutline = () => {
+        let style = "border hover:border-slate-400";
+        if (isSelected || isEditMode) style += " shadow-md shadow-black/30";
+        if (isEditMode) style += " border-slate-400";
+        else style += " border-transparent";
+        // console.log(style)
+        return style;
+    }
+
+    // 只准看
+    if (isLock) return (
+        <>
+            <div className={`boardElement absolute min-h-5 min-w-12 ${isImage ? "overflow-hidden" : ""}`}
+                style={{
+                    borderRadius: `${radius}px`,
+                    left: `${position.left}px`,
+                    top: `${position.top}px`,
+                    rotate: `${deg}deg`,
+                    width: size.width,
+                    height: size.height,
+                    transition: "border-color 0.15s ease",
+                    opacity: data.opacity
+                }}>
+                {children}
+            </div>
+        </>
+    )
     return (
         <>
+            {/* <div className={`absolute z-10 ${isImage ? "overflow-hidden" : ""}`} style={{
+                borderRadius: `${radius}px`,
+                left: `${position.left / 0.95}px`,
+                top: `${position.top / 0.95}px`,
+                rotate: `${deg}deg`,
+                width: size.width * 0.95,
+                height: size.height * 0.95,
+                transition: "border-color 0.15s ease",
+                opacity: data.opacity
+            }}>
+                {children}
+            </div> */}
             <div ref={boxRef}
-                className={`boardElement absolute min-h-5 min-w-12 border hover:border-slate-400 
-            ${isEditMode ? "border-slate-400" : "border-transparent"} 
-            ${isShadowElement ? "opacity-50" : "opacity-100"}
-            ${isLock ? "pointer-events-none" : ""}
-            ${(isSelected || isEditMode) ? "shadow-md shadow-black/30" : ""}
-            `}
+                className={`boardElement absolute min-h-5 min-w-12  
+                    ${isShadowElement ? "opacity-50" : "opacity-100"}
+                    ${boxOutline()}
+                    ${isPointerNone ? "pointer-events-none" : ""}
+                `}
                 style={{
                     left: `${position.left}px`,
                     top: `${position.top}px`,
@@ -98,7 +135,6 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 }}
                 onDragStart={(e: DragEvent) => {
                     // console.log("box drag start", e.target)
-                    // console.log("box drag start", e.currentTarget)
                     // 設定游標 iconvar image = new Image();
                     const image = new Image();
                     image.src = 'https://static.thenounproject.com/png/617175-200.png';
@@ -145,7 +181,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 }}
                 draggable={true}
             >
-                <div className={` w-full h-full`} style={{ borderRadius: `${radius}px` }}>
+                <div className={`w-full h-full ${isImage ? "overflow-hidden" : ""}`} style={{ borderRadius: `${radius}px` }}>
                     {children}
                 </div>
                 {/* size */}

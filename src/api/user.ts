@@ -53,7 +53,7 @@ export async function handleGetUserById(id: string): Promise<IResponse> {
 }
 
 export async function handleGetUserByEmail(email: string): Promise<IResponse> {
-    console.log("email", email)
+    // console.log("email", email)
     try {
         const db = await handleGetFirebaseDB();
         const q = query(collection(db, "user"), where("email", "==", email));
@@ -64,7 +64,7 @@ export async function handleGetUserByEmail(email: string): Promise<IResponse> {
             docSnap.forEach((doc) => {
                 data.push(doc.data() as IUser);
             });
-            console.log(data)
+            // console.log(data)
             return { code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS" };
         }
         else {

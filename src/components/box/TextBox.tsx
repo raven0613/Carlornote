@@ -34,13 +34,14 @@ interface ITextBox {
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;
-    isLocked: boolean;
+    isLocked?: boolean;
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
+    isPointerNone?: boolean;
 }
 
-export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected }: ITextBox) {
+export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone }: ITextBox) {
     // console.log(textData)
     // console.log("isSelected", isSelected)
     const [value, setValue] = useState(textData.content);
@@ -97,14 +98,16 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                 handleDelete={handleDelete}
                 handleSetDirty={handleSetDirty}
                 handleChangeZIndex={handleChangeZIndex}
+                isPointerNone={isPointerNone}
             >
-                <textarea id={textData.id}
+                <textarea id={textData.id} disabled={isLocked}
                     onChange={(e) => {
+                        if (isLocked) return;
                         setValue(e.target.value);
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
                     }}
-                    className={`textInput textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700 overflow-hidden
+                    className={`textInput textbox_textarea w-full h-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-transparent text-neutral-700 overflow-hidden cursor-text
                     ${fontWeightMap[textData.fontWeight ?? "normal"]}
                     ${fontSizeMap[textData.fontSize ?? "base"]}
                     `}
@@ -114,7 +117,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
 
             </Box>
             {/* buttons */}
-            {isSelected && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
+            {(isSelected && !isLocked) && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
                 style={{ top: position.top - 30, left: position.left }}
             >
                 <button type="button" className={`bg-slate-200 w-5 h-5 rounded-full font-semibold relative`}
