@@ -57,7 +57,7 @@ export default function ElementModal({ permission }: IElementModal) {
     // console.log("selectedCard", selectedCard)
     const [editingElementId, setEditingElementId] = useState("");
     const textRef = useAutosizedTextarea<HTMLTextAreaElement>(selectedCard?.boardElement.find(item => item.id === selectedElementId)?.content ?? "", true);
-    const isLock = permission && permission !== "editable";
+    const isLock = (permission && permission !== "editable")? true : false;
     const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
     const nodeRef = useClickOutside<HTMLButtonElement>({
         handleMouseDownOutside: () => {
@@ -67,6 +67,7 @@ export default function ElementModal({ permission }: IElementModal) {
             setIsAddPanelOpen(pre => !pre);
         },
     })
+    // console.log("permission", permission)
     // console.log("isLock", isLock)
 
     function save(updatedCard: ICard) {

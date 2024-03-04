@@ -125,9 +125,10 @@ interface IImageBox {
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
+    elementPositions: { x: number[], y: number[] };
 }
 
-export default function ImageBox({ imageData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone }: IImageBox) {
+export default function ImageBox({ imageData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions }: IImageBox) {
     // console.log("imageData", imageData)
     return (
         <Box
@@ -143,6 +144,7 @@ export default function ImageBox({ imageData, handleUpdateElement, handleClick, 
             handleChangeZIndex={handleChangeZIndex}
             isImage={true}
             isPointerNone={isPointerNone}
+            elementPositions={elementPositions}
         >
             <ImageCore imageData={imageData} handleOnLoad={(card) => {
                 if (isLocked) return;

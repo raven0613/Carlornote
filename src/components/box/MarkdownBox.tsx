@@ -103,9 +103,10 @@ interface IMarkdownBox {
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
+    elementPositions: { x: number[], y: number[] };
 }
 
-export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone }: IMarkdownBox) {
+export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions }: IMarkdownBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
     const [value, setValue] = useState(textData.content);
@@ -136,6 +137,7 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
                 handleSetDirty={handleSetDirty}
                 handleChangeZIndex={handleChangeZIndex}
                 isPointerNone={isPointerNone}
+                elementPositions={elementPositions}
             >
                 <MarkdownCore
                     handleUpdateElement={handleUpdateElement}

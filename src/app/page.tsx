@@ -10,11 +10,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearDirtyCardId, selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
 import CardList from "@/components/CardList";
 import Popup from "@/components/Popup";
-import { removeUser } from "@/redux/reducers/user";
+import { setUserPermission } from "@/redux/reducers/user";
 import ControlBar from "@/components/ControlBar";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { SignPanel } from "@/components/SignPanel";
 
 
 export default function Home() {
@@ -28,16 +27,18 @@ export default function Home() {
     const pathname = usePathname();
     const router = useRouter();
 
+    useEffect(() => {
+        dispatch(setUserPermission("editable"));
+    }, [dispatch])
     // console.log("wheelPx", wheelPx)
     // console.log("user", user)
     // console.log("session", session)
-    // console.log("status", status)
 
     // console.log("allCards page", allCards)
     // console.log("dirtyState", dirtyState)
     // console.log("dirtyCards", dirtyCards)
     // console.log("selectedCardId", selectedCardId)
-    // console.log("selectedCard page", selectedCard)
+    // console.log("selectedCard page", allCards.find(item => item.id === selectedCardId))
 
     // 有修改的話 5 秒存檔一次
     useEffect(() => {
@@ -66,22 +67,14 @@ export default function Home() {
         }
     }, [allCards, dirtyCards, dirtyState, dispatch]);
 
-    // 為了按上一頁時也能抓到資料
+    // 如果點選卡片要切換網址，以下為了按上一頁時也能抓到資料
     // useEffect(() => {
     //     const cardId = pathname.split("/").at(-1);
     //     dispatch(selectCard(allCards.find(item => item.id === `card_${cardId}`) || null));
     // }, [allCards, dispatch, pathname])
 
     return (
-        <main className="flex h-[100svh] flex-col items-center justify-between overflow-hidden">
-            {/* login panel */}
-            {status !== "authenticated" && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
-                <div className="w-[40rem] h-[30rem] bg-white rounded-xl">
-                    {(pathname === "/login" || pathname === "/") && <SignPanel type={"login"} />}
-                    {pathname === "/signup" && <SignPanel type={"signup"} />}
-                </div>
-            </div>}
-
+        <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
             <ControlBar />
             <section className="hidden sm:flex w-full flex-1 px-0 pt-0 relative items-center">
                 {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ?
@@ -112,16 +105,16 @@ export default function Home() {
                                 dispatch(setDirtyState("dirty"))
                                 dispatch(setDirtyCardId(selectedCard.id));
                             }}
-                            permission={"editable"}
+                            permission={status === "authenticated" ? "editable" : "none"}
                         />
                     </main>
                 </>}
-                {status === "authenticated" && <ControlPanel
+                <ControlPanel
                     handleDrag={(type) => {
                         if (!selectedCard) return;
                         setDraggingBox(type);
                     }}
-                />}
+                />
             </section>
 
             <div className="w-full h-full sm:h-auto relative">

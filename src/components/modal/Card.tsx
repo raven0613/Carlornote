@@ -71,6 +71,7 @@ interface ICardModal {
 }
 
 export default function CardModal({ isSelected, cardData, handleClose }: ICardModal) {
+    // console.log("cardData", cardData)
     const [name, setName] = useState(cardData.name);
     const [inputUrl, setInputUrl] = useState("");
     const [url, setUrl] = useState(cardData.imageUrl);
@@ -209,6 +210,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                     <div className={`w-[44rem] h-fit flex duration-100 ${settingArea === "access" ? "translate-x-0" : "-translate-x-1/2"}`}>
                         {/* setting panel */}
                         <div className="w-[22rem] h-full">
+
                             {/* visibility setting panel */}
                             <div className="flex flex-col py-2">
                                 <div className="w-full flex items-center">

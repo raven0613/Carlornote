@@ -19,6 +19,7 @@ const SharedComponents = (props: IProps) => {
     const { data: session, status } = useSession();
     const dispatch = useDispatch();
     const selectedCard = useSelector((state: IState) => state.selectedCard);
+    const userPermission = useSelector((state: IState) => state.userPermission);
     const { type: openModalType, data: modalProp } = useSelector((state: IState) => state.modal)
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
@@ -62,7 +63,7 @@ const SharedComponents = (props: IProps) => {
                 />}
             </Modal>}
 
-            <Modal
+            {userPermission === "editable" && <Modal
                 position="aside"
                 isOpen={openModalType === "boardElements"}
                 handleClose={() => {
@@ -81,7 +82,7 @@ const SharedComponents = (props: IProps) => {
                         dispatch(openModal({ type: "boardElements", data: selectedCard?.boardElement }));
                     }}>
                 </div>
-            </Modal>
+            </Modal>}
 
             {/* {user && <div className="w-full h-full sm:h-auto fixed bottom-0 inset-x-0">
                 {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}

@@ -39,9 +39,10 @@ interface ITextBox {
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
+    elementPositions: { x: number[], y: number[] };
 }
 
-export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone }: ITextBox) {
+export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions }: ITextBox) {
     // console.log(textData)
     // console.log("isSelected", isSelected)
     const [value, setValue] = useState(textData.content);
@@ -99,6 +100,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                 handleSetDirty={handleSetDirty}
                 handleChangeZIndex={handleChangeZIndex}
                 isPointerNone={isPointerNone}
+                elementPositions={elementPositions}
             >
                 <textarea id={textData.id} disabled={isLocked}
                     onChange={(e) => {

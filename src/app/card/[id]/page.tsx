@@ -16,6 +16,7 @@ import ElementModal from "@/components/modal/BoardElements";
 import CardList from "@/components/CardList";
 import ControlBar from "@/components/ControlBar";
 import useWindowSize from "@/hooks/useWindowSize";
+import { setUserPermission } from "@/redux/reducers/user";
 // import login from "@/api/user";
 
 export default function CardPage() {
@@ -31,7 +32,8 @@ export default function CardPage() {
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
     const { type: openModalType, data: modalProp } = useSelector((state: IState) => state.modal)
-    const [userPermission, setUserPermission] = useState<"editable" | "readable" | "none">("readable");
+    // const [userPermission, setUserPermission] = useState<"editable" | "readable" | "none">("readable");
+    const userPermission = useSelector((state: IState) => state.userPermission);
     const { width: windowWidth } = useWindowSize();
     // console.log("session", session)
     // console.log("status", status)
@@ -40,20 +42,21 @@ export default function CardPage() {
     // console.log("allCards card page", allCards)
     // console.log("allCards card selectedCard", selectedCard)
     // console.log("card access: ", selectedCard.visibility)
+    // console.log("userPermission", userPermission)
 
     useEffect(() => {
         const cardId = pathname.split("/").at(-1);
         async function handleCard(cardId: string) {
             const response = await handleGetCard(`card_${cardId}`);
             // console.log("res", response)
-            // console.log("user", user)
+            console.log("user", user)
             // if (response.status === "FAIL") return await handleCard(cardId);
             if (response.status === "FAIL") {
                 router.push("/")
                 return;
             }
             const data = JSON.parse(response.data) as ICard;
-            // console.log("data", data)
+            console.log("data", data)
             // return;
 
             // 閱讀權限閘門
@@ -74,8 +77,8 @@ export default function CardPage() {
             }
 
             // 編輯權限閘門
-            if (data.authorId === user?.id || data.editability === "open") setUserPermission("editable");
-            else if (data.editability === "limited" && data.userId.includes(user?.email ?? "")) setUserPermission("editable");
+            if (data.authorId === user?.id || data.editability === "open") dispatch(setUserPermission("editable"));
+            else if (data.editability === "limited" && data.userId.includes(user?.email ?? "")) dispatch(setUserPermission("editable"));
         }
         if (!cardId) return;
         handleCard(cardId);

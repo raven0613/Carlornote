@@ -18,6 +18,7 @@ interface IBox {
     isImage?: boolean;
     handleMove: (position: { left: number, top: number }) => void;
     isPointerNone?: boolean;
+    elementPositions: { x: number[], y: number[] };
 }
 
 export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone }: IBox) {
@@ -164,18 +165,24 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     if (!e.clientX && !e.clientY) return;
                     // console.log("clientY", e.clientY + distenceToLeftTop.top)
                     // console.log("top", position.top)
+                    
+                    const left = e.clientX - distenceToLeftTop.left - leftTopRef.current.toBoxLeft;
+                    const top = e.clientY - distenceToLeftTop.top - leftTopRef.current.toBoxTop;
+
+                    const isToLeft = position.left > left;
+                    const isToTop = position.top > top;
                     setPosition({
-                        left: e.clientX - distenceToLeftTop.left - leftTopRef.current.toBoxLeft,
-                        top: e.clientY - distenceToLeftTop.top - leftTopRef.current.toBoxTop
+                        left: (left <= 50 && left >= 40)? 45 : left,
+                        top
                     })
                     handleMove({
-                        left: e.clientX - distenceToLeftTop.left - leftTopRef.current.toBoxLeft,
-                        top: e.clientY - distenceToLeftTop.top - leftTopRef.current.toBoxTop
+                        left,
+                        top
                     })
                 }}
                 onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    // e.preventDefault();
+                    // e.stopPropagation();
                     handleClick();
                     setIsEditMode(true);
                 }}

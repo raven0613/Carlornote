@@ -27,6 +27,20 @@ export function userReducer(state: IUser | null = initUserState, action: IAction
 }
 
 
+export const initUserPermissionState = "readable";
+const SET_USER_PERMISSION = "SET_USER_PERMISSION";
+
+export const setUserPermission = (payload: "editable" | "readable") => ({ type: SET_USER_PERMISSION, payload });
+
+export function userPermissionReducer(state: "editable" | "readable" = initUserPermissionState, action: IAction<"editable" | "readable">) {
+    switch (action.type) {
+        case SET_USER_PERMISSION: {
+            return action.payload;
+        }
+        default: return state;
+    }
+}
+
 // export function fetchUser(email: string) {
 //     async function fetchUserThunk(dispatch: Dispatch<any>, getState: typeof store.getState) {
 //         const getUserRes = await handleGetUserByEmail(email ?? "");
