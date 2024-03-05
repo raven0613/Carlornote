@@ -177,9 +177,10 @@ interface ICodeBox {
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
+    handlePositionChange: () => void;
 }
 
-export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions }: ICodeBox) {
+export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, handlePositionChange }: ICodeBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
     const [mode, setMode] = useState<"read" | "edit">("read");
@@ -204,6 +205,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                 handleChangeZIndex={handleChangeZIndex}
                 isPointerNone={isPointerNone}
                 elementPositions={elementPositions}
+                handlePositionChange={handlePositionChange}
             >
                 <CodeCore
                     handleUpdateElement={handleUpdateElement}

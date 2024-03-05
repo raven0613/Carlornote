@@ -4,6 +4,18 @@ import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } f
 import RotateIcon from "../svg/Rotate";
 import { distenceToLeftTop } from "@/components/Board";
 
+const binarySearch = (array: number[], target: number, direction: "before" | "after") => {
+    let left = 0;
+    let right = array.length - 1;
+    while (right >= left) {
+        const middle = Math.floor((left + right) / 2);
+        if (target === array[middle]) return array[middle];
+        else if (target > array[middle]) left = middle + 1;
+        else right = middle - 1;
+    }
+    return direction === "before"? (array[right] ?? 0)  : (array[left] ?? array.at(-1));
+}
+
 interface IBox {
     data: IBoardElement;
     handleUpdate: (data: IBoardElement) => void;
@@ -19,9 +31,13 @@ interface IBox {
     handleMove: (position: { left: number, top: number }) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
+    handlePositionChange: () => void;
 }
 
-export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone }: IBox) {
+type xDirection = "left" | "right";
+type yDirection = "top" | "bottom";
+
+export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone, elementPositions, handlePositionChange }: IBox) {
 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -33,8 +49,15 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     const [position, setPosition] = useState({ left, top });
     const [radius, setRadius] = useState(0);
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
+    const moveDirectionRef = useRef<{ x: xDirection, y: yDirection }>({ x: "left", y: "top" });
+    const pointerRef = useRef({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [isLock, setIsLock] = useState(false);
+    // 把自己原本的位置過濾掉
+    const otherPositionsRef = useRef({ 
+        x: elementPositions.x.filter(xAxis => xAxis !== data.left && xAxis !== data.left + data.width),
+        y: elementPositions.y.filter(yAxis => yAxis !== data.top && yAxis !== data.top + data.height)
+    });
 
     // console.log("isDragging", isDragging)
     // console.log("isEditMode", isEditMode)
@@ -42,6 +65,9 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     // console.log("isLock", isLock)
     // console.log("data isLock", data.isLock)
     // console.log("clickedRef", clickedRef)
+    // console.log("data", data)
+    // console.log("elementPositions", elementPositions)
+    // console.log("otherPositionsRef", otherPositionsRef.current)
     // const isSelected = isShadowElement ? true : selectedElementId === data.id;
 
     useEffect(() => {
@@ -146,8 +172,13 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 }}
                 onDragEnd={(e: DragEvent) => {
                     // 這時候才存資料
-                    // console.log("box drag end")
+                    console.log("box drag end")
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
+                    handlePositionChange();
+                    otherPositionsRef.current = { 
+                        x: elementPositions.x.filter(xAxis => xAxis !== data.left && xAxis !== data.left + data.width),
+                        y: elementPositions.y.filter(yAxis => yAxis !== data.top && yAxis !== data.top + data.height)
+                    };
                     handleSetDirty();
                     setIsDragging(false);
                     // 如果是 selected狀態，移動完不要關閉 edit mode
@@ -165,19 +196,35 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     if (!e.clientX && !e.clientY) return;
                     // console.log("clientY", e.clientY + distenceToLeftTop.top)
                     // console.log("top", position.top)
-                    
-                    const left = e.clientX - distenceToLeftTop.left - leftTopRef.current.toBoxLeft;
-                    const top = e.clientY - distenceToLeftTop.top - leftTopRef.current.toBoxTop;
+                    // console.log("elementPositions", elementPositions)
 
-                    const isToLeft = position.left > left;
-                    const isToTop = position.top > top;
+                    let left = e.clientX - distenceToLeftTop.left - leftTopRef.current.toBoxLeft;
+                    let top = e.clientY - distenceToLeftTop.top - leftTopRef.current.toBoxTop;
+
+                    if (e.clientX < pointerRef.current.x) moveDirectionRef.current.x = "left";
+                    else if (e.clientX > pointerRef.current.x) moveDirectionRef.current.x = "right";
+                    if (e.clientY < pointerRef.current.x) moveDirectionRef.current.y = "top";
+                    else if (e.clientY > pointerRef.current.y) moveDirectionRef.current.y = "bottom";
+                    pointerRef.current.x = e.clientX;
+                    pointerRef.current.y = e.clientY;
+
+                    const leftTarget = binarySearch(elementPositions.x, left, "before");
+                    const rightTarget = binarySearch(elementPositions.x, left + width, "after");
+                    const topTarget = binarySearch(elementPositions.y, top, "before");
+                    const bottomTarget = binarySearch(elementPositions.y, top + height, "after");
+
+                    const newLeft = left <= leftTarget + 5 && left >= leftTarget - 5? leftTarget: left;
+                    const newRight = left + width >= rightTarget - 5 && left + width <= rightTarget + 5? rightTarget - width: left;
+                    const newTop = top <= topTarget + 5 && top >= topTarget - 5? topTarget: top;
+                    const newBottom = top + height >= bottomTarget - 5 && top + height <= bottomTarget + 5? bottomTarget - height: top;
+
                     setPosition({
-                        left: (left <= 50 && left >= 40)? 45 : left,
-                        top
+                        left: moveDirectionRef.current.x === "left"? newLeft : newRight,
+                        top: moveDirectionRef.current.y === "top"? newTop : newBottom
                     })
                     handleMove({
-                        left,
-                        top
+                        left: moveDirectionRef.current.x === "left"? newLeft : newRight,
+                        top: moveDirectionRef.current.y === "top"? newTop : newBottom
                     })
                 }}
                 onClick={(e) => {

@@ -138,7 +138,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             return [...pre, curr.left, curr.left + curr.width];
         }, []).sort((a, b) => a - b),
         y: elements.reduce((pre: number[], curr: IBoardElement) => {
-            return [...pre, curr.left, curr.top + curr.height];
+            return [...pre, curr.top, curr.top + curr.height];
         }, []).sort((a, b) => a - b)
     });
     // console.log("draggingBox", draggingBox)
@@ -160,7 +160,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 return [...pre, curr.left, curr.left + curr.width];
             }, []).sort((a, b) => a - b),
             y: elements.reduce((pre: number[], curr: IBoardElement) => {
-                return [...pre, curr.left, curr.top + curr.height];
+                return [...pre, curr.top, curr.top + curr.height];
             }, []).sort((a, b) => a - b)
         }
         // console.log("existPositionsRef", existPositionsRef.current)
@@ -326,6 +326,18 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         handleSetDirty();
     }
 
+    function handlePositionChange() {
+        // 這邊還是拿沒改過的舊的 element 來用，要改成更新過的
+        // existPositionsRef.current = { 
+        //     x: elements.reduce((pre: number[], curr: IBoardElement) => {
+        //         return [...pre, curr.left, curr.left + curr.width];
+        //     }, []).sort((a, b) => a - b),
+        //     y: elements.reduce((pre: number[], curr: IBoardElement) => {
+        //         return [...pre, curr.top, curr.top + curr.height];
+        //     }, []).sort((a, b) => a - b)
+        // }
+    }
+
     return (
         <>
             <div className="boardElement relative w-full h-full " ref={boardRef}
@@ -413,6 +425,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 handleSetDirty();
                             }}
                             elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                            handlePositionChange={handlePositionChange}
                         />
                     )
                     if (item.type === "image") return (
@@ -445,6 +458,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             }}
                             isPointerNone={isPointerNone}
                             elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                            handlePositionChange={handlePositionChange}
                         />
                     )
                     if (item.type === "code") return (
@@ -477,6 +491,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             }}
                             isPointerNone={isPointerNone}
                             elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                            handlePositionChange={handlePositionChange}
                         />
                     )
                     if (item.type === "markdown") return (
@@ -509,6 +524,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             }}
                             isPointerNone={isPointerNone}
                             elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                            handlePositionChange={handlePositionChange}
                         />
                     )
                     return <></>
@@ -536,6 +552,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     isShadow={true}
                     handleChangeZIndex={() => { }}
                     elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                    handlePositionChange={handlePositionChange}
                 />}
                 {draggingBox === "image" && <ImageBox
                     isLocked={isLock}
@@ -559,6 +576,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     isShadow={true}
                     handleChangeZIndex={() => { }}
                     elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                    handlePositionChange={handlePositionChange}
                 />}
                 {draggingBox === "code" && <CodeBox
                     isLocked={isLock}
@@ -582,6 +600,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     isShadow={true}
                     handleChangeZIndex={() => { }}
                     elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                    handlePositionChange={handlePositionChange}
                 />}
                 {draggingBox === "markdown" && <MarkdownBox
                     isLocked={isLock}
@@ -605,6 +624,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     isShadow={true}
                     handleChangeZIndex={() => { }}
                     elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                    handlePositionChange={handlePositionChange}
                 />}
             </div>
         </>

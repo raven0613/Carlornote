@@ -165,7 +165,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
 
                     {/* name input */}
                     <input className="textInput row-span-1 w-full h-full text-slate-700 m-auto text-sm outline-none px-2 rounded-md placeholder:text-sm" placeholder="輸入卡片名稱" value={name} onChange={(e) => {
-                        setName(e.target.value.trim());
+                        setName(e.target.value);
                     }} />
 
                     <div className="absolute -bottom-8 right-0 flex gap-4">
