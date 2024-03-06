@@ -15,6 +15,7 @@ import { ImageLoading } from "../ImageLoading";
 import DeleteIcon from "../svg/Delete";
 import OKIcon from "../svg/OK";
 import { checkEmail } from "../SignPanel";
+import { closeAllModal, openModal } from "@/redux/reducers/modal";
 
 interface IRadioOptions {
     groupName: string,
@@ -71,7 +72,7 @@ interface ICardModal {
 }
 
 export default function CardModal({ isSelected, cardData, handleClose }: ICardModal) {
-    // console.log("cardData", cardData)
+    console.log("cardData", cardData)
     const [name, setName] = useState(cardData.name);
     const [inputUrl, setInputUrl] = useState("");
     const [url, setUrl] = useState(cardData.imageUrl);
@@ -86,7 +87,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
 
     return (
         <>
-            <div className={`absolute top-0 left-1 /2 -translate-x-1/2 w-fit h-96 bg-zinc-300 rounded-lg duration-200 shadow-lg  flex gap-6
+            <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-fit h-96 bg-zinc-300 rounded-lg duration-200 shadow-lg  flex gap-6 
                         ${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-10"}`}
             >
                 {/* avator section */}
@@ -176,11 +177,18 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                             onClick={async (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                // console.log("Delete")
-                                const response = await handleDeleteCard(cardData.id);
-                                if (response.status === "FAIL") return;
-                                dispatch(removeCard(cardData.id));
-                                handleClose();
+                                dispatch(openModal({ 
+                                    type: "checkWindow", 
+                                    props: { 
+                                        text: "卡片刪除後無法復原，確定要刪除卡片嗎？", 
+                                        data: cardData,
+                                        handleConfirm: async() => {
+                                            const response = await handleDeleteCard(cardData.id);
+                                            if (response.status === "FAIL") return;
+                                            dispatch(removeCard(cardData.id));
+                                            dispatch(closeAllModal({ type: "" }));
+                                        }
+                                    }}));
                             }}
                             className={`w-6 h-6 p-[3px] rounded-full  bg-red-500 cursor-pointer hover:scale-125 duration-200 
                 `}

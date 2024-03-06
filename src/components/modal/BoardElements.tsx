@@ -1,11 +1,11 @@
 "use client"
 import { IBoardElement, ICard } from "@/type/card";
 import { useDispatch, useSelector } from "react-redux";
-import { closeModal, openModal } from "@/redux/reducers/modal";
+import { closeAllModal, closeModal, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { selectElementId } from "@/redux/reducers/boardElement";
 import { ImageCore } from "../box/ImageBox";
-import { addCard, selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
+import { addCard, removeCard, selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
 import { draggingBoxHeight, draggingBoxWidth, getResizedSize, handleChangeZIndex } from "../Board";
 import { ReactNode, useState } from "react";
 import StackArrowIcon from "../svg/StackArrow";
@@ -18,7 +18,7 @@ import EyeCloseIcon from "../svg/EyeClose";
 import CodeBox, { CodeCore, EditButton } from "../box/CodeBox";
 import { MarkdownCore } from "../box/MarkdownBox";
 import useAutosizedTextarea from "@/hooks/useAutosizedTextarea";
-import { handleAddCard } from "@/api/card";
+import { handleAddCard, handleDeleteCard } from "@/api/card";
 import { Button as AddBoxButton } from "@/components/ControlPanel";
 import TextIcon from "../svg/Text";
 import CodeIcon from "../svg/Code";
@@ -50,14 +50,14 @@ interface IElementModal {
 
 export default function ElementModal({ permission }: IElementModal) {
     const selectedCard = useSelector((state: IState) => state.selectedCard);
-    const { type: openModalType, data: modalProp } = useSelector((state: IState) => state.modal)
+    const { type: openModalType, props: modalProp } = useSelector((state: IState) => state.modal)
     const user = useSelector((state: IState) => state.user);
     const dispatch = useDispatch();
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     // console.log("selectedCard", selectedCard)
     const [editingElementId, setEditingElementId] = useState("");
     const textRef = useAutosizedTextarea<HTMLTextAreaElement>(selectedCard?.boardElement.find(item => item.id === selectedElementId)?.content ?? "", true);
-    const isLock = (permission && permission !== "editable")? true : false;
+    const isLock = (permission && permission !== "editable") ? true : false;
     const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
     const nodeRef = useClickOutside<HTMLButtonElement>({
         handleMouseDownOutside: () => {
@@ -184,13 +184,22 @@ export default function ElementModal({ permission }: IElementModal) {
                                     </ElementControlButton>
                                     <ElementControlButton
                                         handleClick={() => {
-                                            const newElements = selectedCard.boardElement.filter(ele => ele.id !== item.id);
-                                            const updatedCard: ICard = {
-                                                ...selectedCard,
-                                                boardElement: newElements
-                                            }
-                                            save(updatedCard);
-                                            dispatch(selectElementId(""));
+                                            dispatch(openModal({
+                                                type: "checkWindow",
+                                                props: {
+                                                    text: "刪除後將無法復原，確定要刪除嗎？",
+                                                    handleConfirm: async () => {
+                                                        const newElements = selectedCard.boardElement.filter(ele => ele.id !== item.id);
+                                                        const updatedCard: ICard = {
+                                                            ...selectedCard,
+                                                            boardElement: newElements
+                                                        }
+                                                        save(updatedCard);
+                                                        dispatch(selectElementId(""));
+                                                        dispatch(closeModal({ type: "" }));
+                                                    }
+                                                }
+                                            }));
                                         }} classProps="bg-red-400" >
                                         <DeleteIcon classProps="stroke-2 stroke-red-100" />
                                     </ElementControlButton>

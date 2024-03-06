@@ -31,13 +31,12 @@ interface IBox {
     handleMove: (position: { left: number, top: number }) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
-    handlePositionChange: () => void;
 }
 
 type xDirection = "left" | "right";
 type yDirection = "top" | "bottom";
 
-export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone, elementPositions, handlePositionChange }: IBox) {
+export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone, elementPositions }: IBox) {
 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -174,7 +173,6 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     // 這時候才存資料
                     console.log("box drag end")
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
-                    handlePositionChange();
                     otherPositionsRef.current = { 
                         x: elementPositions.x.filter(xAxis => xAxis !== data.left && xAxis !== data.left + data.width),
                         y: elementPositions.y.filter(yAxis => yAxis !== data.top && yAxis !== data.top + data.height)
@@ -203,11 +201,11 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
 
                     if (e.clientX < pointerRef.current.x) moveDirectionRef.current.x = "left";
                     else if (e.clientX > pointerRef.current.x) moveDirectionRef.current.x = "right";
-                    if (e.clientY < pointerRef.current.x) moveDirectionRef.current.y = "top";
+                    if (e.clientY < pointerRef.current.y) moveDirectionRef.current.y = "top";
                     else if (e.clientY > pointerRef.current.y) moveDirectionRef.current.y = "bottom";
                     pointerRef.current.x = e.clientX;
                     pointerRef.current.y = e.clientY;
-
+                    console.log("moveDirectionRef", moveDirectionRef.current)
                     const leftTarget = binarySearch(elementPositions.x, left, "before");
                     const rightTarget = binarySearch(elementPositions.x, left + width, "after");
                     const topTarget = binarySearch(elementPositions.y, top, "before");

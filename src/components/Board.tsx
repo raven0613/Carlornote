@@ -88,8 +88,7 @@ function getContent(type: boxType) {
     }
 }
 
-function getNewPositions(newPosition: number, oldPositions: number[]): number[]
-{
+function getNewPositions(newPosition: number, oldPositions: number[]): number[] {
     let left = 0;
     let right = oldPositions.length - 1;
     while (right >= left) {
@@ -133,7 +132,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const [isLock, setIsLock] = useState(false);
     const [isPointerNone, setIsPointerNone] = useState(false);
     const dispatch = useDispatch();
-    const existPositionsRef = useRef({ 
+    const existPositionsRef = useRef({
         x: elements.reduce((pre: number[], curr: IBoardElement) => {
             return [...pre, curr.left, curr.left + curr.width];
         }, []).sort((a, b) => a - b),
@@ -154,8 +153,11 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     // 每次切換卡片的時候重新設定 existPositions
     useEffect(() => {
-        if (elements.length === 0) return;
-        existPositionsRef.current = { 
+        if (elements.length === 0) {
+            existPositionsRef.current = { x: [], y: [] };
+            return;
+        };
+        existPositionsRef.current = {
             x: elements.reduce((pre: number[], curr: IBoardElement) => {
                 return [...pre, curr.left, curr.left + curr.width];
             }, []).sort((a, b) => a - b),
@@ -326,18 +328,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         handleSetDirty();
     }
 
-    function handlePositionChange() {
-        // 這邊還是拿沒改過的舊的 element 來用，要改成更新過的
-        // existPositionsRef.current = { 
-        //     x: elements.reduce((pre: number[], curr: IBoardElement) => {
-        //         return [...pre, curr.left, curr.left + curr.width];
-        //     }, []).sort((a, b) => a - b),
-        //     y: elements.reduce((pre: number[], curr: IBoardElement) => {
-        //         return [...pre, curr.top, curr.top + curr.height];
-        //     }, []).sort((a, b) => a - b)
-        // }
-    }
-
     return (
         <>
             <div className="boardElement relative w-full h-full " ref={boardRef}
@@ -371,6 +361,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
                 }}
             >
+
                 <input id="board_input" name="board_input" type="file" className="boardElement board_input w-full h-full opacity-0"
                     onChange={async (e) => {
                         // console.log("image drop")
@@ -425,7 +416,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 handleSetDirty();
                             }}
                             elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                            handlePositionChange={handlePositionChange}
                         />
                     )
                     if (item.type === "image") return (
@@ -458,7 +448,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             }}
                             isPointerNone={isPointerNone}
                             elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                            handlePositionChange={handlePositionChange}
                         />
                     )
                     if (item.type === "code") return (
@@ -491,7 +480,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             }}
                             isPointerNone={isPointerNone}
                             elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                            handlePositionChange={handlePositionChange}
                         />
                     )
                     if (item.type === "markdown") return (
@@ -524,7 +512,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             }}
                             isPointerNone={isPointerNone}
                             elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                            handlePositionChange={handlePositionChange}
                         />
                     )
                     return <></>
@@ -552,7 +539,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     isShadow={true}
                     handleChangeZIndex={() => { }}
                     elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                    handlePositionChange={handlePositionChange}
                 />}
                 {draggingBox === "image" && <ImageBox
                     isLocked={isLock}
@@ -576,7 +562,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     isShadow={true}
                     handleChangeZIndex={() => { }}
                     elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                    handlePositionChange={handlePositionChange}
                 />}
                 {draggingBox === "code" && <CodeBox
                     isLocked={isLock}
@@ -600,7 +585,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     isShadow={true}
                     handleChangeZIndex={() => { }}
                     elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                    handlePositionChange={handlePositionChange}
                 />}
                 {draggingBox === "markdown" && <MarkdownBox
                     isLocked={isLock}
@@ -624,9 +608,20 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     isShadow={true}
                     handleChangeZIndex={() => { }}
                     elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                    handlePositionChange={handlePositionChange}
                 />}
             </div>
         </>
     )
 }
+
+// 吸附線
+// {existPositionsRef.current.x.map(item => {
+//     return (
+//         <div className="absolute w-[1px] h-full bg-red-500 top-0 z-10" style={{ left: item + "px" }}></div>
+//     )
+// })}
+// {existPositionsRef.current.y.map(item => {
+//     return (
+//         <div className="absolute h-[1px] w-full  bg-blue-500 left-0 z-10" style={{ top: item + "px" }}></div>
+//     )
+// })}

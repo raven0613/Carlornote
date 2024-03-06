@@ -41,7 +41,6 @@ body {
   /* background: var(--primary); */
   background-color: transparent;
   border-radius: 3px;
-  margin: 6px 0px;
 }
 
 *::-webkit-scrollbar-thumb {

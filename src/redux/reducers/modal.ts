@@ -1,26 +1,36 @@
 "use client"
 import { IAction } from "../store";
 
-export interface IModalPayload {
-    type: string,
+export interface IModalState {
+    type: string[],
     data?: any
 }
 
-export const initModalState = { type: "" };
+export interface IModalPayload {
+    type: string,
+    props?: any
+}
+
+export const initModalState = { type: [] };
 const OPEN_MODAL = "OPEN_MODAL";
 const CLOSE_MODAL = "CLOSE_MODAL";
+const CLOSE_ALL_MODAL = "CLOSE_ALL_MODAL";
 
 export const openModal = (payload: IModalPayload) => ({ type: OPEN_MODAL, payload });
 export const closeModal = (payload?: IModalPayload) => ({ type: CLOSE_MODAL, payload });
+export const closeAllModal = (payload?: IModalPayload) => ({ type: CLOSE_ALL_MODAL, payload });
 
-export function modalReducer(state: IModalPayload = initModalState, action: IAction<IModalPayload>) {
+export function modalReducer(state: IModalState = initModalState, action: IAction<IModalPayload>) {
     // console.log("payload", action.payload)
     switch (action.type) {
         case OPEN_MODAL: {
-            return action.payload;
+            return { type: [...state.type, action.payload?.type], props: action.payload?.props };
         }
         case CLOSE_MODAL: {
-            return action.payload;
+            return { ...state, type: state.type.filter((_item, i) => i !== state.type.length - 1) };
+        }
+        case CLOSE_ALL_MODAL: {
+            return { type: [], props: null };
         }
         default: return state;
     }

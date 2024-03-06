@@ -100,7 +100,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                             authorId: user.id,
                             name: "",
                             boardElement: [],
-                            userId: [user.id],
+                            userId: [user.email],
                             visibility: "private",
                             editability: "close",
                             imageUrl: "",
@@ -167,7 +167,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                                             // setDirtyState("none");
                                         }}
                                         handleClickEdit={() => {
-                                            dispatch(openModal({ type: "card", data: item }));
+                                            dispatch(openModal({ type: "card", props: item }));
                                         }}
                                     />
                                 )}

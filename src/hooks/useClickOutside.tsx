@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 
-export default function useClickOutside<T extends HTMLElement>({ handleMouseDownOutside, handleMouseDownInside }: { handleMouseDownOutside: () => void, handleMouseDownInside?: () => void }) {
+export default function useClickOutside<T extends HTMLElement>({ handleMouseDownOutside, handleMouseDownInside, exceptions }: { handleMouseDownOutside: () => void, handleMouseDownInside?: () => void, exceptions?: string[] }) {
     const nodeRef = useRef<T>(null);
     useEffect(() => {
         function handleMouse(e: MouseEvent) {
@@ -9,6 +9,9 @@ export default function useClickOutside<T extends HTMLElement>({ handleMouseDown
             // console.log("e.target", e.target)
             if (!e.target) return;
             if (e.target instanceof HTMLElement) {
+                // 點到例外的 element
+                if (exceptions?.some(item => (e.target as HTMLElement)?.classList.contains(item))) return;
+
                 if (!nodeRef.current?.contains(e.target)) {
                     // console.log("handleMouseDown")
                     handleMouseDownOutside();

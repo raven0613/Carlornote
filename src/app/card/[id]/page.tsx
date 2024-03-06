@@ -31,7 +31,6 @@ export default function CardPage() {
     const [draggingBox, setDraggingBox] = useState<boxType>("");
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
-    const { type: openModalType, data: modalProp } = useSelector((state: IState) => state.modal)
     // const [userPermission, setUserPermission] = useState<"editable" | "readable" | "none">("readable");
     const userPermission = useSelector((state: IState) => state.userPermission);
     const { width: windowWidth } = useWindowSize();
