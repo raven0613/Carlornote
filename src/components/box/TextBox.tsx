@@ -34,15 +34,16 @@ interface ITextBox {
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;
-    isLocked?: boolean;
+    isBoardLocked?: boolean;
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
+    scrollPosition:  { x: number, y: number };
 }
 
-export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions }: ITextBox) {
+export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: ITextBox) {
     // console.log(textData)
     // console.log("isSelected", isSelected)
     const [value, setValue] = useState(textData.content);
@@ -90,7 +91,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                 handleMove={({ left, top }) => {
                     setPosition({ left, top });
                 }}
-                isLocked={isLocked}
+                isLocked={isBoardLocked}
                 isShadowElement={isShadow}
                 handleUpdate={handleUpdateElement}
                 data={textData}
@@ -101,10 +102,11 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                 handleChangeZIndex={handleChangeZIndex}
                 isPointerNone={isPointerNone}
                 elementPositions={elementPositions}
+                scrollPosition={scrollPosition}
             >
-                <textarea id={textData.id} disabled={isLocked}
+                <textarea id={textData.id} disabled={isBoardLocked}
                     onChange={(e) => {
-                        if (isLocked) return;
+                        if (isBoardLocked) return;
                         setValue(e.target.value);
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
@@ -119,7 +121,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
 
             </Box>
             {/* buttons */}
-            {(isSelected && !isLocked) && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
+            {(isSelected && !isBoardLocked) && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
                 style={{ top: position.top - 30, left: position.left }}
             >
                 <button type="button" className={`bg-slate-200 w-5 h-5 rounded-full font-semibold relative`}

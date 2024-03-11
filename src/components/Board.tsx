@@ -119,6 +119,7 @@ interface IBoard {
     handleMouseUp: () => void;
     handleSetDirty: () => void;
     permission: "editable" | "readable" | "none";
+    // boardSize: { x: number, y: number }
 }
 
 export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission }: IBoard) {
@@ -128,7 +129,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // console.log("selectedElementId", selectedElementId)
     const pointerRef = useRef({ x: 0, y: 0 });
     const clickedPointRef = useRef({ startX: 0, startY: 0, endX: 0, endY: 0 });
-    const dropPointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
     const [isPointerNone, setIsPointerNone] = useState(false);
     const dispatch = useDispatch();
@@ -140,9 +140,11 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             return [...pre, curr.top, curr.top + curr.height];
         }, []).sort((a, b) => a - b)
     });
+    const wrapperRef = useRef<HTMLDivElement>(null);
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
     // console.log("Board isLock", isLock)
+    console.log("Board isPointerNone", isPointerNone)
     // console.log("permission", permission)
 
     useEffect(() => {
@@ -196,7 +198,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const handleAddImageBox = useCallback(({ name, content, position: { left, top }, size: { width, height } }: INewImageBoxProps) => {
         const id = `element_${uuidv4()}`;
         if (!left || !top) return;
-        // console.log("ㄟㄟ")
+        console.log("AddImageBox")
         const newBoardElements = [...elements, {
             id: id,
             type: "image" as boxType,
@@ -217,6 +219,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     }, [dispatch, elements, handleUpdateElementList])
 
     const imageUpload = useCallback(async (file: File) => {
+        console.log("imageUpload")
         const formData = new FormData();
         formData.append("image", file);
         let newBoardElement: IBoardElement[] = [];
@@ -240,6 +243,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             };
         };
         reader.readAsDataURL(file);
+        // return;
         const res = await handlePostImgur(formData);
         // console.log("res", res)
 
@@ -258,7 +262,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }))
     }, [handleAddImageBox, handleUpdateElementList])
 
-    // mouse up 拖曳後放開：drop 時加入資料
+    // mouse up 拖曳後放開：drop 時加入 dragging box 資料
     useEffect(() => {
         // if (!draggingBox) return;
         function handleMouse(e: MouseEvent) {
@@ -275,7 +279,10 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 handleAddBox({
                     type: draggingBox,
                     content: getContent(draggingBox),
-                    position: { left: e.clientX - distenceToLeftTop.left, top: e.clientY - distenceToLeftTop.top },
+                    position: {
+                        left: e.clientX - distenceToLeftTop.left + (wrapperRef.current?.scrollLeft ?? 0),
+                        top: e.clientY - distenceToLeftTop.top + (wrapperRef.current?.scrollTop ?? 0)
+                    },
                     size: { width: draggingBoxWidth[draggingBox], height: draggingBoxHeight[draggingBox] }
                 })
                 handleSetDirty();
@@ -328,288 +335,311 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         handleSetDirty();
     }
 
+    const [boardSize, setBoardSize] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+    // 每次選擇卡片後，board 的尺寸要被撐到涵蓋內部 box
+    useEffect(() => {
+        if (!elements) return;
+        setBoardSize({ x: wrapperRef.current?.scrollWidth ?? 0, y: wrapperRef.current?.scrollHeight ?? 0 });
+    }, [elements])
+    // console.log("x", boardSize.x)
+    // console.log("y", boardSize.y)
     return (
         <>
-            <div className="boardElement relative w-full h-full " ref={boardRef}
-                // style={{ scale: "70%" }}
-                onDragOver={(e) => {
-                    // 為了防止在圖片上方 drop 的時候變成在瀏覽器打開圖片的行為，需要將圖片設定成 pointer-events-none
-                    e.preventDefault();
-                    setIsPointerNone(true);
-                }}
-                onDragEnd={(e) => {
-                    // console.log("end")
-                    setIsPointerNone(false);
-                    // console.log("left", e.clientX)
-                    // console.log("top", e.clientY)
-                }}
-                onMouseDown={(e) => {
-                    clickedPointRef.current = {
-                        startX: e.clientX - distenceToLeftTop.left,
-                        startY: e.clientY - distenceToLeftTop.top,
-                        endX: 0,
-                        endY: 0
-                    }
-                }}
-                onMouseUp={(e) => {
-                    clickedPointRef.current = {
-                        startX: e.clientX - distenceToLeftTop.left,
-                        startY: e.clientY - distenceToLeftTop.top,
-                        endX: e.clientX - distenceToLeftTop.left,
-                        endY: e.clientY - distenceToLeftTop.top
-                    }
-
-                }}
+            <main ref={wrapperRef} className="boardElement absolute inset-0 items-center overflow-scroll min-w-full min-h-full bg-white/80"
             >
-
-                <input id="board_input" name="board_input" type="file" className="boardElement board_input w-full h-full opacity-0"
-                    onChange={async (e) => {
-                        // console.log("image drop")
-                        e.preventDefault()
-                        e.stopPropagation()
-
-                        if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
-                        const file = e.currentTarget.files[0];
-                        imageUpload(file);
-                        handleSetDirty();
-                    }}
-                    onMouseMove={(e) => {
-                        pointerRef.current = { x: e.clientX - distenceToLeftTop.left, y: e.clientY - distenceToLeftTop.top };
-                    }}
-                    onClick={(e) => {
+                <div className="boardElement absolute top-0 flex" ref={boardRef}
+                    style={{ width: boardSize.x || "100%", height: boardSize.y || "100%" }}
+                    // style={{ scale: "70%" }}
+                    onDragOver={(e) => {
+                        // 為了防止在圖片上方 drop 的時候變成在瀏覽器打開圖片的行為，需要將圖片設定成 pointer-events-none
                         e.preventDefault();
-                        // e.stopPropagation();
-                        dispatch(selectElementId(""));
+                        setIsPointerNone(true);
                     }}
-                    onDrop={(e) => {
-                        dropPointerRef.current = { x: e.clientX - distenceToLeftTop.left, y: e.clientY - distenceToLeftTop.top };
+                    onDragEnd={(e) => {
+                        // console.log("end")
+                        setIsPointerNone(false);
+                        // console.log("left", e.clientX)
+                        // console.log("top", e.clientY)
                     }}
-                />
+                    onMouseDown={(e) => {
+                        clickedPointRef.current = {
+                            startX: e.clientX - distenceToLeftTop.left,
+                            startY: e.clientY - distenceToLeftTop.top,
+                            endX: 0,
+                            endY: 0
+                        }
+                    }}
+                    onMouseUp={(e) => {
+                        clickedPointRef.current = {
+                            startX: e.clientX - distenceToLeftTop.left,
+                            startY: e.clientY - distenceToLeftTop.top,
+                            endX: e.clientX - distenceToLeftTop.left,
+                            endY: e.clientY - distenceToLeftTop.top
+                        }
 
-                {elements && elements.map(item => {
-                    if (item.type === "text") return (
-                        <TextBox key={item.id}
-                            isLocked={isLock || item.isLock}
-                            handleUpdateElement={(data: IBoardElement) => {
-                                handleUpdateElementList(elements.map((item) => {
-                                    if (item.id === data.id) return data;
-                                    return item;
-                                }))
-                            }}
-                            textData={item}
-                            isSelected={selectedElementId === item.id}
-                            handleClick={() => {
-                                dispatch(selectElementId(item.id));
-                                // 拉到DOM最上方
-                                const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                if (!updatedElements) return;
-                                handleUpdateElementList(updatedElements);
-                                handleSetDirty();
-                            }}
-                            handleDelete={handleDelete}
-                            handleSetDirty={handleSetDirty}
-                            handleChangeZIndex={() => {
-                                // 拉到DOM最下方
-                                const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                if (!updatedElements) return;
-                                handleUpdateElementList(updatedElements);
-                                handleSetDirty();
-                            }}
-                            elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                        />
-                    )
-                    if (item.type === "image") return (
-                        <ImageBox key={item.id}
-                            isLocked={isLock || item.isLock}
-                            handleUpdateElement={(data: IBoardElement) => {
-                                handleUpdateElementList(elements.map((item) => {
-                                    if (item.id === data.id) return data;
-                                    return item;
-                                }))
-                            }}
-                            imageData={item}
-                            isSelected={selectedElementId === item.id}
-                            handleClick={() => {
-                                dispatch(selectElementId(item.id));
-                                // 拉到DOM最上方
-                                const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                if (!updatedElements) return;
-                                handleUpdateElementList(updatedElements);
-                                handleSetDirty();
-                            }}
-                            handleDelete={handleDelete}
-                            handleSetDirty={handleSetDirty}
-                            handleChangeZIndex={() => {
-                                // 拉到DOM最下方
-                                const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                if (!updatedElements) return;
-                                handleUpdateElementList(updatedElements);
-                                handleSetDirty();
-                            }}
-                            isPointerNone={isPointerNone}
-                            elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                        />
-                    )
-                    if (item.type === "code") return (
-                        <CodeBox key={item.id}
-                            isLocked={isLock || item.isLock}
-                            handleUpdateElement={(data: IBoardElement) => {
-                                handleUpdateElementList(elements.map((item) => {
-                                    if (item.id === data.id) return data;
-                                    return item;
-                                }))
-                            }}
-                            textData={item}
-                            isSelected={selectedElementId === item.id}
-                            handleClick={() => {
-                                dispatch(selectElementId(item.id));
-                                // 拉到DOM最上方
-                                const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                if (!updatedElements) return;
-                                handleUpdateElementList(updatedElements);
-                                handleSetDirty();
-                            }}
-                            handleDelete={handleDelete}
-                            handleSetDirty={handleSetDirty}
-                            handleChangeZIndex={() => {
-                                // 拉到DOM最下方
-                                const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                if (!updatedElements) return;
-                                handleUpdateElementList(updatedElements);
-                                handleSetDirty();
-                            }}
-                            isPointerNone={isPointerNone}
-                            elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                        />
-                    )
-                    if (item.type === "markdown") return (
-                        <MarkdownBox key={item.id}
-                            isLocked={isLock || item.isLock}
-                            handleUpdateElement={(data: IBoardElement) => {
-                                handleUpdateElementList(elements.map((item) => {
-                                    if (item.id === data.id) return data;
-                                    return item;
-                                }))
-                            }}
-                            textData={item}
-                            isSelected={selectedElementId === item.id}
-                            handleClick={() => {
-                                dispatch(selectElementId(item.id));
-                                // 拉到DOM最上方
-                                const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                if (!updatedElements) return;
-                                handleUpdateElementList(updatedElements);
-                                handleSetDirty();
-                            }}
-                            handleDelete={handleDelete}
-                            handleSetDirty={handleSetDirty}
-                            handleChangeZIndex={() => {
-                                // 拉到DOM最下方
-                                const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                if (!updatedElements) return;
-                                handleUpdateElementList(updatedElements);
-                                handleSetDirty();
-                            }}
-                            isPointerNone={isPointerNone}
-                            elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                        />
-                    )
-                    return <></>
-                })}
+                    }}
+                >
+                    <input id="board_input" name="board_input" type="file" className="boardElement board_input opacity-0 w-full h-full bg-red-200 z-0"
+                        onChange={async (e) => {
+                            console.log("image drop")
+                            e.preventDefault()
+                            e.stopPropagation()
+                            if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
+                            console.log("image drop2")
+                            const file = e.currentTarget.files[0];
+                            imageUpload(file);
+                            handleSetDirty();
+                            // 如果是上傳一樣的圖片會無法觸發 onChange，所以必須把值歸零
+                            e.target.value = "";
+                        }}
+                        onMouseMove={(e) => {
+                            pointerRef.current = {
+                                x: e.clientX - distenceToLeftTop.left,
+                                y: e.clientY - distenceToLeftTop.top
+                            };
+                        }}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            // e.stopPropagation();
+                            dispatch(selectElementId(""));
+                        }}
+                        onDrop={(e) => {
+                        }}
+                    />
 
-                {draggingBox === "text" && <TextBox
-                    isLocked={isLock}
-                    handleUpdateElement={() => { }}
-                    textData={{
-                        id: "dragging_text",
-                        type: "text",
-                        name: "",
-                        content: "text",
-                        width: 200,
-                        height: 60,
-                        rotation: 0,
-                        left: window.outerWidth,
-                        top: window.outerHeight,
-                        radius: 0
-                    }}
-                    isSelected={true}
-                    handleClick={() => { }}
-                    handleDelete={() => { }}
-                    handleSetDirty={() => { }}
-                    isShadow={true}
-                    handleChangeZIndex={() => { }}
-                    elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                />}
-                {draggingBox === "image" && <ImageBox
-                    isLocked={isLock}
-                    handleUpdateElement={() => { }}
-                    imageData={{
-                        id: "dragging_image",
-                        type: "image",
-                        name: "",
-                        content: "dragging_image",
-                        width: 500,
-                        height: 30,
-                        rotation: 0,
-                        left: window.outerWidth,
-                        top: window.outerHeight,
-                        radius: 0
-                    }}
-                    isSelected={true}
-                    handleClick={() => { }}
-                    handleSetDirty={() => { }}
-                    handleDelete={() => { }}
-                    isShadow={true}
-                    handleChangeZIndex={() => { }}
-                    elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                />}
-                {draggingBox === "code" && <CodeBox
-                    isLocked={isLock}
-                    handleUpdateElement={() => { }}
-                    textData={{
-                        id: "dragging_code",
-                        type: "code",
-                        name: "",
-                        content: "code",
-                        width: 500,
-                        height: 300,
-                        rotation: 0,
-                        left: window.outerWidth,
-                        top: window.outerHeight,
-                        radius: 0
-                    }}
-                    isSelected={true}
-                    handleClick={() => { }}
-                    handleSetDirty={() => { }}
-                    handleDelete={() => { }}
-                    isShadow={true}
-                    handleChangeZIndex={() => { }}
-                    elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                />}
-                {draggingBox === "markdown" && <MarkdownBox
-                    isLocked={isLock}
-                    handleUpdateElement={() => { }}
-                    textData={{
-                        id: "dragging_code",
-                        type: "markdown",
-                        name: "",
-                        content: "",
-                        width: 500,
-                        height: 300,
-                        rotation: 0,
-                        left: window.outerWidth,
-                        top: window.outerHeight,
-                        radius: 0
-                    }}
-                    isSelected={true}
-                    handleClick={() => { }}
-                    handleSetDirty={() => { }}
-                    handleDelete={() => { }}
-                    isShadow={true}
-                    handleChangeZIndex={() => { }}
-                    elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
-                />}
-            </div>
+                    {elements && elements.map(item => {
+                        if (item.type === "text") return (
+                            <TextBox key={item.id}
+                                isBoardLocked={isLock || item.isLock}
+                                handleUpdateElement={(data: IBoardElement) => {
+                                    handleUpdateElementList(elements.map((item) => {
+                                        if (item.id === data.id) return data;
+                                        return item;
+                                    }))
+                                }}
+                                textData={item}
+                                isSelected={selectedElementId === item.id}
+                                handleClick={() => {
+                                    dispatch(selectElementId(item.id));
+                                    // 拉到DOM最上方
+                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                handleDelete={handleDelete}
+                                handleSetDirty={handleSetDirty}
+                                handleChangeZIndex={() => {
+                                    // 拉到DOM最下方
+                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                                scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                            />
+                        )
+                        if (item.type === "image") return (
+                            <ImageBox key={item.id}
+                                isBoardLocked={isLock || item.isLock}
+                                handleUpdateElement={(data: IBoardElement) => {
+                                    handleUpdateElementList(elements.map((item) => {
+                                        if (item.id === data.id) return data;
+                                        return item;
+                                    }))
+                                }}
+                                imageData={item}
+                                isSelected={selectedElementId === item.id}
+                                handleClick={() => {
+                                    dispatch(selectElementId(item.id));
+                                    // 拉到DOM最上方
+                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                handleDelete={handleDelete}
+                                handleSetDirty={handleSetDirty}
+                                handleChangeZIndex={() => {
+                                    // 拉到DOM最下方
+                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                isPointerNone={isPointerNone}
+                                elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                                scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                            />
+                        )
+                        if (item.type === "code") return (
+                            <CodeBox key={item.id}
+                                isBoardLocked={isLock || item.isLock}
+                                handleUpdateElement={(data: IBoardElement) => {
+                                    handleUpdateElementList(elements.map((item) => {
+                                        if (item.id === data.id) return data;
+                                        return item;
+                                    }))
+                                }}
+                                textData={item}
+                                isSelected={selectedElementId === item.id}
+                                handleClick={() => {
+                                    dispatch(selectElementId(item.id));
+                                    // 拉到DOM最上方
+                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                handleDelete={handleDelete}
+                                handleSetDirty={handleSetDirty}
+                                handleChangeZIndex={() => {
+                                    // 拉到DOM最下方
+                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                isPointerNone={isPointerNone}
+                                elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                                scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                            />
+                        )
+                        if (item.type === "markdown") return (
+                            <MarkdownBox key={item.id}
+                                isBoardLocked={isLock || item.isLock}
+                                handleUpdateElement={(data: IBoardElement) => {
+                                    handleUpdateElementList(elements.map((item) => {
+                                        if (item.id === data.id) return data;
+                                        return item;
+                                    }))
+                                }}
+                                textData={item}
+                                isSelected={selectedElementId === item.id}
+                                handleClick={() => {
+                                    dispatch(selectElementId(item.id));
+                                    // 拉到DOM最上方
+                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                handleDelete={handleDelete}
+                                handleSetDirty={handleSetDirty}
+                                handleChangeZIndex={() => {
+                                    // 拉到DOM最下方
+                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                isPointerNone={isPointerNone}
+                                elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                                scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                            />
+                        )
+                        return <></>
+                    })}
+
+                    {draggingBox === "text" && <TextBox
+                        isBoardLocked={isLock}
+                        handleUpdateElement={() => { }}
+                        textData={{
+                            id: "dragging_text",
+                            type: "text",
+                            name: "",
+                            content: "text",
+                            width: 200,
+                            height: 60,
+                            rotation: 0,
+                            left: window.outerWidth,
+                            top: window.outerHeight,
+                            radius: 0
+                        }}
+                        isSelected={true}
+                        handleClick={() => { }}
+                        handleDelete={() => { }}
+                        handleSetDirty={() => { }}
+                        isShadow={true}
+                        handleChangeZIndex={() => { }}
+                        elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                        scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                    />}
+                    {draggingBox === "image" && <ImageBox
+                        isBoardLocked={isLock}
+                        handleUpdateElement={() => { }}
+                        imageData={{
+                            id: "dragging_image",
+                            type: "image",
+                            name: "",
+                            content: "dragging_image",
+                            width: 500,
+                            height: 30,
+                            rotation: 0,
+                            left: window.outerWidth,
+                            top: window.outerHeight,
+                            radius: 0
+                        }}
+                        isSelected={true}
+                        handleClick={() => { }}
+                        handleSetDirty={() => { }}
+                        handleDelete={() => { }}
+                        isShadow={true}
+                        handleChangeZIndex={() => { }}
+                        elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                        scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                    />}
+                    {draggingBox === "code" && <CodeBox
+                        isBoardLocked={isLock}
+                        handleUpdateElement={() => { }}
+                        textData={{
+                            id: "dragging_code",
+                            type: "code",
+                            name: "",
+                            content: "code",
+                            width: 500,
+                            height: 300,
+                            rotation: 0,
+                            left: window.outerWidth,
+                            top: window.outerHeight,
+                            radius: 0
+                        }}
+                        isSelected={true}
+                        handleClick={() => { }}
+                        handleSetDirty={() => { }}
+                        handleDelete={() => { }}
+                        isShadow={true}
+                        handleChangeZIndex={() => { }}
+                        elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                        scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                    />}
+                    {draggingBox === "markdown" && <MarkdownBox
+                        isBoardLocked={isLock}
+                        handleUpdateElement={() => { }}
+                        textData={{
+                            id: "dragging_code",
+                            type: "markdown",
+                            name: "",
+                            content: "",
+                            width: 500,
+                            height: 300,
+                            rotation: 0,
+                            left: window.outerWidth,
+                            top: window.outerHeight,
+                            radius: 0
+                        }}
+                        isSelected={true}
+                        handleClick={() => { }}
+                        handleSetDirty={() => { }}
+                        handleDelete={() => { }}
+                        isShadow={true}
+                        handleChangeZIndex={() => { }}
+                        elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                        scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                    />}
+                </div>
+            </main>
         </>
     )
 }

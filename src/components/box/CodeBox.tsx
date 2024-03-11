@@ -78,7 +78,7 @@ export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMo
             `}
             >
                 {/* title */}
-                <div className="w-full h-8 absolute top-0 inset-x-0 bg-slate-700 rounded-t-xl z-10 leading-8 pl-4 pr-8 text-slate-400 flex items-center justify-between " >
+                <div className="w-full h-8 absolute top-0 inset-x-0 bg-slate-700 rounded-t-xl z-10 leading-8 pl-4 pr-8 text-slate-400 flex items-center justify-between overflow-hidden" >
                     <span className='truncate pr-2 text-sm'>{title}</span>
                     <div className='flex items-center gap-2'>
                         <select name="programmingLanguage" id="programmingLanguage" className="outline-none bg-slate-700 border-b px-1 border-slate-400 text-sm" value={textData.programmingLanguage}
@@ -171,15 +171,16 @@ interface ICodeBox {
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;
-    isLocked?: boolean;
+    isBoardLocked?: boolean;
     handleDelete: (id: string) => void;
     handleSetDirty: () => void;
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
+    scrollPosition:  { x: number, y: number };
 }
 
-export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions }: ICodeBox) {
+export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: ICodeBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
     const [mode, setMode] = useState<"read" | "edit">("read");
@@ -193,7 +194,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                 handleMove={({ left, top }) => {
                     setPosition({ left, top });
                 }}
-                isLocked={isLocked}
+                isLocked={isBoardLocked}
                 isShadowElement={isShadow}
                 handleUpdate={handleUpdateElement}
                 data={textData}
@@ -204,6 +205,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                 handleChangeZIndex={handleChangeZIndex}
                 isPointerNone={isPointerNone}
                 elementPositions={elementPositions}
+                scrollPosition={scrollPosition}
             >
                 <CodeCore
                     handleUpdateElement={handleUpdateElement}

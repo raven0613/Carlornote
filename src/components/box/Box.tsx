@@ -4,6 +4,28 @@ import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } f
 import RotateIcon from "../svg/Rotate";
 import { distenceToLeftTop } from "@/components/Board";
 
+const degreeMappings = [
+    { range: [-5, 5], value: 0 },
+    { range: [40, 50], value: 45 },
+    { range: [85, 95], value: 90 },
+    { range: [130, 140], value: 135 },
+    { range: [175, 185], value: 180 },
+    { range: [-50, -40], value: -45 },
+    { range: [-95, -85], value: -90 },
+    { range: [-140, -130], value: -135 },
+];
+
+// 找到最接近的值
+const findClosestValue = (degree: number) => {
+    for (const mapping of degreeMappings) {
+        const [min, max] = mapping.range;
+        if (degree > min && degree < max) {
+            return mapping.value;
+        }
+    }
+    return degree;
+};
+
 const binarySearch = (array: number[], target: number, direction: "before" | "after") => {
     let left = 0;
     let right = array.length - 1;
@@ -13,7 +35,7 @@ const binarySearch = (array: number[], target: number, direction: "before" | "af
         else if (target > array[middle]) left = middle + 1;
         else right = middle - 1;
     }
-    return direction === "before"? (array[right] ?? 0)  : (array[left] ?? array.at(-1));
+    return direction === "before" ? (array[right] ?? 0) : (array[left] ?? array.at(-1));
 }
 
 interface IBox {
@@ -31,12 +53,13 @@ interface IBox {
     handleMove: (position: { left: number, top: number }) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
+    scrollPosition: { x: number, y: number };
 }
 
 type xDirection = "left" | "right";
 type yDirection = "top" | "bottom";
 
-export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone, elementPositions }: IBox) {
+export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone, elementPositions, scrollPosition }: IBox) {
 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -53,15 +76,16 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     const [isDragging, setIsDragging] = useState(false);
     const [isLock, setIsLock] = useState(false);
     // 把自己原本的位置過濾掉
-    const otherPositionsRef = useRef({ 
+    const otherPositionsRef = useRef({
         x: elementPositions.x.filter(xAxis => xAxis !== data.left && xAxis !== data.left + data.width),
         y: elementPositions.y.filter(yAxis => yAxis !== data.top && yAxis !== data.top + data.height)
     });
 
+    // console.log("scrollPosition", scrollPosition)
     // console.log("isDragging", isDragging)
     // console.log("isEditMode", isEditMode)
     // console.log("isLocked", isLocked)
-    // console.log("isLock", isLock)
+    // console.log("box isLock", isLock)
     // console.log("data isLock", data.isLock)
     // console.log("clickedRef", clickedRef)
     // console.log("data", data)
@@ -88,7 +112,10 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     useEffect(() => {
         if (!isShadowElement) return;
         function handleMouse(e: MouseEvent) {
-            setPosition({ left: e.clientX - distenceToLeftTop.left, top: e.clientY - distenceToLeftTop.top });
+            setPosition({
+                left: e.clientX - distenceToLeftTop.left + scrollPosition.x,
+                top: e.clientY - distenceToLeftTop.top + scrollPosition.y
+            });
         }
         document.addEventListener("mousemove", handleMouse);
         return () => document.removeEventListener("mousemove", handleMouse);
@@ -173,7 +200,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     // 這時候才存資料
                     console.log("box drag end")
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
-                    otherPositionsRef.current = { 
+                    otherPositionsRef.current = {
                         x: elementPositions.x.filter(xAxis => xAxis !== data.left && xAxis !== data.left + data.width),
                         y: elementPositions.y.filter(yAxis => yAxis !== data.top && yAxis !== data.top + data.height)
                     };
@@ -187,6 +214,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     e.preventDefault();
                     // setIsLock(true);
                 }}
+                // move
                 onDrag={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -205,29 +233,30 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     else if (e.clientY > pointerRef.current.y) moveDirectionRef.current.y = "bottom";
                     pointerRef.current.x = e.clientX;
                     pointerRef.current.y = e.clientY;
-                    console.log("moveDirectionRef", moveDirectionRef.current)
+                    // console.log("moveDirectionRef", moveDirectionRef.current)
+                    // 找出最接近自己的要吸附的目標
                     const leftTarget = binarySearch(elementPositions.x, left, "before");
                     const rightTarget = binarySearch(elementPositions.x, left + width, "after");
                     const topTarget = binarySearch(elementPositions.y, top, "before");
                     const bottomTarget = binarySearch(elementPositions.y, top + height, "after");
 
-                    const newLeft = left <= leftTarget + 5 && left >= leftTarget - 5? leftTarget: left;
-                    const newRight = left + width >= rightTarget - 5 && left + width <= rightTarget + 5? rightTarget - width: left;
-                    const newTop = top <= topTarget + 5 && top >= topTarget - 5? topTarget: top;
-                    const newBottom = top + height >= bottomTarget - 5 && top + height <= bottomTarget + 5? bottomTarget - height: top;
+                    const newLeft = left <= leftTarget + 5 && left >= leftTarget - 5 ? leftTarget : left;
+                    const newRight = left + width >= rightTarget - 5 && left + width <= rightTarget + 5 ? rightTarget - width : left;
+                    const newTop = top <= topTarget + 5 && top >= topTarget - 5 ? topTarget : top;
+                    const newBottom = top + height >= bottomTarget - 5 && top + height <= bottomTarget + 5 ? bottomTarget - height : top;
 
                     setPosition({
-                        left: moveDirectionRef.current.x === "left"? newLeft : newRight,
-                        top: moveDirectionRef.current.y === "top"? newTop : newBottom
+                        left: moveDirectionRef.current.x === "left" ? newLeft : newRight,
+                        top: moveDirectionRef.current.y === "top" ? newTop : newBottom
                     })
                     handleMove({
-                        left: moveDirectionRef.current.x === "left"? newLeft : newRight,
-                        top: moveDirectionRef.current.y === "top"? newTop : newBottom
+                        left: moveDirectionRef.current.x === "left" ? newLeft : newRight,
+                        top: moveDirectionRef.current.y === "top" ? newTop : newBottom
                     })
                 }}
                 onClick={(e) => {
-                    // e.preventDefault();
-                    // e.stopPropagation();
+                    e.preventDefault();
+                    e.stopPropagation();
                     handleClick();
                     setIsEditMode(true);
                 }}
@@ -246,12 +275,12 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                         setIsEditMode(true);
                         const startX = boxRef.current.offsetLeft + boxRef.current.offsetWidth;
                         const startY = boxRef.current.offsetTop + boxRef.current.offsetHeight;
-                        const nowX = e.clientX - distenceToLeftTop.left;
-                        const nowY = e.clientY - distenceToLeftTop.top;
+                        const nowX = e.clientX - distenceToLeftTop.left + scrollPosition.x;
+                        const nowY = e.clientY - distenceToLeftTop.top + scrollPosition.y;
                         if (!nowX && !nowY) return;
                         let width, height;
-                        width = Number(boxRef.current.style.width.split("px")[0]) + nowX - startX;
-                        height = Number(boxRef.current.style.height.split("px")[0]) + nowY - startY;
+                        width = Math.floor(Number(boxRef.current.style.width.split("px")[0]) + nowX - startX);
+                        height = Math.floor(Number(boxRef.current.style.height.split("px")[0]) + nowY - startY);
                         if (width <= 48) width = 48;
                         if (height <= 20) height = 20;
 
@@ -263,7 +292,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                             if (width >= widthInAspectRatio) width = widthInAspectRatio;
                             if (height >= heightInAspectRatio) height = heightInAspectRatio;
                         }
-                        setSize({ width, height });
+                        setSize({ width: width, height: height });
                     }}
                     className={`w-2.5 h-2.5 rounded-sm bg-slate-500 absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 z-20 cursor-nwse-resize duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 ></div>
@@ -277,21 +306,14 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                         setIsEditMode(true);
                         const centerX = boxRef.current.offsetLeft + boxRef.current.offsetWidth / 2;
                         const centerY = boxRef.current.offsetTop + boxRef.current.offsetHeight / 2;
-                        const nowX = e.clientX - distenceToLeftTop.left;
-                        const nowY = e.clientY - distenceToLeftTop.top;
+                        const nowX = e.clientX - distenceToLeftTop.left + scrollPosition.x;
+                        const nowY = e.clientY - distenceToLeftTop.top + scrollPosition.y;
                         const theta = Math.atan2(nowY - centerY, nowX - centerX);
                         let degree = (theta * 180) / Math.PI;
                         if (!nowX && !nowY) return;
 
-                        if (degree > -5 && degree < 5) degree = 0;
-                        else if (degree > 40 && degree < 50) degree = 45;
-                        else if (degree > 85 && degree < 95) degree = 90;
-                        else if (degree > 130 && degree < 140) degree = 135;
-                        else if (degree > 175 && degree < 185) degree = 180;
-                        else if (degree > -50 && degree < -40) degree = -45;
-                        else if (degree > -95 && degree < -85) degree = -90;
-                        else if (degree > -140 && degree < -130) degree = -135;
-                        setDeg(Number(degree.toFixed(2)));
+                        const updatedDegree = findClosestValue(degree);
+                        setDeg(Number(updatedDegree.toFixed(2)));
                     }}
                     className={`w-4 h-4 absolute bottom-1/2 -right-5 translate-y-1/2  translate-x-1/2 z-20 cursor-grab active:cursor-grabbing duration-100 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 ><RotateIcon classProps="fill-slate-500 stroke-slate-500" /></div>

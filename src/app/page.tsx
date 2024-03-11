@@ -1,6 +1,6 @@
 "use client"
 import Board from "@/components/Board";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import ControlPanel from "@/components/ControlPanel";
 import { handleUpdateCard } from "@/api/card";
@@ -24,8 +24,6 @@ export default function Home() {
     const allCards = useSelector((state: IState) => state.card);
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
-    const pathname = usePathname();
-    const router = useRouter();
 
     useEffect(() => {
         dispatch(setUserPermission("editable"));
@@ -74,9 +72,11 @@ export default function Home() {
     // }, [allCards, dispatch, pathname])
 
     return (
-        <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
+        <main className="flex h-svh w-full flex-col items-center justify-between overflow-hidden">
             <ControlBar />
-            <section className="hidden sm:flex w-full flex-1 px-0 pt-0 relative items-center">
+
+            <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
+            >
                 {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ?
                     <>
                         {"請先"}
@@ -84,30 +84,27 @@ export default function Home() {
                     </>
                     : "請選擇一張卡片"}</p>}
                 {selectedCard && <>
-
-                    <main className="w-full h-full overflow-scroll bg-white/85 ">
-                        <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
-                            handleUpdateElementList={(allElement: IBoardElement[]) => {
-                                // console.log("update allElement list", allElement)
-                                const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
-                                const updatedCard: ICard = {
-                                    ...newCard,
-                                    boardElement: allElement
-                                }
-                                dispatch(updateCards([updatedCard]));
-                                dispatch(selectCard(updatedCard));
-                            }}
-                            draggingBox={draggingBox}
-                            handleMouseUp={() => {
-                                setDraggingBox("");
-                            }}
-                            handleSetDirty={() => {
-                                dispatch(setDirtyState("dirty"))
-                                dispatch(setDirtyCardId(selectedCard.id));
-                            }}
-                            permission={status === "authenticated" ? "editable" : "none"}
-                        />
-                    </main>
+                    <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
+                        handleUpdateElementList={(allElement: IBoardElement[]) => {
+                            // console.log("update allElement list", allElement)
+                            const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
+                            const updatedCard: ICard = {
+                                ...newCard,
+                                boardElement: allElement
+                            }
+                            dispatch(updateCards([updatedCard]));
+                            dispatch(selectCard(updatedCard));
+                        }}
+                        draggingBox={draggingBox}
+                        handleMouseUp={() => {
+                            setDraggingBox("");
+                        }}
+                        handleSetDirty={() => {
+                            dispatch(setDirtyState("dirty"))
+                            dispatch(setDirtyCardId(selectedCard.id));
+                        }}
+                        permission={status === "authenticated" ? "editable" : "none"}
+                    />
                 </>}
                 <ControlPanel
                     handleDrag={(type) => {
@@ -117,7 +114,7 @@ export default function Home() {
                 />
             </section>
 
-            <div className="w-full h-full sm:h-auto relative">
+            <div className="w-full h-full sm:h-fit relative sm:flex-grow-0 sm:flex-shrink-0">
                 {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}
                 {dirtyState === "clear" && <p className={`cursor-default absolute top-1.5 left-2 animate-hide opacity-0 text-sm text-slate-500 z-20`}>已成功儲存</p>}
                 <CardList selectedCardId={selectedCard?.id}

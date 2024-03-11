@@ -34,6 +34,8 @@ export default function CardPage() {
     // const [userPermission, setUserPermission] = useState<"editable" | "readable" | "none">("readable");
     const userPermission = useSelector((state: IState) => state.userPermission);
     const { width: windowWidth } = useWindowSize();
+    const boardRef = useRef<HTMLDivElement>(null);
+    const [borderSize, setBorderSize] = useState<{x: number, y: number}>({ x: 0, y: 0 });
     // console.log("session", session)
     // console.log("status", status)
     // console.log("user", user)
@@ -115,16 +117,14 @@ export default function CardPage() {
     // }, [allCards, dispatch, pathname])
 
     return (
-        <main className="flex h-screen flex-col items-center justify-between overflow-hidden">
+        <main className="flex h-svh flex-col items-center justify-between overflow-hidden">
             {(windowWidth && windowWidth < 640) && <ElementModal permission={userPermission} />}
 
             <ControlBar />
-            <section className="hidden sm:flex w-full flex-1 px-0 pt-0 relative items-center">
-                {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ? "請先登入" : "請選擇一張卡片"}</p>}
+            <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
+            >
                 {selectedCard && <>
-
-                    <main className="w-full h-full overflow-scroll bg-white/85 ">
-                        <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement ?? selectedCard.boardElement}
+                    <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement ?? selectedCard.boardElement}
                             handleUpdateElementList={(allElement: IBoardElement[]) => {
                                 // console.log("update allElement list", allElement)
                                 const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
@@ -145,7 +145,6 @@ export default function CardPage() {
                             }}
                             permission={userPermission}
                         />
-                    </main>
                 </>}
                 {userPermission === "editable" && <ControlPanel
                     handleDrag={(type) => {
