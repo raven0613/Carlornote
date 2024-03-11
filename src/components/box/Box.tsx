@@ -119,7 +119,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
         }
         document.addEventListener("mousemove", handleMouse);
         return () => document.removeEventListener("mousemove", handleMouse);
-    }, [isShadowElement]);
+    }, [isShadowElement, scrollPosition]);
 
     const boxOutline = () => {
         let style = "border hover:border-slate-400";

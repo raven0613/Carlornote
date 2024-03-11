@@ -22,7 +22,7 @@ export interface IBoardElement {
 export interface ICard {
     id: string,
     authorId: string,
-    userId: string[],
+    userList: string[],
     boardElement: IBoardElement[],
     visibility: "public" | "private" | "limited",
     editability: "open" | "close" | "limited"
@@ -30,4 +30,5 @@ export interface ICard {
     updatedAt: string,
     imageUrl: string,
     name: string,
+    tags: string[]
 }

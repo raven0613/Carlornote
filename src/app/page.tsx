@@ -19,6 +19,7 @@ import { usePathname, useRouter } from "next/navigation";
 export default function Home() {
     const { data: session, status } = useSession();
     const [draggingBox, setDraggingBox] = useState<boxType>("");
+    const [draggingCard, setDraggingCard] = useState<ICard>();
     const dispatch = useDispatch();
     const selectedCard = useSelector((state: IState) => state.selectedCard);
     const allCards = useSelector((state: IState) => state.card);
@@ -32,6 +33,7 @@ export default function Home() {
     // console.log("user", user)
     // console.log("session", session)
 
+    console.log("draggingBox page", draggingBox)
     // console.log("allCards page", allCards)
     // console.log("dirtyState", dirtyState)
     // console.log("dirtyCards", dirtyCards)
@@ -104,6 +106,7 @@ export default function Home() {
                             dispatch(setDirtyCardId(selectedCard.id));
                         }}
                         permission={status === "authenticated" ? "editable" : "none"}
+                        draggingCard={draggingCard}
                     />
                 </>}
                 <ControlPanel
@@ -123,6 +126,11 @@ export default function Home() {
                         dispatch(selectCard(allCards.find(item => item.id === id) || null));
                         // window && window.history.pushState(null, 'cardId', `/card/${id.split("_").at(-1)}`);
                         // router.push(`/card/${id.split("_").at(-1)}`);
+                    }}
+                    handleDrag={(card: ICard) => {
+                        if (!selectedCard) return;
+                        setDraggingBox("card");
+                        setDraggingCard(card);
                     }}
                 />
             </div>

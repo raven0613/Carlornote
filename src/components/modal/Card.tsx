@@ -77,7 +77,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
     const [inputUrl, setInputUrl] = useState("");
     const [url, setUrl] = useState(cardData.imageUrl);
     const [email, setEmail] = useState("");
-    const [emailList, setEmailList] = useState(cardData.userId);
+    const [emailList, setEmailList] = useState(cardData.userList ?? []);
     const [emailErrorMsg, setEmailErrorMsg] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [visibility, setVisibility] = useState(cardData.visibility);
@@ -200,7 +200,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
 
                         {/* OK button */}
                         <button className="bg-green-400 w-6 h-6 p-[4px] rounded-full text-slate-100 hover:scale-125 duration-200" onClick={async () => {
-                            const response = await handleUpdateCard([{ ...cardData, imageUrl: url, name, visibility, editability, userId: emailList }]);
+                            const response = await handleUpdateCard([{ ...cardData, imageUrl: url, name, visibility, editability, userList: emailList }]);
                             if (response.status === "FAIL") return setEmailErrorMsg("儲存失敗，請再試一次");
                             const resData = JSON.parse(response.data);
                             // console.log("resData", resData)
@@ -318,8 +318,8 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                             <div className="w-full h-[11.5rem] bg-zinc-400/50 overflow-scroll rounded-md mt-2 pl-[6px] py-[6px]">
                                 {emailList.map(item => {
                                     return (
-                                        <div className="flex justify-between items-center gap-1">
-                                            <span className="py-1 text-base even:bg-zinc-400/80 truncate relative px-0.5" key={item}>
+                                        <div className="flex justify-between items-center gap-1" key={item}>
+                                            <span className="py-1 text-base even:bg-zinc-400/80 truncate relative px-0.5" >
                                                 {item}
                                             </span>
                                             <button type="button" className=" hover:bg-zinc-400/50 rounded-full duration-150 w-6 h-6 shrink-0 relative before:absolute before:content-[''] before:left-1/2 before:-translate-x-1/2 before:w-[1px] before:h-4 before:bg-zinc-600 before:rotate-45 before:top-1/2 before:-translate-y-1/2 

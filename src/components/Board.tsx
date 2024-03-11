@@ -1,6 +1,6 @@
 "use client"
 import TextBox from "@/components/box/TextBox";
-import { IBoardElement, boxType } from "@/type/card";
+import { IBoardElement, ICard, boxType } from "@/type/card";
 import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ImageBox from "./box/ImageBox";
@@ -11,6 +11,7 @@ import { IState } from "@/redux/store";
 import { closeModal } from "@/redux/reducers/modal";
 import CodeBox from "./box/CodeBox";
 import MarkdownBox from "./box/MarkdownBox";
+import CardBox from "./box/CardBox";
 
 // 看 board 離螢幕左和上有多少 px
 export const distenceToLeftTop = { left: 0, top: 0 };
@@ -20,7 +21,7 @@ export const draggingBoxWidth: Record<boxType, number> = {
     image: 500,
     code: 500,
     markdown: 500,
-    card: 0,
+    card: 96,
     "": 0
 }
 
@@ -29,7 +30,7 @@ export const draggingBoxHeight: Record<boxType, number> = {
     image: 30,
     code: 300,
     markdown: 300,
-    card: 0,
+    card: 128,
     "": 0
 }
 
@@ -76,6 +77,7 @@ interface INewBoxProps {
     content: string,
     position: { left: number, top: number }
     size: { width: number, height: number }
+    name?: string
 }
 
 
@@ -88,41 +90,18 @@ function getContent(type: boxType) {
     }
 }
 
-function getNewPositions(newPosition: number, oldPositions: number[]): number[] {
-    let left = 0;
-    let right = oldPositions.length - 1;
-    while (right >= left) {
-        let middle = Math.floor((left + right) / 2);
-        if (newPosition === oldPositions[middle]) return [...oldPositions.slice(0, middle), newPosition, ...oldPositions.slice(middle, oldPositions.length)];
-        else if (newPosition > oldPositions[middle]) left = middle + 1;
-        else right = middle - 1;
-    }
-    // 上面的條件沒達成的話，middle = 0, left = 0, right = -1
-    if (newPosition > oldPositions[left]) return [...oldPositions.slice(0, left + 1), newPosition, ...oldPositions.slice(left + 1, oldPositions.length)];
-    else return [...oldPositions.slice(0, left), newPosition, ...oldPositions.slice(left, oldPositions.length)];
-}
-// 暫不需要
-// function getPositionsMap(ids: string[], positions: number[]): Record<string, number>
-// {
-//     let result: Record<string, number> = {};
-//     for (let i = 0; i < ids.length; i++) {
-//         if (result[ids[i]]) continue;
-//         result[ids[i]] 
-//     }
-//     return { "1": 0 }
-// }
-
 interface IBoard {
     elements: IBoardElement[];
     handleUpdateElementList: (allElement: IBoardElement[]) => void;
     draggingBox: boxType;
+    draggingCard?: ICard;
     handleMouseUp: () => void;
     handleSetDirty: () => void;
     permission: "editable" | "readable" | "none";
-    // boardSize: { x: number, y: number }
+
 }
 
-export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission }: IBoard) {
+export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, draggingCard }: IBoard) {
     const boardRef = useRef<HTMLDivElement>(null)
     // console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
@@ -171,12 +150,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     }, [elements])
 
     // add box
-    const handleAddBox = useCallback(({ type, content, position: { left, top }, size: { width, height } }: INewBoxProps) => {
+    const handleAddBox = useCallback(({ type, content, name, position: { left, top }, size: { width, height } }: INewBoxProps) => {
         const id = `element_${uuidv4()}`;
         const newBoardElement: IBoardElement[] = [...elements, {
             id: id,
             type,
-            name: "",
+            name: type === "card" ? (name ?? "") : "",
             content: content,
             width,
             height,
@@ -191,6 +170,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             isLock: false
         }]
         handleUpdateElementList(newBoardElement);
+        setIsPointerNone(false);
         dispatch(selectElementId(newBoardElement.at(-1)?.id ?? ""));
         dispatch(closeModal({ type: "" }));
     }, [dispatch, elements, handleUpdateElementList])
@@ -278,12 +258,13 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             if (boardRef.current?.contains(e.target)) {
                 handleAddBox({
                     type: draggingBox,
-                    content: getContent(draggingBox),
+                    content: draggingBox === "card" ? (draggingCard?.imageUrl ?? "") : getContent(draggingBox),
                     position: {
                         left: e.clientX - distenceToLeftTop.left + (wrapperRef.current?.scrollLeft ?? 0),
                         top: e.clientY - distenceToLeftTop.top + (wrapperRef.current?.scrollTop ?? 0)
                     },
-                    size: { width: draggingBoxWidth[draggingBox], height: draggingBoxHeight[draggingBox] }
+                    size: { width: draggingBoxWidth[draggingBox], height: draggingBoxHeight[draggingBox] },
+                    name: draggingCard?.name
                 })
                 handleSetDirty();
             }
@@ -539,6 +520,39 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
                             />
                         )
+                        if (item.type === "card") return (
+                            <CardBox key={item.id}
+                                isBoardLocked={isLock || item.isLock}
+                                handleUpdateElement={(data: IBoardElement) => {
+                                    handleUpdateElementList(elements.map((item) => {
+                                        if (item.id === data.id) return data;
+                                        return item;
+                                    }))
+                                }}
+                                cardData={item}
+                                isSelected={selectedElementId === item.id}
+                                handleClick={() => {
+                                    dispatch(selectElementId(item.id));
+                                    // 拉到DOM最上方
+                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                handleDelete={handleDelete}
+                                handleSetDirty={handleSetDirty}
+                                handleChangeZIndex={() => {
+                                    // 拉到DOM最下方
+                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
+                                    if (!updatedElements) return;
+                                    handleUpdateElementList(updatedElements);
+                                    handleSetDirty();
+                                }}
+                                isPointerNone={isPointerNone}
+                                elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                                scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                            />
+                        )
                         return <></>
                     })}
 
@@ -618,12 +632,36 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         isBoardLocked={isLock}
                         handleUpdateElement={() => { }}
                         textData={{
-                            id: "dragging_code",
+                            id: "dragging_markdown",
                             type: "markdown",
                             name: "",
                             content: "",
                             width: 500,
                             height: 300,
+                            rotation: 0,
+                            left: window.outerWidth,
+                            top: window.outerHeight,
+                            radius: 0
+                        }}
+                        isSelected={true}
+                        handleClick={() => { }}
+                        handleSetDirty={() => { }}
+                        handleDelete={() => { }}
+                        isShadow={true}
+                        handleChangeZIndex={() => { }}
+                        elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
+                        scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                    />}
+                    {draggingBox === "card" && <CardBox
+                        isBoardLocked={isLock}
+                        handleUpdateElement={() => { }}
+                        cardData={{
+                            id: "dragging_card",
+                            type: "card",
+                            name: draggingCard?.name ?? "",
+                            content: draggingCard?.imageUrl ?? "",
+                            width: 96,
+                            height: 128,
                             rotation: 0,
                             left: window.outerWidth,
                             top: window.outerHeight,

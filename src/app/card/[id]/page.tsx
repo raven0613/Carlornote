@@ -65,7 +65,7 @@ export default function CardPage() {
                 router.push("/");
                 return;
             }
-            else if (data.visibility === "limited" && data.authorId !== user?.id && !data.userId.includes(user?.email ?? "")) {
+            else if (data.visibility === "limited" && data.authorId !== user?.id && !data.userList.includes(user?.email ?? "")) {
                 router.push("/");
                 return;
             }
@@ -79,7 +79,7 @@ export default function CardPage() {
 
             // 編輯權限閘門
             if (data.authorId === user?.id || data.editability === "open") dispatch(setUserPermission("editable"));
-            else if (data.editability === "limited" && data.userId.includes(user?.email ?? "")) dispatch(setUserPermission("editable"));
+            else if (data.editability === "limited" && data.userList.includes(user?.email ?? "")) dispatch(setUserPermission("editable"));
         }
         if (!cardId) return;
         handleCard(cardId);
@@ -162,6 +162,10 @@ export default function CardPage() {
                         // console.log("id", id)
                         // dispatch(selectCard(allCards.find(item => item.id === id) || null));
                         window && window.history.pushState(null, 'cardId', `/card/${id.split("_").at(-1)}`);
+                    }}
+                    handleDrag={() => {
+                        if (!selectedCard) return;
+                        setDraggingBox("card");
                     }}
                 />}
             </div>

@@ -54,9 +54,10 @@ interface ICardWithHover {
     url: string;
     name: string;
     cardLize: "hidden" | "sm" | "lg";
+    handleDrag: () => void;
 }
 
-export function CardWithHover({ handleClick, isSelected, url, name, handleClickEdit, cardLize }: ICardWithHover) {
+export function CardWithHover({ handleClick, isSelected, url, name, handleClickEdit, cardLize, handleDrag }: ICardWithHover) {
     // console.log("name", name, url)
     return (
         <>
@@ -69,7 +70,13 @@ export function CardWithHover({ handleClick, isSelected, url, name, handleClickE
                     e.stopPropagation();
                     // console.log("Select")
                     handleClick();
-                }}>
+                }}
+                onDragStart={() => {
+                    if (isSelected) return;
+                    handleDrag();
+                }}
+                draggable={!isSelected}
+            >
                 <Card url={url} name={name} cardLize={cardLize}
                     classProps={`${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-6 cursor-pointer"}
                     absolute top-0 left-1/2 -translate-x-1/2

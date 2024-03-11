@@ -35,10 +35,10 @@ function CardLoading({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
 interface ICardList {
     selectedCardId: string;
     handleSetSelectedCard: (id: string) => void;
-
+    handleDrag: (card: ICard) => void;
 }
 
-export default function CardList({ selectedCardId, handleSetSelectedCard }: ICardList) {
+export default function CardList({ selectedCardId, handleSetSelectedCard, handleDrag }: ICardList) {
     const user = useSelector((state: IState) => state.user);
     const dispatch = useDispatch();
     const allCards = useSelector((state: IState) => state.card);
@@ -89,7 +89,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                 {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
                     className={`w-14 h-14 bg-slate-200 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
-                sm:left-10 sm:bottom-1/2 sm:translate-y-1/2 
+                sm:left-12 sm:bottom-1/2 sm:translate-y-1/2 
                 text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150 ${cardLize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
                         // 之後再新增公開匿名卡片
@@ -100,12 +100,13 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                             authorId: user.id,
                             name: "",
                             boardElement: [],
-                            userId: [user.email],
+                            userList: [],
                             visibility: "private",
                             editability: "close",
                             imageUrl: "",
                             createdAt: new Date().toUTCString(),
                             updatedAt: new Date().toUTCString(),
+                            tags: []
                         });
                         if (response.status === "FAIL") return setAddCardState("error");
                         const card = JSON.parse(response.data) as ICard;
@@ -127,7 +128,12 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                     {allCards.map(item => {
                         return (
                             <Link scroll={false} key={item.id} href={`/card/${item.id.split("card_")[1]}`} className="w-full h-full">
-                                <Card url={item.imageUrl} name={item.name} classProps={""} cardLize={cardLize}></Card>
+                                <Card
+                                    url={item.imageUrl}
+                                    name={item.name}
+                                    classProps={""}
+                                    cardLize={cardLize}
+                                />
                             </Link>
                         )
                     })}
@@ -169,6 +175,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                                         handleClickEdit={() => {
                                             dispatch(openModal({ type: "card", props: item }));
                                         }}
+                                        handleDrag={() => handleDrag(item)}
                                     />
                                 )}
                     </div>
@@ -198,7 +205,6 @@ export default function CardList({ selectedCardId, handleSetSelectedCard }: ICar
                         }}
                     >-</button>
                 </div>}
-
             </section>
         </>
     )

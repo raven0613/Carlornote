@@ -79,13 +79,14 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
         await Promise.all(data.map(async item => {
             const cardRef = doc(db, "card", item.id);
             await updateDoc(cardRef, {
-                boardElement: item.boardElement,
+                boardElement: item.boardElement ?? [],
                 visibility: item.visibility ?? "private",
                 editability: item.editability ?? "close",
                 updatedAt: new Date().toUTCString(),
-                userId: item.userId,
-                imageUrl: item.imageUrl,
-                name: item.name
+                userList: item.userList ?? [],
+                imageUrl: item.imageUrl ?? "",
+                name: item.name ?? "",
+                tags: item.tags ?? []
             });
         }))
     } catch (error) {

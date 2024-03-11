@@ -23,6 +23,6 @@ export default function useClickOutside<T extends HTMLElement>({ handleMouseDown
         }
         document.addEventListener("mousedown", handleMouse);
         return () => document.removeEventListener("mousedown", handleMouse);
-    }, [handleMouseDownOutside, handleMouseDownInside]);
+    }, [handleMouseDownOutside, handleMouseDownInside, exceptions]);
     return nodeRef;
 }
