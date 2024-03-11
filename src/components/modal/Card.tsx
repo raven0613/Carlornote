@@ -177,18 +177,19 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                             onClick={async (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                dispatch(openModal({ 
-                                    type: "checkWindow", 
-                                    props: { 
-                                        text: "卡片刪除後無法復原，確定要刪除卡片嗎？", 
+                                dispatch(openModal({
+                                    type: "checkWindow",
+                                    props: {
+                                        text: "卡片刪除後無法復原，確定要刪除卡片嗎？",
                                         data: cardData,
-                                        handleConfirm: async() => {
+                                        handleConfirm: async () => {
                                             const response = await handleDeleteCard(cardData.id);
                                             if (response.status === "FAIL") return;
                                             dispatch(removeCard(cardData.id));
                                             dispatch(closeAllModal({ type: "" }));
                                         }
-                                    }}));
+                                    }
+                                }));
                             }}
                             className={`w-6 h-6 p-[3px] rounded-full  bg-red-500 cursor-pointer hover:scale-125 duration-200 
                 `}
@@ -317,7 +318,17 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                             <div className="w-full h-[11.5rem] bg-zinc-400/50 overflow-scroll rounded-md mt-2 pl-[6px] py-[6px]">
                                 {emailList.map(item => {
                                     return (
-                                        <p className="py-1 text-base even:bg-zinc-400/80 px-2 truncate" key={item}>{item}</p>
+                                        <div className="flex justify-between items-center gap-1">
+                                            <span className="py-1 text-base even:bg-zinc-400/80 truncate relative px-0.5" key={item}>
+                                                {item}
+                                            </span>
+                                            <button type="button" className=" hover:bg-zinc-400/50 rounded-full duration-150 w-6 h-6 shrink-0 relative before:absolute before:content-[''] before:left-1/2 before:-translate-x-1/2 before:w-[1px] before:h-4 before:bg-zinc-600 before:rotate-45 before:top-1/2 before:-translate-y-1/2 
+                                            after:absolute after:content-[''] after:left-1/2 after:-translate-x-1/2 after:w-[1px] after:h-4 after:bg-zinc-600 after:-rotate-45 after:top-1/2 after:-translate-y-1/2"
+                                                onClick={() => {
+                                                    setEmailList(pre => pre.filter(email => email !== item));
+                                                }}
+                                            />
+                                        </div>
                                     )
                                 })}
                             </div>
