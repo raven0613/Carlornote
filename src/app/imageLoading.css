@@ -1,7 +1,7 @@
 .loader {
   display: inline-block;
   position: relative;
-  border: 4px solid #64748b;
+  border: 4px solid #36a2c1;
   animation: loader 4s infinite ease;
 }
 
@@ -9,7 +9,7 @@
   vertical-align: top;
   display: inline-block;
   width: 100%;
-  background-color: #64748b;
+  background-color: #36a2c1;
   animation: loader-inner 4s infinite ease-in;
 }
 

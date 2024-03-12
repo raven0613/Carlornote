@@ -117,6 +117,7 @@ function getUrlIsValid(url: string) {
 interface IImageBox {
     imageData: IBoardElement;
     handleUpdateElement: (data: IBoardElement) => void;
+    handleImgOnLoad: (data: IBoardElement) => void;
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;
@@ -126,10 +127,10 @@ interface IImageBox {
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
-    scrollPosition:  { x: number, y: number };
+    scrollPosition: { x: number, y: number };
 }
 
-export default function ImageBox({ imageData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: IImageBox) {
+export default function ImageBox({ imageData, handleUpdateElement, handleImgOnLoad, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: IImageBox) {
     // console.log("imageData", imageData)
     return (
         <Box
@@ -150,7 +151,7 @@ export default function ImageBox({ imageData, handleUpdateElement, handleClick, 
         >
             <ImageCore imageData={imageData} handleOnLoad={(card) => {
                 if (isBoardLocked) return;
-                handleUpdateElement(card);
+                handleImgOnLoad(card);
             }} />
         </Box>
     )

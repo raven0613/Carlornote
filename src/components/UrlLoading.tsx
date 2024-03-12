@@ -28,7 +28,7 @@ export default function UrlLoading({ isCompleted }: IUrlLoading) {
 
     return (
         <div className="w-full h-4 p-1 shadow-lg bg-white shadow-black/30 rounded-full">
-            <div className="h-full bg-slate-400 rounded-full" style={{
+            <div className="h-full bg-seagull-400 rounded-full" style={{
                 width: `${progress}%`
             }}>
             </div>

@@ -5,12 +5,31 @@ import Popup from "./Popup";
 import { signOut } from "next-auth/react";
 import { removeUser } from "@/redux/reducers/user";
 
-export default function ControlBar() {
+interface IControlBar {
+    handleRedo: () => void;
+    handleUndo: () => void;
+}
+
+export default function ControlBar({ handleRedo, handleUndo }: IControlBar) {
     const [openPopup, setOpenPopup] = useState<"setting" | null>(null);
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
     return (
-        <div className="hidden sm:flex fixed top-2 right-10 z-30">
+        <div className="hidden sm:flex fixed top-2 right-10 z-30 gap-2">
+            <button className=""
+                onClick={() => {
+                    handleUndo();
+                }}
+            >
+                Undo
+            </button>
+            <button className=""
+                onClick={() => {
+                    handleRedo();
+                }}
+            >
+                Redo
+            </button>
             <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative"
                 onClick={() => {
                     setOpenPopup("setting");

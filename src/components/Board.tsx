@@ -98,10 +98,11 @@ interface IBoard {
     handleMouseUp: () => void;
     handleSetDirty: () => void;
     permission: "editable" | "readable" | "none";
-
+    handlePushStep: (step: { added: IBoardElement } |
+    { deleted: IBoardElement, index: number } | IBoardElement) => void;
 }
 
-export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, draggingCard }: IBoard) {
+export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, draggingCard, handlePushStep }: IBoard) {
     const boardRef = useRef<HTMLDivElement>(null)
     // console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
@@ -120,11 +121,13 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }, []).sort((a, b) => a - b)
     });
     const wrapperRef = useRef<HTMLDivElement>(null);
+
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
     // console.log("Board isLock", isLock)
-    console.log("Board isPointerNone", isPointerNone)
+    // console.log("Board isPointerNone", isPointerNone)
     // console.log("permission", permission)
+
 
     useEffect(() => {
         if (permission !== "editable") {
@@ -151,6 +154,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     // add box
     const handleAddBox = useCallback(({ type, content, name, position: { left, top }, size: { width, height } }: INewBoxProps) => {
+        console.log("add box")
         const id = `element_${uuidv4()}`;
         const newBoardElement: IBoardElement = {
             id: id,
@@ -169,22 +173,26 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             opacity: 100,
             isLock: false
         }
-        const cardBox: IBoardElement = {...newBoardElement, cardData: {
-            id: draggingCard?.id ?? "", name: draggingCard?.name ?? "", imageUrl: draggingCard?.imageUrl ?? ""
-        } }
-        const newBoardElements: IBoardElement[] = [...elements, type === "card"? cardBox : newBoardElement];
+        const cardBox: IBoardElement = {
+            ...newBoardElement, cardData: {
+                id: draggingCard?.id ?? "", name: draggingCard?.name ?? "", imageUrl: draggingCard?.imageUrl ?? ""
+            }
+        }
+        const newBoardElements: IBoardElement[] = [...elements, type === "card" ? cardBox : newBoardElement];
 
         handleUpdateElementList(newBoardElements);
+        handlePushStep({ added: newBoardElement });
         setIsPointerNone(false);
         dispatch(selectElementId(newBoardElements.at(-1)?.id ?? ""));
         dispatch(closeModal({ type: "" }));
-    }, [dispatch, elements, handleUpdateElementList])
+    }, [dispatch, elements, handleUpdateElementList, draggingCard, handlePushStep])
 
     const handleAddImageBox = useCallback(({ name, content, position: { left, top }, size: { width, height } }: INewImageBoxProps) => {
+        console.log("add img box")
         const id = `element_${uuidv4()}`;
         if (!left || !top) return;
         console.log("AddImageBox")
-        const newBoardElements = [...elements, {
+        const newBoardElement = {
             id: id,
             type: "image" as boxType,
             name: name,
@@ -196,12 +204,14 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             top,
             radius: 0,
             isLock: false
-        }]
+        }
+        const newBoardElements = [...elements, newBoardElement]
         handleUpdateElementList(newBoardElements);
+        handlePushStep({ added: newBoardElement });
         setIsPointerNone(false);
         dispatch(closeModal({ type: "" }));
         return newBoardElements;
-    }, [dispatch, elements, handleUpdateElementList])
+    }, [dispatch, elements, handleUpdateElementList, handlePushStep])
 
     const imageUpload = useCallback(async (file: File) => {
         console.log("imageUpload")
@@ -279,7 +289,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }
         document.addEventListener("mouseup", handleMouse);
         return () => document.removeEventListener("mouseup", handleMouse);
-    }, [draggingBox, handleAddBox, handleMouseUp, handleSetDirty]);
+    }, [draggingBox, handleAddBox, handleMouseUp, handleSetDirty, draggingCard]);
 
     // paste
     useEffect(() => {
@@ -314,10 +324,46 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     function handleDelete(id: string) {
         if (!id) return;
-        const newElements = elements.filter(item => item.id !== id)
+        const newElements = elements.filter(item => item.id !== id);
+        const deletedIdx = elements.findIndex(item => item.id === id);
+        handlePushStep({ deleted: elements[deletedIdx], index: deletedIdx });
         handleUpdateElementList(newElements);
         // setSelectedId("");
         dispatch(selectElementId(""))
+        handleSetDirty();
+    }
+
+    function handleBoxUpdateElement(data: IBoardElement) {
+        const box = elements.find(ele => ele.id === data.id);
+        box && handlePushStep(box);
+
+        handleUpdateElementList(elements.map((item) => {
+            if (item.id === data.id) return data;
+            return item;
+        }))
+    }
+
+    function handleBoxClick(id: string) {
+        dispatch(selectElementId(id));
+        if (elements.at(-1)?.id === id) return;
+        const box = elements.find(ele => ele.id === id);
+        box && handlePushStep(box);
+
+        // 拉到DOM最上方
+        const updatedElements = handleChangeZIndex(id, "top", elements);
+        if (!updatedElements) return;
+        handleUpdateElementList(updatedElements);
+        handleSetDirty();
+    }
+
+    function handleBoxChangeZIdx(id: string) {
+        const box = elements.find(ele => ele.id === id);
+        box && handlePushStep(box);
+
+        // 拉到DOM最下方
+        const updatedElements = handleChangeZIndex(id, "bottom", elements);
+        if (!updatedElements) return;
+        handleUpdateElementList(updatedElements);
         handleSetDirty();
     }
 
@@ -397,30 +443,16 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         if (item.type === "text") return (
                             <TextBox key={item.id}
                                 isBoardLocked={isLock || item.isLock}
-                                handleUpdateElement={(data: IBoardElement) => {
-                                    handleUpdateElementList(elements.map((item) => {
-                                        if (item.id === data.id) return data;
-                                        return item;
-                                    }))
-                                }}
+                                handleUpdateElement={handleBoxUpdateElement}
                                 textData={item}
                                 isSelected={selectedElementId === item.id}
                                 handleClick={() => {
-                                    dispatch(selectElementId(item.id));
-                                    // 拉到DOM最上方
-                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxClick(item.id);
                                 }}
                                 handleDelete={handleDelete}
                                 handleSetDirty={handleSetDirty}
                                 handleChangeZIndex={() => {
-                                    // 拉到DOM最下方
-                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxChangeZIdx(item.id);
                                 }}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                                 scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
@@ -429,7 +461,8 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         if (item.type === "image") return (
                             <ImageBox key={item.id}
                                 isBoardLocked={isLock || item.isLock}
-                                handleUpdateElement={(data: IBoardElement) => {
+                                handleUpdateElement={handleBoxUpdateElement}
+                                handleImgOnLoad={(data) => {
                                     handleUpdateElementList(elements.map((item) => {
                                         if (item.id === data.id) return data;
                                         return item;
@@ -438,21 +471,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 imageData={item}
                                 isSelected={selectedElementId === item.id}
                                 handleClick={() => {
-                                    dispatch(selectElementId(item.id));
-                                    // 拉到DOM最上方
-                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxClick(item.id);
                                 }}
                                 handleDelete={handleDelete}
                                 handleSetDirty={handleSetDirty}
                                 handleChangeZIndex={() => {
-                                    // 拉到DOM最下方
-                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxChangeZIdx(item.id);
                                 }}
                                 isPointerNone={isPointerNone}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
@@ -462,30 +486,16 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         if (item.type === "code") return (
                             <CodeBox key={item.id}
                                 isBoardLocked={isLock || item.isLock}
-                                handleUpdateElement={(data: IBoardElement) => {
-                                    handleUpdateElementList(elements.map((item) => {
-                                        if (item.id === data.id) return data;
-                                        return item;
-                                    }))
-                                }}
+                                handleUpdateElement={handleBoxUpdateElement}
                                 textData={item}
                                 isSelected={selectedElementId === item.id}
                                 handleClick={() => {
-                                    dispatch(selectElementId(item.id));
-                                    // 拉到DOM最上方
-                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxClick(item.id);
                                 }}
                                 handleDelete={handleDelete}
                                 handleSetDirty={handleSetDirty}
                                 handleChangeZIndex={() => {
-                                    // 拉到DOM最下方
-                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxChangeZIdx(item.id);
                                 }}
                                 isPointerNone={isPointerNone}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
@@ -495,30 +505,16 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         if (item.type === "markdown") return (
                             <MarkdownBox key={item.id}
                                 isBoardLocked={isLock || item.isLock}
-                                handleUpdateElement={(data: IBoardElement) => {
-                                    handleUpdateElementList(elements.map((item) => {
-                                        if (item.id === data.id) return data;
-                                        return item;
-                                    }))
-                                }}
+                                handleUpdateElement={handleBoxUpdateElement}
                                 textData={item}
                                 isSelected={selectedElementId === item.id}
                                 handleClick={() => {
-                                    dispatch(selectElementId(item.id));
-                                    // 拉到DOM最上方
-                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxClick(item.id);
                                 }}
                                 handleDelete={handleDelete}
                                 handleSetDirty={handleSetDirty}
                                 handleChangeZIndex={() => {
-                                    // 拉到DOM最下方
-                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxChangeZIdx(item.id);
                                 }}
                                 isPointerNone={isPointerNone}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
@@ -528,30 +524,16 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         if (item.type === "card") return (
                             <CardBox key={item.id}
                                 isBoardLocked={isLock || item.isLock}
-                                handleUpdateElement={(data: IBoardElement) => {
-                                    handleUpdateElementList(elements.map((item) => {
-                                        if (item.id === data.id) return data;
-                                        return item;
-                                    }))
-                                }}
+                                handleUpdateElement={handleBoxUpdateElement}
                                 cardData={item}
                                 isSelected={selectedElementId === item.id}
                                 handleClick={() => {
-                                    dispatch(selectElementId(item.id));
-                                    // 拉到DOM最上方
-                                    const updatedElements = handleChangeZIndex(item.id, "top", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxClick(item.id);
                                 }}
                                 handleDelete={handleDelete}
                                 handleSetDirty={handleSetDirty}
                                 handleChangeZIndex={() => {
-                                    // 拉到DOM最下方
-                                    const updatedElements = handleChangeZIndex(item.id, "bottom", elements);
-                                    if (!updatedElements) return;
-                                    handleUpdateElementList(updatedElements);
-                                    handleSetDirty();
+                                    handleBoxChangeZIdx(item.id);
                                 }}
                                 isPointerNone={isPointerNone}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
@@ -588,6 +570,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     {draggingBox === "image" && <ImageBox
                         isBoardLocked={isLock}
                         handleUpdateElement={() => { }}
+                        handleImgOnLoad={() => { }}
                         imageData={{
                             id: "dragging_image",
                             type: "image",

@@ -13,8 +13,9 @@ import Popup from "@/components/Popup";
 import { setUserPermission } from "@/redux/reducers/user";
 import ControlBar from "@/components/ControlBar";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 
+let undoList: Array<IBoardElement | { added: IBoardElement } | { deleted: IBoardElement, index: number }> = [];
+let redoList: Array<IBoardElement | { added: IBoardElement } | { deleted: IBoardElement, index: number }> = [];
 
 export default function Home() {
     const { data: session, status } = useSession();
@@ -25,6 +26,10 @@ export default function Home() {
     const allCards = useSelector((state: IState) => state.card);
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
+    const undoStepListRef = useRef<Array<IBoardElement | string>>([]);
+    const redoStepListRef = useRef<Array<IBoardElement | { deleted: IBoardElement, index: number }>>([]);
+    console.log("回復", undoList)
+    console.log("重來", redoList)
 
     useEffect(() => {
         dispatch(setUserPermission("editable"));
@@ -75,7 +80,75 @@ export default function Home() {
 
     return (
         <main className="flex h-svh w-full flex-col items-center justify-between overflow-hidden">
-            <ControlBar />
+            <ControlBar
+                handleUndo={() => {
+                    console.log("現在回復 boardElement", selectedCard.boardElement)
+                    const lastStep = undoList.pop();
+                    console.log("現在回復 lastStep", lastStep)
+                    if (typeof lastStep === "undefined") return;
+
+                    let newBoardElements: IBoardElement[] = [...selectedCard.boardElement];
+                    if ("added" in lastStep) {
+                        console.log("added")
+                        redoList.push({ added: lastStep.added });
+                        // 原本被增加的 undo 要刪除
+                        newBoardElements = selectedCard.boardElement.filter(item => item.id !== lastStep.added.id);
+                    }
+                    else if ("deleted" in lastStep) {
+                        console.log("deleted", newBoardElements.splice(lastStep.index, 0, lastStep.deleted))
+                        redoList.push({ deleted: lastStep.deleted, index: lastStep.index });
+                        // 原本被刪除的 undo 要加回原本的 index
+                        newBoardElements = [...selectedCard.boardElement.slice(0, lastStep.index), lastStep.deleted, ...selectedCard.boardElement.slice(lastStep.index, -1)]
+                    }
+                    else {
+                        redoList.push(lastStep);
+                        // 被修改而已的話就用原資料覆蓋回去即可
+                        newBoardElements = selectedCard.boardElement.map(item => {
+                            if (item.id === lastStep.id) return lastStep;
+                            return item;
+                        })
+                    }
+                    console.log("newBoardElements", newBoardElements)
+
+                    const updatedCard: ICard = {
+                        ...selectedCard,
+                        boardElement: newBoardElements
+                    }
+                    dispatch(updateCards([updatedCard]));
+                    dispatch(selectCard(updatedCard));
+                }}
+                handleRedo={() => {
+                    console.log("現在重來", redoList)
+                    const lastStep = redoList.pop();
+                    console.log("現在重來", lastStep)
+                    if (!lastStep) return;
+                    let newBoardElements: IBoardElement[];
+                    if ("added" in lastStep) {
+                        undoList.push({ added: lastStep.added });
+                        // 原本被增加的 redo 要加回最後一個
+                        newBoardElements = [...selectedCard.boardElement, lastStep.added];
+                    }
+                    else if ("deleted" in lastStep) {
+                        undoList.push({ deleted: lastStep.deleted, index: lastStep.index });
+                        // 原本被刪除的 redo 要再刪除
+                        newBoardElements = selectedCard.boardElement.filter(item => item.id !== lastStep.deleted.id);
+                    }
+                    else {
+                        undoList.push(lastStep);
+                        newBoardElements = selectedCard.boardElement.map(item => {
+                            if (item.id === lastStep.id) return lastStep;
+                            return item;
+                        })
+                    }
+
+                    const updatedCard: ICard = {
+                        ...selectedCard,
+                        boardElement: newBoardElements
+                    }
+                    dispatch(updateCards([updatedCard]));
+                    dispatch(selectCard(updatedCard));
+                }}
+            />
 
             <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
             >
@@ -86,7 +159,13 @@ export default function Home() {
                     </>
                     : "請選擇一張卡片"}</p>}
                 {selectedCard && <>
-                    <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
+                    <Board
+                        handlePushStep={(step: { added: IBoardElement } | { deleted: IBoardElement, index: number } | IBoardElement) => {
+                            console.log("新動作")
+                            undoList.push(step);
+                            redoList = [];
+                        }}
+                        elements={allCards.find(item => item.id === selectedCard.id)?.boardElement || []}
                         handleUpdateElementList={(allElement: IBoardElement[]) => {
                             // console.log("update allElement list", allElement)
                             const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
@@ -126,6 +205,8 @@ export default function Home() {
                         dispatch(selectCard(allCards.find(item => item.id === id) || null));
                         // window && window.history.pushState(null, 'cardId', `/card/${id.split("_").at(-1)}`);
                         // router.push(`/card/${id.split("_").at(-1)}`);
+                        undoList = [];
+                        redoList = [];
                     }}
                     handleDrag={(card: ICard) => {
                         if (!selectedCard) return;

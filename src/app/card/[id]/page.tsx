@@ -19,6 +19,9 @@ import useWindowSize from "@/hooks/useWindowSize";
 import { setUserPermission } from "@/redux/reducers/user";
 // import login from "@/api/user";
 
+let undoList: Array<IBoardElement | { added: IBoardElement } | { deleted: IBoardElement, index: number }> = [];
+let redoList: Array<IBoardElement | { added: IBoardElement } | { deleted: IBoardElement, index: number }> = [];
+
 export default function CardPage() {
     // TODO: 要驗證有沒有閱覽/編輯權限
     const { data: session, status } = useSession();
@@ -35,7 +38,7 @@ export default function CardPage() {
     const userPermission = useSelector((state: IState) => state.userPermission);
     const { width: windowWidth } = useWindowSize();
     const boardRef = useRef<HTMLDivElement>(null);
-    const [borderSize, setBorderSize] = useState<{x: number, y: number}>({ x: 0, y: 0 });
+    const [borderSize, setBorderSize] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
     // console.log("session", session)
     // console.log("status", status)
     // console.log("user", user)
@@ -120,31 +123,103 @@ export default function CardPage() {
         <main className="flex h-svh flex-col items-center justify-between overflow-hidden">
             {(windowWidth && windowWidth < 640) && <ElementModal permission={userPermission} />}
 
-            <ControlBar />
+            <ControlBar handleUndo={() => {
+                console.log("現在回復 boardElement", selectedCard.boardElement)
+                const lastStep = undoList.pop();
+                console.log("現在回復 lastStep", lastStep)
+                if (typeof lastStep === "undefined") return;
+
+                let newBoardElements: IBoardElement[] = [...selectedCard.boardElement];
+                if ("added" in lastStep) {
+                    console.log("added")
+                    redoList.push({ added: lastStep.added });
+                    // 原本被增加的 undo 要刪除
+                    newBoardElements = selectedCard.boardElement.filter(item => item.id !== lastStep.added.id);
+                }
+                else if ("deleted" in lastStep) {
+                    console.log("deleted", newBoardElements.splice(lastStep.index, 0, lastStep.deleted))
+                    redoList.push({ deleted: lastStep.deleted, index: lastStep.index });
+                    // 原本被刪除的 undo 要加回原本的 index
+                    newBoardElements = [...selectedCard.boardElement.slice(0, lastStep.index), lastStep.deleted, ...selectedCard.boardElement.slice(lastStep.index, -1)]
+                }
+                else {
+                    redoList.push(lastStep);
+                    // 被修改而已的話就用原資料覆蓋回去即可
+                    newBoardElements = selectedCard.boardElement.map(item => {
+                        if (item.id === lastStep.id) return lastStep;
+                        return item;
+                    })
+                }
+                console.log("newBoardElements", newBoardElements)
+
+                const updatedCard: ICard = {
+                    ...selectedCard,
+                    boardElement: newBoardElements
+                }
+                dispatch(updateCards([updatedCard]));
+                dispatch(selectCard(updatedCard));
+            }}
+                handleRedo={() => {
+                    console.log("現在重來", redoList)
+                    const lastStep = redoList.pop();
+                    console.log("現在重來", lastStep)
+                    if (!lastStep) return;
+                    let newBoardElements: IBoardElement[];
+                    if ("added" in lastStep) {
+                        undoList.push({ added: lastStep.added });
+                        // 原本被增加的 redo 要加回最後一個
+                        newBoardElements = [...selectedCard.boardElement, lastStep.added];
+                    }
+                    else if ("deleted" in lastStep) {
+                        undoList.push({ deleted: lastStep.deleted, index: lastStep.index });
+                        // 原本被刪除的 redo 要再刪除
+                        newBoardElements = selectedCard.boardElement.filter(item => item.id !== lastStep.deleted.id);
+                    }
+                    else {
+                        undoList.push(lastStep);
+                        newBoardElements = selectedCard.boardElement.map(item => {
+                            if (item.id === lastStep.id) return lastStep;
+                            return item;
+                        })
+                    }
+
+                    const updatedCard: ICard = {
+                        ...selectedCard,
+                        boardElement: newBoardElements
+                    }
+                    dispatch(updateCards([updatedCard]));
+                    dispatch(selectCard(updatedCard));
+                }} />
             <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
             >
                 {selectedCard && <>
-                    <Board elements={allCards.find(item => item.id === selectedCard.id)?.boardElement ?? selectedCard.boardElement}
-                            handleUpdateElementList={(allElement: IBoardElement[]) => {
-                                // console.log("update allElement list", allElement)
-                                const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
-                                const updatedCard: ICard = {
-                                    ...newCard,
-                                    boardElement: allElement
-                                }
-                                dispatch(updateCards([updatedCard]));
-                                dispatch(selectCard(updatedCard));
-                            }}
-                            draggingBox={draggingBox}
-                            handleMouseUp={() => {
-                                setDraggingBox("");
-                            }}
-                            handleSetDirty={() => {
-                                dispatch(setDirtyState("dirty"))
-                                dispatch(setDirtyCardId(selectedCard.id));
-                            }}
-                            permission={userPermission}
-                        />
+                    <Board
+                        handlePushStep={(step: { added: IBoardElement } | { deleted: IBoardElement, index: number } | IBoardElement) => {
+                            console.log("新動作")
+                            undoList.push(step);
+                            redoList = [];
+                        }}
+                        elements={allCards.find(item => item.id === selectedCard.id)?.boardElement ?? selectedCard.boardElement}
+                        handleUpdateElementList={(allElement: IBoardElement[]) => {
+                            // console.log("update allElement list", allElement)
+                            const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
+                            const updatedCard: ICard = {
+                                ...newCard,
+                                boardElement: allElement
+                            }
+                            dispatch(updateCards([updatedCard]));
+                            dispatch(selectCard(updatedCard));
+                        }}
+                        draggingBox={draggingBox}
+                        handleMouseUp={() => {
+                            setDraggingBox("");
+                        }}
+                        handleSetDirty={() => {
+                            dispatch(setDirtyState("dirty"))
+                            dispatch(setDirtyCardId(selectedCard.id));
+                        }}
+                        permission={userPermission}
+                    />
                 </>}
                 {userPermission === "editable" && <ControlPanel
                     handleDrag={(type) => {

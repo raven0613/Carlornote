@@ -28,7 +28,7 @@ const SharedComponents = (props: IProps) => {
     const dirtyState = useSelector((state: IState) => state.dirtyState);
     const user = useSelector((state: IState) => state.user);
     const pathname = usePathname();
-    console.log("modalProp", modalProp)
+    // console.log("modalProp", modalProp)
     // console.log("selectedCard", selectedCard)
     // console.log("status", status)
     // console.log("openModalType", openModalType)
