@@ -16,7 +16,12 @@ export interface IBoardElement {
     fontWeight?: "normal" | "extraLight" | "semiBold" | "extraBold",
     opacity?: number,
     isLock?: boolean,
-    programmingLanguage?: string
+    programmingLanguage?: string,
+    cardData?: {
+        id: string,
+        name: string,
+        imageUrl: string
+    }
 }
 
 export interface ICard {

@@ -14,7 +14,7 @@ interface IButton {
 
 export function Button({ handleDrag, handleClick, children, type }: IButton) {
     return (
-        <button className="p-1 w-10 h-10 bg-transparent border border-slate-400 rounded-md hover:scale-105 duration-200"
+        <button className="p-1 w-10 h-10 bg-transparent border border-slate-300 rounded-md hover:scale-105 duration-200"
             onMouseDown={() => {
                 handleDrag && handleDrag(type);
             }}
@@ -34,7 +34,7 @@ interface IControlPanel {
 export default function ControlPanel({ handleDrag }: IControlPanel) {
     return (
         <>
-            <main className="absolute left-5 top-8 grid grid-cols-1 grid-rows-4 gap-1.5 p-3 shadow-md shadow-black/40 rounded-lg bg-white">
+            <main className="absolute left-0 top-8 grid grid-cols-1 grid-rows-4 gap-1.5 p-3 shadow-md shadow-black/40 rounded-r-lg bg-white">
                 <Button handleDrag={handleDrag} type="text">
                     <TextIcon classProps="fill-slate-600" />
                 </Button>

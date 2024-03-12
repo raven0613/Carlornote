@@ -27,6 +27,7 @@ import NoteIcon from "../svg/Note";
 import { v4 as uuidv4 } from 'uuid';
 import { handlePostImgur } from "@/api/imgur";
 import useClickOutside from "@/hooks/useClickOutside";
+import Card from "@/components/Card";
 
 interface IButton {
     children: ReactNode;
@@ -80,7 +81,7 @@ export default function ElementModal({ permission }: IElementModal) {
     return (
         <>
             {/* panel */}
-            <main className="fixed inset-x-0 bottom-0 top-12 sm:top-0 w-full sm:relative sm:w-96 sm:h-[97vh] sm:rounded-xl bg-white overflow-y-scroll pt-4 sm:py-2 pl-2 pr-2 z-20 sm:z-50" onClick={(e) => {
+            <main className="fixed inset-x-0 bottom-0 top-12 sm:top-0 w-full sm:relative sm:w-96 sm:h-svh sm:rounded-xl bg-white overflow-y-scroll pt-4 sm:py-2 pl-2 pr-2 z-20 sm:z-50" onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 dispatch(selectElementId(""));
@@ -298,6 +299,16 @@ export default function ElementModal({ permission }: IElementModal) {
                                         needFull={true}
                                     />
                                 </div>}
+                                {(item.type === "card") && <div
+                                    onClick={() => {
+                                        dispatch(selectElementId(item.id));
+                                    }}
+                                    className={`flex items-center justify-center relative h-fit`}
+                                >
+                                    <Card url={item.cardData?.imageUrl ?? ""} name={item.cardData?.name ?? ""} cardLize={"lg"}
+                                        classProps={`absolute top-0 left-1/2 -translate-x-1/2`} 
+                                    />
+                                </div>}
                             </div>
                         )
                     })}
@@ -435,9 +446,9 @@ export default function ElementModal({ permission }: IElementModal) {
                 </div>
                 {/* add button */}
                 <button ref={nodeRef} type="button"
-                    className={`w-14 h-14 bg-slate-100 rounded-full absolute z-50 top-[90%] left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-50 top-[90%] left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:hidden
-                text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150`}
+                text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 duration-150 hover:bg-seagull-600`}
                     onClick={async (e) => {
                         e.preventDefault();
                         e.stopPropagation();

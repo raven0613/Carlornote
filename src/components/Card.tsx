@@ -11,18 +11,20 @@ interface ICard {
     children?: ReactNode;
     classProps: string;
     cardLize: "hidden" | "sm" | "lg";
+    isSelected?: boolean
 }
 
-export default function Card({ url, name, children, classProps, cardLize }: ICard) {
+export default function Card({ url, name, children, classProps, cardLize, isSelected }: ICard) {
     // console.log("name", name, url)
     return (
         <>
-            <div className={`card w-full h-full sm:w-24 bg-zinc-300 rounded-lg duration-200 shadow-md grid grid-rows-5
+            <div className={`card w-full h-full sm:w-24 rounded-lg duration-200 shadow-md grid grid-rows-5
+                    ${isSelected ? "bg-gray-700 text-white/90" : "bg-gray-300 group-hover:bg-gray-600 group-hover:-top-6 group-hover:text-white/90 cursor-pointer text-seagull-950/90"}
                     ${classProps} ${cardLize === "lg" ? "sm:h-32" : "sm:h-24"}
                 `}
             >
                 <div className={`${(name && cardLize === "lg") ? "row-span-4" : "row-span-5"} flex items-center justify-center overflow-hidden`}>
-                    {!url && <EmptyImageIcon classProps="p-1 pointer-events-none" />}
+                    {!url && <EmptyImageIcon classProps="p-1 pointer-events-none text-gray-400" />}
                     {url && <Image
                         className={`rounded-md`} width={150} height={150} src={url}
                         priority={true}
@@ -38,7 +40,7 @@ export default function Card({ url, name, children, classProps, cardLize }: ICar
                         }}
                     />}
                 </div>
-                {(name && cardLize === "lg") && <p className="row-span-1 text-white/90 w-full text-center text-sm truncate px-2">{name}</p>}
+                {(name && cardLize === "lg") && <p className={`row-span-1  w-full text-center text-sm truncate px-2`}>{name}</p>}
 
                 {/* controllers */}
                 {children}
@@ -77,8 +79,8 @@ export function CardWithHover({ handleClick, isSelected, url, name, handleClickE
                 }}
                 draggable={!isSelected}
             >
-                <Card url={url} name={name} cardLize={cardLize}
-                    classProps={`${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-6 cursor-pointer"}
+                <Card url={url} name={name} cardLize={cardLize} isSelected={isSelected}
+                    classProps={`
                     absolute top-0 left-1/2 -translate-x-1/2
                     `} >
                     {/* edit */}
@@ -90,8 +92,11 @@ export function CardWithHover({ handleClick, isSelected, url, name, handleClickE
                         }}
                         className={`w-5 h-5 p-[3px] rounded-full border border-slate-500 bg-slate-100 absolute bottom-1 right-1 z-20 
                         ${isSelected ?
-                                "opacity-0 group-hover:opacity-100 group-hover:cursor-pointer" :
-                                "opacity-0 pointer-events-none"} hover:scale-125 duration-200
+                                "opacity-0 group-hover:opacity-100 group-hover:cursor-pointer " 
+                                :
+                                "opacity-0 pointer-events-none"
+                        } 
+                        hover:scale-125 duration-200
                 `}
                     ><EditIcon classProps="fill-none stroke-slate-500" /></div>
                 </Card>

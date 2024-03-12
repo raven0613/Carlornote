@@ -88,9 +88,9 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
             >
                 {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
-                    className={`w-14 h-14 bg-slate-200 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:left-12 sm:bottom-1/2 sm:translate-y-1/2 
-                text-slate-400 text-3xl font-light disabled:bg-slate-100 hover:scale-110 duration-150 ${cardLize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 hover:bg-seagull-600 duration-150 ${cardLize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
                         // 之後再新增公開匿名卡片
                         if (!user?.id) return;
@@ -183,21 +183,27 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     <p className="text-slate-600">{user && "卡片盒空空如也，新增一張卡片吧"}</p>}
                 {/* pc control button */}
                 {user && <div className={`hidden sm:flex absolute right-2 text-xs gap-2 ${cardLize === "hidden" ? "" : "flex-col"}`}>
-                    <button className="w-5 h-5 bg-slate-200 rounded-full hover:scale-125 duration-150"
+                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 relative ${cardLize === "lg"? "bg-seagull-600" : "bg-seagull-200"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             setCardSize("lg");
                         }}
-                    >L</button>
-                    <button className="w-5 h-5 bg-slate-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm"
+                    >
+                        <span className={`absolute w-[0.5rem] h-[0.65rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardLize === "lg"? "bg-seagull-100" : "bg-seagull-700"}`} />
+                    </button>
+                    
+                    <button className={`w-5 h-5 rounded-full hover:scale-125 duration-150 hover:shadow-sm ${cardLize === "sm"? "bg-seagull-600" : "bg-seagull-200"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             setCardSize("sm");
                         }}
-                    >S</button>
-                    <button className="w-5 h-5 bg-slate-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm"
+                    >
+                        <span className={`absolute w-[0.5rem] h-[0.5rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardLize === "sm"? "bg-seagull-100" : "bg-seagull-700"}`} />
+                    </button>
+                    
+                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm  font-semibold ${cardLize === "hidden"? "bg-seagull-600 text-seagull-200" : "bg-seagull-200 text-seagull-700"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();

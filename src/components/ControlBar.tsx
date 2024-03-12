@@ -11,7 +11,7 @@ export default function ControlBar() {
     const user = useSelector((state: IState) => state.user);
     return (
         <div className="hidden sm:flex fixed top-2 right-10 z-30">
-            <button type="button" className="w-6 h-6 bg-slate-100 rounded-full relative"
+            <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative"
                 onClick={() => {
                     setOpenPopup("setting");
                 }}

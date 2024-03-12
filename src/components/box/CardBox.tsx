@@ -14,6 +14,8 @@ import ShrinkIcon from '../svg/Shrink';
 import ExpandIcon from '../svg/Expand';
 import Card from '../Card';
 import ShareIcon from '../svg/Share';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface ICardBox {
     cardData: IBoardElement;
@@ -31,10 +33,11 @@ interface ICardBox {
 }
 
 export default function CardBox({ cardData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: ICardBox) {
-    // console.log(textData)
+    // console.log("cardData", cardData)
     // console.log("CodeBox isSelected", isSelected)
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: cardData.left, top: cardData.top });
+    const router = useRouter();
 
     // console.log("supportedLanguages", SyntaxHighlighter.supportedLanguages)
     // console.log("mode", mode)
@@ -57,15 +60,18 @@ export default function CardBox({ cardData, handleUpdateElement, handleClick, is
                 elementPositions={elementPositions}
                 scrollPosition={scrollPosition}
             >
-                <button type="button" className="absolute top-2 left-2 z-10 w-6 h-6 p-1" onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log("導頁")
-                }}>
-                    <ShareIcon classProps="fill-none stroke-slate-200 -scale-x-100" />
-                </button>
+                <Link href={`/card/${cardData.cardData?.id.split("_")[1]}`}
+                    rel="preconnect"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
+                    <div className="absolute top-2 left-2 z-10 w-5 h-5 p-1 bg-seagull-500 rounded-full hover:scale-110 hover:bg-seagull-600 duration-150">
+                        <ShareIcon classProps="fill-none stroke-slate-100 -scale-x-100" />
+                    </div>
+                </Link>
 
-                <Card url={cardData.content} name={cardData.name} cardLize={"lg"}
+                <Card url={cardData.cardData?.imageUrl ?? ""} name={cardData.cardData?.name ?? ""} cardLize={"lg"}
                     classProps={`${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-6 cursor-pointer"}
                     absolute top-0 left-1/2 -translate-x-1/2
                     `} >

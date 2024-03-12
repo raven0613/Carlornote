@@ -152,10 +152,10 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // add box
     const handleAddBox = useCallback(({ type, content, name, position: { left, top }, size: { width, height } }: INewBoxProps) => {
         const id = `element_${uuidv4()}`;
-        const newBoardElement: IBoardElement[] = [...elements, {
+        const newBoardElement: IBoardElement = {
             id: id,
             type,
-            name: type === "card" ? (name ?? "") : "",
+            name: "",
             content: content,
             width,
             height,
@@ -168,10 +168,15 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             fontWeight: "normal",
             opacity: 100,
             isLock: false
-        }]
-        handleUpdateElementList(newBoardElement);
+        }
+        const cardBox: IBoardElement = {...newBoardElement, cardData: {
+            id: draggingCard?.id ?? "", name: draggingCard?.name ?? "", imageUrl: draggingCard?.imageUrl ?? ""
+        } }
+        const newBoardElements: IBoardElement[] = [...elements, type === "card"? cardBox : newBoardElement];
+
+        handleUpdateElementList(newBoardElements);
         setIsPointerNone(false);
-        dispatch(selectElementId(newBoardElement.at(-1)?.id ?? ""));
+        dispatch(selectElementId(newBoardElements.at(-1)?.id ?? ""));
         dispatch(closeModal({ type: "" }));
     }, [dispatch, elements, handleUpdateElementList])
 
@@ -258,7 +263,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             if (boardRef.current?.contains(e.target)) {
                 handleAddBox({
                     type: draggingBox,
-                    content: draggingBox === "card" ? (draggingCard?.imageUrl ?? "") : getContent(draggingBox),
+                    content: getContent(draggingBox),
                     position: {
                         left: e.clientX - distenceToLeftTop.left + (wrapperRef.current?.scrollLeft ?? 0),
                         top: e.clientY - distenceToLeftTop.top + (wrapperRef.current?.scrollTop ?? 0)

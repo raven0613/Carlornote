@@ -20,7 +20,7 @@ export default function Header({ }: IHeader) {
             <div className="w-60 h-full col-span-4"></div>
             <span className="absolute top-1/2 -translate-x-1/2 left-1/2 -translate-y-1/2">Deck Crafter</span>
             <div className="w-full h-full col-span-2 flex items-center justify-end px-2">
-                <button type="button" className="w-6 h-6 bg-slate-100 rounded-full relative"
+                <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative"
                     onClick={() => {
                         setOpenPopup("setting");
                     }}
