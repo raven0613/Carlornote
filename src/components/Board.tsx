@@ -12,6 +12,7 @@ import { closeModal } from "@/redux/reducers/modal";
 import CodeBox from "./box/CodeBox";
 import MarkdownBox from "./box/MarkdownBox";
 import CardBox from "./box/CardBox";
+import { StepType } from "@/app/page";
 
 // 看 board 離螢幕左和上有多少 px
 export const distenceToLeftTop = { left: 0, top: 0 };
@@ -50,7 +51,6 @@ export function getResizedSize(originWidth: number, originHeight: number) {
 }
 
 export function handleChangeZIndex(id: string, to: "top" | "bottom", elements: IBoardElement[]) {
-    // 被點選到的 element 要拉到第一個
     // console.log("id", id)
     const filteredElements = elements.filter(item => item.id !== id);
     const selectedElement = elements.find(item => item.id === id);
@@ -98,8 +98,7 @@ interface IBoard {
     handleMouseUp: () => void;
     handleSetDirty: () => void;
     permission: "editable" | "readable" | "none";
-    handlePushStep: (step: { added: IBoardElement } |
-    { deleted: IBoardElement, index: number } | IBoardElement) => void;
+    handlePushStep: (step: StepType) => void;
 }
 
 export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, draggingCard, handlePushStep }: IBoard) {
@@ -334,8 +333,8 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     }
 
     function handleBoxUpdateElement(data: IBoardElement) {
-        const box = elements.find(ele => ele.id === data.id);
-        box && handlePushStep(box);
+        const selectedElement = elements.find(ele => ele.id === data.id);
+        selectedElement && handlePushStep({ newData: data, oldData: selectedElement });
 
         handleUpdateElementList(elements.map((item) => {
             if (item.id === data.id) return data;
@@ -345,9 +344,9 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     function handleBoxClick(id: string) {
         dispatch(selectElementId(id));
-        if (elements.at(-1)?.id === id) return;
-        const box = elements.find(ele => ele.id === id);
-        box && handlePushStep(box);
+        const oldIdx = elements.findIndex(item => item.id === id);
+        if (elements.at(-1)?.id === id || oldIdx === -1) return;
+        handlePushStep({ id, newIdx: elements.length - 1, oldIdx });
 
         // 拉到DOM最上方
         const updatedElements = handleChangeZIndex(id, "top", elements);
@@ -357,8 +356,9 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     }
 
     function handleBoxChangeZIdx(id: string) {
-        const box = elements.find(ele => ele.id === id);
-        box && handlePushStep(box);
+        const oldIdx = elements.findIndex(item => item.id === id);
+        if (elements.at(-1)?.id === id || oldIdx === -1) return;
+        handlePushStep({ id, newIdx: 0, oldIdx });
 
         // 拉到DOM最下方
         const updatedElements = handleChangeZIndex(id, "bottom", elements);

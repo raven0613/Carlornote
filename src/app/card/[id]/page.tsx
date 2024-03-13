@@ -17,10 +17,12 @@ import CardList from "@/components/CardList";
 import ControlBar from "@/components/ControlBar";
 import useWindowSize from "@/hooks/useWindowSize";
 import { setUserPermission } from "@/redux/reducers/user";
+import { StepType } from "@/app/page";
+import { changeIndex } from "@/utils/utils";
 // import login from "@/api/user";
 
-let undoList: Array<IBoardElement | { added: IBoardElement } | { deleted: IBoardElement, index: number }> = [];
-let redoList: Array<IBoardElement | { added: IBoardElement } | { deleted: IBoardElement, index: number }> = [];
+let undoList: Array<StepType> = [];
+let redoList: Array<StepType> = [];
 
 export default function CardPage() {
     // TODO: 要驗證有沒有閱覽/編輯權限
@@ -123,48 +125,57 @@ export default function CardPage() {
         <main className="flex h-svh flex-col items-center justify-between overflow-hidden">
             {(windowWidth && windowWidth < 640) && <ElementModal permission={userPermission} />}
 
-            <ControlBar handleUndo={() => {
-                console.log("現在回復 boardElement", selectedCard.boardElement)
-                const lastStep = undoList.pop();
-                console.log("現在回復 lastStep", lastStep)
-                if (typeof lastStep === "undefined") return;
+            <ControlBar                 
+                canEdit={userPermission === "editable"}
+                canUndo={undoList.length > 0}
+                canRedo={redoList.length > 0}
+                handleUndo={() => {
+                    console.log("現在回復 boardElement", selectedCard.boardElement)
+                    const lastStep = undoList.pop();
+                    console.log("現在回復 lastStep", lastStep)
+                    if (typeof lastStep === "undefined") return;
 
-                let newBoardElements: IBoardElement[] = [...selectedCard.boardElement];
-                if ("added" in lastStep) {
-                    console.log("added")
-                    redoList.push({ added: lastStep.added });
-                    // 原本被增加的 undo 要刪除
-                    newBoardElements = selectedCard.boardElement.filter(item => item.id !== lastStep.added.id);
-                }
-                else if ("deleted" in lastStep) {
-                    console.log("deleted", newBoardElements.splice(lastStep.index, 0, lastStep.deleted))
-                    redoList.push({ deleted: lastStep.deleted, index: lastStep.index });
-                    // 原本被刪除的 undo 要加回原本的 index
-                    newBoardElements = [...selectedCard.boardElement.slice(0, lastStep.index), lastStep.deleted, ...selectedCard.boardElement.slice(lastStep.index, -1)]
-                }
-                else {
-                    redoList.push(lastStep);
-                    // 被修改而已的話就用原資料覆蓋回去即可
-                    newBoardElements = selectedCard.boardElement.map(item => {
-                        if (item.id === lastStep.id) return lastStep;
-                        return item;
-                    })
-                }
-                console.log("newBoardElements", newBoardElements)
+                    let newBoardElements: IBoardElement[] = [];
+                    if ("added" in lastStep) {
+                        console.log("added")
+                        redoList.push({ added: lastStep.added });
+                        // 原本被增加的 undo 要刪除
+                        newBoardElements = selectedCard.boardElement.filter(item => item.id !== lastStep.added.id);
+                    }
+                    else if ("deleted" in lastStep) {
+                        console.log("deleted")
+                        redoList.push({ deleted: lastStep.deleted, index: lastStep.index });
+                        // 原本被刪除的 undo 要加回原本的 index
+                        newBoardElements = [...selectedCard.boardElement.slice(0, lastStep.index), lastStep.deleted, ...selectedCard.boardElement.slice(lastStep.index, -1)]
+                    }
+                    else if ("newData" in lastStep) {
+                        redoList.push(lastStep);
+                        // 被修改而已的話就用原資料覆蓋回去即可
+                        newBoardElements = selectedCard.boardElement.map(item => {
+                            if (item.id === lastStep.oldData.id) return lastStep.oldData;
+                            return item;
+                        })
+                    }
+                    else {
+                        redoList.push(lastStep);
+                        // 被改變 index 的話就放回原本 index
+                        newBoardElements = changeIndex({ targetIdx: lastStep.oldIdx, originIdx: lastStep.newIdx, array: selectedCard.boardElement });
+                    }
+                    console.log("newBoardElements", newBoardElements)
 
-                const updatedCard: ICard = {
-                    ...selectedCard,
-                    boardElement: newBoardElements
-                }
-                dispatch(updateCards([updatedCard]));
-                dispatch(selectCard(updatedCard));
-            }}
+                    const updatedCard: ICard = {
+                        ...selectedCard,
+                        boardElement: newBoardElements
+                    }
+                    dispatch(updateCards([updatedCard]));
+                    dispatch(selectCard(updatedCard));
+                }}
                 handleRedo={() => {
                     console.log("現在重來", redoList)
                     const lastStep = redoList.pop();
                     console.log("現在重來", lastStep)
                     if (!lastStep) return;
-                    let newBoardElements: IBoardElement[];
+                    let newBoardElements: IBoardElement[] = [];
                     if ("added" in lastStep) {
                         undoList.push({ added: lastStep.added });
                         // 原本被增加的 redo 要加回最後一個
@@ -175,12 +186,18 @@ export default function CardPage() {
                         // 原本被刪除的 redo 要再刪除
                         newBoardElements = selectedCard.boardElement.filter(item => item.id !== lastStep.deleted.id);
                     }
-                    else {
+                    else if ("newData" in lastStep) {
                         undoList.push(lastStep);
+                        // 被修改而已的話就用新資料再覆蓋回去
                         newBoardElements = selectedCard.boardElement.map(item => {
-                            if (item.id === lastStep.id) return lastStep;
+                            if (item.id === lastStep.newData.id) return lastStep.newData;
                             return item;
                         })
+                    }
+                    else {
+                        undoList.push(lastStep);
+                        // 被改變 index 的話就再次放到新的 index
+                        newBoardElements = changeIndex({ targetIdx: lastStep.newIdx, originIdx: lastStep.oldIdx, array: selectedCard.boardElement });
                     }
 
                     const updatedCard: ICard = {
@@ -194,8 +211,7 @@ export default function CardPage() {
             >
                 {selectedCard && <>
                     <Board
-                        handlePushStep={(step: { added: IBoardElement } | { deleted: IBoardElement, index: number } | IBoardElement) => {
-                            console.log("新動作")
+                        handlePushStep={(step: StepType) => {
                             undoList.push(step);
                             redoList = [];
                         }}

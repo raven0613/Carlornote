@@ -4,33 +4,41 @@ import { useDispatch, useSelector } from "react-redux";
 import Popup from "./Popup";
 import { signOut } from "next-auth/react";
 import { removeUser } from "@/redux/reducers/user";
+import UndoRedoIcon from "./svg/UndoRedo";
 
 interface IControlBar {
     handleRedo: () => void;
     handleUndo: () => void;
+    canUndo: boolean;
+    canRedo: boolean;
+    canEdit: boolean;
 }
 
-export default function ControlBar({ handleRedo, handleUndo }: IControlBar) {
+export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, canEdit }: IControlBar) {
     const [openPopup, setOpenPopup] = useState<"setting" | null>(null);
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
     return (
-        <div className="hidden sm:flex fixed top-2 right-10 z-30 gap-2">
-            <button className=""
-                onClick={() => {
-                    handleUndo();
-                }}
-            >
-                Undo
-            </button>
-            <button className=""
-                onClick={() => {
-                    handleRedo();
-                }}
-            >
-                Redo
-            </button>
-            <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative"
+        <div className="hidden sm:flex fixed top-2 right-10 z-30 gap-2 items-center justify-center">
+            {canEdit &&<>
+                <button disabled={!canUndo} className={`w-6 h-6 ${canUndo? "text-seagull-500" : "text-seagull-200 cursor-default"}`}
+                    onClick={() => {
+                        if (!canUndo) return;
+                        handleUndo();
+                    }}
+                >
+                    <UndoRedoIcon />
+                </button>
+                <button disabled={!canRedo} className={`w-6 h-6 ${canRedo? "text-seagull-500" : "text-seagull-200 cursor-default"}`}
+                    onClick={() => {
+                        if (!canRedo) return;
+                        handleRedo();
+                    }}
+                >
+                    <UndoRedoIcon classProps="-scale-x-100" />
+                </button>
+            </>}
+            <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative ml-4"
                 onClick={() => {
                     setOpenPopup("setting");
                 }}
