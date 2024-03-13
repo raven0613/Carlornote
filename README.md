@@ -95,7 +95,7 @@
 
 點擊 undo 與 redo icon 可以回復或重作步驟，需注意切換卡片後保存的步驟將會重置
 
-
+![復原重複](https://cdn.discordapp.com/attachments/1164423317239889931/1217512744824340560/BOX.gif?ex=66044c1a&is=65f1d71a&hm=a17c000e82a28b2e9c6fb3b1a6a17d27b4f9803ded0c07d0a24c7095dd1bb124&)
 
 ## 卡片的權限設定
 
