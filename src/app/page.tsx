@@ -45,8 +45,7 @@ export default function Home() {
     // console.log("allCards page", allCards)
     // console.log("dirtyState", dirtyState)
     // console.log("dirtyCards", dirtyCards)
-    // console.log("selectedCardId", selectedCardId)
-    // console.log("selectedCard page", allCards.find(item => item.id === selectedCardId))
+    console.log("selectedCard page", selectedCard)
 
     // 有修改的話 5 秒存檔一次
     useEffect(() => {
@@ -205,6 +204,7 @@ export default function Home() {
                     />
                 </>}
                 <ControlPanel
+                    isSelectingCard={selectedCard != null}
                     handleDrag={(type) => {
                         if (!selectedCard) return;
                         setDraggingBox(type);

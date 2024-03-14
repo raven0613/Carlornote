@@ -70,7 +70,7 @@ export default function Signup() {
         <main className="w-10/12 sm:w-[40rem] h-[30rem] fixed left-1/2 -translate-x-1/2 bg-gray-100 shadow-gray-400 shadow-lg top-1/2 -translate-y-1/2 rounded-xl z-50 flex gap-2 overflow-hidden">
 
             {/* box */}
-            <div className={`hidden sm:block w-60 h-full bg-slate-500 absolute duration-500 ease-in-out z-20
+            <div className={`hidden sm:block w-60 h-full bg-seagull-700 absolute duration-500 ease-in-out z-20
                 ${path === "/login" ? "right-0" : ""}
                 ${path === "/signup" ? "right-[25rem]" : ""}
             `}></div>

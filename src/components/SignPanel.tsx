@@ -24,7 +24,7 @@ export function Panel({ isLoading, title, disabled, children, handleSubmit, subm
     return (
         <main className="w-full h-full px-5 pt-16 pb-20 grid grid-rows-5 items-center relative">
             {isLoading && <div className="w-full h-full bg-white/50 absolute"></div>}
-            <p className="text-center text-3xl text-stone-500 pb-3 font-semibold   row-span-1">{title}</p>
+            <p className="text-center text-3xl text-seagull-600 pb-3 font-semibold   row-span-1">{title}</p>
 
             <div className="row-span-3 flex flex-col items-center gap-2 ">
                 {children}
@@ -33,7 +33,7 @@ export function Panel({ isLoading, title, disabled, children, handleSubmit, subm
             <div className="row-span-1 flex items-center flex-col gap-2">
                 <button type="button"
                     className={`h-9 px-8 py-1 rounded-full  text-white mt-3 text-sm
-                        ${disabled ? "bg-stone-300/70 cursor-default" : "bg-stone-500/70 cursor-pointer shadow-md"}
+                        ${disabled ? "bg-seagull-300/70 cursor-default" : "bg-seagull-500/70 cursor-pointer shadow-md hover:bg-seagull-600 duration-150"}
                     `}
                     onClick={async () => {
                         handleSubmit()
@@ -43,10 +43,10 @@ export function Panel({ isLoading, title, disabled, children, handleSubmit, subm
                 </button>
 
                 <div className="flex items-center">
-                    <p className="text-center text-xs text-stone-500 px-2 py-1">{directToDescription} <span>&#10513;</span></p>
-                    <button type="button" className="text-xs px-2 py-1 text-stone-500 bg-stone-200 rounded-full"
+                    <p className="text-center text-xs text-seagull-500 px-2 py-1">{directToDescription} <span>&#10513;</span></p>
+                    <button type="button" className="text-xs px-2 py-1 text-seagull-300 bg-seagull-100 hover:bg-seagull-300 hover:text-seagull-100 duration-150 rounded-full"
                         onClick={() => {
-                            handleDirectTo()
+                            handleDirectTo();
                         }}
                     >
                         {directToText}
@@ -95,7 +95,7 @@ export function SignPanel({ type }: { type: "login" | "signup" }) {
                     <GoogleIcon />
                 </button>
                 <input value={email} className={`w-60 h-10 outline-none rounded-md 
-                ${isEmailWrong ? "bg-red-100 placeholder:text-red-300" : "bg-stone-100"} px-4 py-1`} placeholder="Email"
+                ${isEmailWrong ? "bg-red-100 placeholder:text-red-300" : "bg-gray-100"} px-4 py-1`} placeholder="Email"
                     onChange={(e) => {
                         const emailVal = e.target.value.trim();
                         setEmail(emailVal);
@@ -104,7 +104,7 @@ export function SignPanel({ type }: { type: "login" | "signup" }) {
                         if (checker) setIsEmailWrong(false);
                         else setIsEmailWrong(true);
                     }} />
-                <input type="password" value={password} className={`w-60 h-10 ${isPasswordWrong ? "bg-red-100 placeholder:text-red-300" : "bg-stone-100"} outline-none rounded-md  px-4 py-1 text-sm`} placeholder="Password"
+                <input type="password" value={password} className={`w-60 h-10 ${isPasswordWrong ? "bg-red-100 placeholder:text-red-300" : "bg-gray-100"} outline-none rounded-md  px-4 py-1 text-sm`} placeholder="Password"
                     onChange={(e) => {
                         const passwordVal = e.target.value.trim();
                         setPassword(passwordVal);
@@ -134,7 +134,7 @@ export function SignPanel({ type }: { type: "login" | "signup" }) {
             directToText={"LOGIN"}
         >
             <>
-                <input value={name} className={`w-60 h-10 outline-none rounded-md ${isNameWrong ? "bg-red-100 placeholder:text-red-300" : "bg-stone-100"} px-4 py-1`} placeholder="Name"
+                <input value={name} className={`w-60 h-10 outline-none rounded-md ${isNameWrong ? "bg-red-100 placeholder:text-red-300" : "bg-gray-100"} px-4 py-1`} placeholder="Name"
                     onChange={(e) => {
                         const nameVal = e.target.value.trim();
                         setName(nameVal);
@@ -143,7 +143,7 @@ export function SignPanel({ type }: { type: "login" | "signup" }) {
                         else setIsNameWrong(false);
                     }}
                 />
-                <input value={email} className={`w-60 h-10 outline-none rounded-md ${isEmailWrong ? "bg-red-100 placeholder:text-red-300" : "bg-stone-100"} px-4 py-1`} placeholder="Email"
+                <input value={email} className={`w-60 h-10 outline-none rounded-md ${isEmailWrong ? "bg-red-100 placeholder:text-red-300" : "bg-gray-100"} px-4 py-1`} placeholder="Email"
                     onChange={(e) => {
                         const emailVal = e.target.value.trim();
                         setEmail(emailVal);
@@ -153,7 +153,7 @@ export function SignPanel({ type }: { type: "login" | "signup" }) {
                         else setIsEmailWrong(true);
                     }}
                 />
-                <input type="password" value={password} className={`w-60 h-10 ${isPasswordWrong ? "bg-red-100 placeholder:text-red-300" : "bg-stone-100"} outline-none rounded-md  px-4 py-1 text-sm`} placeholder="Password"
+                <input type="password" value={password} className={`w-60 h-10 ${isPasswordWrong ? "bg-red-100 placeholder:text-red-300" : "bg-gray-100 "} outline-none rounded-md  px-4 py-1 text-sm`} placeholder="Password"
                     onChange={(e) => {
                         const passwordVal = e.target.value.trim();
                         setPassword(passwordVal);

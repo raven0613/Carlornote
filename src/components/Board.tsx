@@ -256,38 +256,44 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }))
     }, [handleAddImageBox, handleUpdateElementList])
 
+
     // mouse up 拖曳後放開：drop 時加入 dragging box 資料
     useEffect(() => {
-        // if (!draggingBox) return;
-        function handleMouse(e: MouseEvent) {
-            // console.log("mouseup")
+        function handlePutBoxOnBoard(e: MouseEvent) {
+            console.log("put box")
             e.stopPropagation();
             e.preventDefault();
-            // console.log((e.target as HTMLElement))
+            console.log((e.target as HTMLElement))
             if (!(e.target instanceof HTMLElement)) return;
             // drop 時加入資料
             // console.log("draggingBox", draggingBox)
             if (!draggingBox) return;
-            // console.log("ㄟ")
-            if (boardRef.current?.contains(e.target)) {
-                handleAddBox({
-                    type: draggingBox,
-                    content: getContent(draggingBox),
-                    position: {
-                        left: e.clientX - distenceToLeftTop.left + (wrapperRef.current?.scrollLeft ?? 0),
-                        top: e.clientY - distenceToLeftTop.top + (wrapperRef.current?.scrollTop ?? 0)
-                    },
-                    size: { width: draggingBoxWidth[draggingBox], height: draggingBoxHeight[draggingBox] },
-                    name: draggingCard?.name
-                })
-                handleSetDirty();
-            }
+            console.log("ㄟ")
+            handleAddBox({
+                type: draggingBox,
+                content: getContent(draggingBox),
+                position: {
+                    left: e.clientX - distenceToLeftTop.left + (wrapperRef.current?.scrollLeft ?? 0),
+                    top: e.clientY - distenceToLeftTop.top + (wrapperRef.current?.scrollTop ?? 0)
+                },
+                size: { width: draggingBoxWidth[draggingBox], height: draggingBoxHeight[draggingBox] },
+                name: draggingCard?.name
+            })
+            handleSetDirty();
+            // 先不限制放開位置
+            // if (boardRef.current?.contains(e.target)) {
+            // }
             // console.log((e.target as HTMLElement))
-            // 如果在 board 以外的地方放開，就停止 drop 流程
+            // old(如果在 board 以外的地方放開) 停止 drop 流程
             handleMouseUp();
         }
-        document.addEventListener("mouseup", handleMouse);
-        return () => document.removeEventListener("mouseup", handleMouse);
+        // dragend for cardBox, mouseup for others
+        document.addEventListener("dragend", handlePutBoxOnBoard);
+        document.addEventListener("mouseup", handlePutBoxOnBoard);
+        return () => {
+            document.removeEventListener("dragend", handlePutBoxOnBoard);
+            document.removeEventListener("mouseup", handlePutBoxOnBoard);
+        }
     }, [draggingBox, handleAddBox, handleMouseUp, handleSetDirty, draggingCard]);
 
     // paste
@@ -388,7 +394,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         setIsPointerNone(true);
                     }}
                     onDragEnd={(e) => {
-                        // console.log("end")
+                        // console.log("drag end")
                         setIsPointerNone(false);
                         // console.log("left", e.clientX)
                         // console.log("top", e.clientY)
