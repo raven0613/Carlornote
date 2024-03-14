@@ -180,7 +180,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         setIsPointerNone(false);
         dispatch(closeModal({ type: "" }));
         return newBoardElements;
-    }, [dispatch, elements, handleUpdateElementList, handlePushStep])
+    }, [dispatch, elements, handleUpdateElementList])
 
     const imageUpload = useCallback(async (file: File) => {
         console.log("imageUpload")
@@ -226,7 +226,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         })
         handleUpdateElementList(updatedNewBoardElement)
         handlePushStep({ added: updatedNewBoardElement.at(-1) as IBoardElement });
-    }, [handleAddImageBox, handleUpdateElementList])
+    }, [handleAddImageBox, handlePushStep, handleUpdateElementList])
 
 
     // mouse up 拖曳後放開：drop 時加入 dragging box 資料

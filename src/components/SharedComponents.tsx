@@ -45,6 +45,14 @@ const SharedComponents = (props: IProps) => {
         return () => document.removeEventListener("click", handleMouse);
     }, []);
 
+    useEffect(() => {
+        function handleMouse(e: MouseEvent) {
+            if (window.getSelection) window.getSelection()?.removeAllRanges();
+        }
+        document.addEventListener("mousedown", handleMouse);
+        return () => document.removeEventListener("mousedown", handleMouse);
+    }, []);
+
     if (status === "unauthenticated" || outerPage.includes(pathname)) return <>{props.children}</>;
     return (
         <>

@@ -94,12 +94,18 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 </div>}
 
                 {/* normal card info */}
-                <div className={`${cardLize === "hidden"? "-right-[15rem]" : "right-0"} h-full w-[15rem] duration-150 absolute  truncate leading-[2rem] px-4 text-sm rounded-l-xl shadow-[40px_35px_60px_15px_rgba(0,0,0,0.3)]`} onClick={(e) => {
+                {selectedCard && <div className={`${cardLize === "hidden" ? "-right-[15rem]" : "right-0"} flex flex-col h-full w-[15rem] duration-150 absolute   leading-[2rem] pl-4 pr-7 pb-2 text-sm rounded-l-xl shadow-[40px_35px_60px_15px_rgba(0,0,0,0.3)] overflow-y-scroll`} onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                }}>
+                }}
+                >
                     {selectedCard?.name}
-                </div>
+                    <div className="flex gap-2 flex-wrap  w-full h-fit pt-2 text-sm">
+                        {selectedCard.tags?.map(tag => (
+                            <span key={tag} className="bg-seagull-200 px-2 py-1 rounded-md">{tag}</span>
+                        ))}
+                    </div>
+                </div>}
 
                 {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
@@ -198,7 +204,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     <p className="text-slate-600">{user && "卡片盒空空如也，新增一張卡片吧"}</p>}
 
                 {/* pc control button */}
-                {user && <div className={`hidden sm:flex absolute right-2 text-xs gap-2 ${cardLize === "hidden" ? "" : "flex-col"}`}>
+                {user && <div className={`hidden sm:flex absolute right-3 text-xs gap-2 ${cardLize === "hidden" ? "" : "flex-col"}`}>
                     <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 relative ${cardLize === "lg" ? "bg-seagull-600" : "bg-seagull-200"}`}
                         onClick={(e) => {
                             e.preventDefault();
