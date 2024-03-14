@@ -49,6 +49,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const [cardLize, setCardSize] = useState<"hidden" | "sm" | "lg">("lg");
     const { width: windowWidth } = useWindowSize();
     const pathname = usePathname();
+    const selectedCard = useSelector((state: IState) => state.selectedCard);
 
     useEffect(() => {
         if (!user) return setCardSize("hidden");
@@ -73,9 +74,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     // 手機版 list 佔整頁
     return (
         <>
-            <section className={`w-full h-full sm:px-28 flex sm:items-center sm:justify-center relative 
-                
-                border-t-slate-200/70
+            <section className={`w-full h-full sm:px-28 flex sm:items-center sm:justify-center relative border-t-slate-200/70
                 ${cardLize === "lg" ? "sm:h-[10rem]" : `${cardLize === "sm" ? "sm:h-[7rem]" : "sm:h-[2rem]"}`}
                 ${cardLize === "hidden" ? "bg-[#f8f8f8] border-t-[1px]" : "border-t-[3px]"}
                 duration-150
@@ -86,6 +85,22 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     handleSetSelectedCard("");
                 }}
             >
+                {/* bottom card info */}
+                {cardLize === "hidden" && <div className={`h-full w-1/2 absolute left-0 truncate leading-[2rem] px-4 text-sm`} onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}>
+                    {selectedCard?.name}
+                </div>}
+
+                {/* normal card info */}
+                <div className={`${cardLize === "hidden"? "-right-[15rem]" : "right-0"} h-full w-[15rem] duration-150 absolute  truncate leading-[2rem] px-4 text-sm rounded-l-xl shadow-[40px_35px_60px_15px_rgba(0,0,0,0.3)]`} onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}>
+                    {selectedCard?.name}
+                </div>
+
                 {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
                     className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
@@ -181,29 +196,30 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     </div>
                     :
                     <p className="text-slate-600">{user && "卡片盒空空如也，新增一張卡片吧"}</p>}
+
                 {/* pc control button */}
                 {user && <div className={`hidden sm:flex absolute right-2 text-xs gap-2 ${cardLize === "hidden" ? "" : "flex-col"}`}>
-                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 relative ${cardLize === "lg"? "bg-seagull-600" : "bg-seagull-200"}`}
+                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 relative ${cardLize === "lg" ? "bg-seagull-600" : "bg-seagull-200"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             setCardSize("lg");
                         }}
                     >
-                        <span className={`absolute w-[0.5rem] h-[0.65rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardLize === "lg"? "bg-seagull-100" : "bg-seagull-700"}`} />
+                        <span className={`absolute w-[0.5rem] h-[0.65rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardLize === "lg" ? "bg-seagull-100" : "bg-seagull-700"}`} />
                     </button>
-                    
-                    <button className={`w-5 h-5 rounded-full hover:scale-125 duration-150 hover:shadow-sm ${cardLize === "sm"? "bg-seagull-600" : "bg-seagull-200"}`}
+
+                    <button className={`w-5 h-5 rounded-full hover:scale-125 duration-150 hover:shadow-sm ${cardLize === "sm" ? "bg-seagull-600" : "bg-seagull-200"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             setCardSize("sm");
                         }}
                     >
-                        <span className={`absolute w-[0.5rem] h-[0.5rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardLize === "sm"? "bg-seagull-100" : "bg-seagull-700"}`} />
+                        <span className={`absolute w-[0.5rem] h-[0.5rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardLize === "sm" ? "bg-seagull-100" : "bg-seagull-700"}`} />
                     </button>
-                    
-                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm  font-semibold ${cardLize === "hidden"? "bg-seagull-600 text-seagull-200" : "bg-seagull-200 text-seagull-700"}`}
+
+                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm  font-semibold ${cardLize === "hidden" ? "bg-seagull-600 text-seagull-200" : "bg-seagull-200 text-seagull-700"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();

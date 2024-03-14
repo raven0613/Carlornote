@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { Provider } from "next-auth/providers/index";
 import { handleAddUser, handleGetUserByEmail, handleUpdateUser } from "../user";
+import { handleAddCard } from "../card";
 
 const authOptions: NextAuthOptions = {
     // Configure one or more authentication providers
@@ -62,6 +63,20 @@ const authOptions: NextAuthOptions = {
                 })
                 // console.log("addUserRes", addUserRes)
                 if (addUserRes.status === "FAIL") return null;
+                const addCardRes = await handleAddCard({
+                    id: "",
+                    authorId: addUserRes.data.id,
+                    userList: [],
+                    boardElement: [],
+                    visibility: "private",
+                    editability: "close",
+                    createdAt: new Date().toUTCString(),
+                    updatedAt: new Date().toUTCString(),        
+                    imageUrl: "",
+                    name: "",
+                    tags: []
+                })
+                // console.log("addCardRes", addCardRes)
                 return JSON.parse(addUserRes.data);
             },
         })
