@@ -1,12 +1,12 @@
 "use client"
 import { IBoardElement, ICard } from "@/type/card";
 import { useDispatch, useSelector } from "react-redux";
-import { closeAllModal, closeModal, openModal } from "@/redux/reducers/modal";
+import { closeModal, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { selectElementId } from "@/redux/reducers/boardElement";
 import { ImageCore } from "../box/ImageBox";
-import { addCard, removeCard, selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
-import { draggingBoxHeight, draggingBoxWidth, getResizedSize, handleChangeZIndex } from "../Board";
+import { selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
+import { draggingBoxHeight, draggingBoxWidth } from "../Board";
 import { ReactNode, useState } from "react";
 import StackArrowIcon from "../svg/StackArrow";
 import DeleteIcon from "../svg/Delete";
@@ -15,10 +15,9 @@ import UnlockIcon from "../svg/Unlock";
 import LockIcon from "../svg/Lock";
 import EyeIcon from "../svg/Eye";
 import EyeCloseIcon from "../svg/EyeClose";
-import CodeBox, { CodeCore, EditButton } from "../box/CodeBox";
+import { CodeCore, EditButton } from "../box/CodeBox";
 import { MarkdownCore } from "../box/MarkdownBox";
 import useAutosizedTextarea from "@/hooks/useAutosizedTextarea";
-import { handleAddCard, handleDeleteCard } from "@/api/card";
 import { Button as AddBoxButton } from "@/components/ControlPanel";
 import TextIcon from "../svg/Text";
 import CodeIcon from "../svg/Code";
@@ -28,6 +27,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { handlePostImgur } from "@/api/imgur";
 import useClickOutside from "@/hooks/useClickOutside";
 import Card from "@/components/Card";
+import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
 
 interface IButton {
     children: ReactNode;

@@ -64,9 +64,14 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
     }
 
     useEffect(() => {
-        if (!textData) return;
+        // 為了 undo/redo 的時候位置要跟著跑
+        setPosition({ left: textData.left, top: textData.top })
+    }, [textData.left, textData.top]);
+
+    useEffect(() => {
+        if (!textData?.content) return;
         setValue(textData.content);
-    }, [textData])
+    }, [textData.content])
 
     return (
         <>

@@ -1,7 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 
+interface IUseClickOutside { 
+    handleMouseDownOutside: () => void, 
+    handleMouseDownInside?: () => void, 
+    exceptions?: string[] 
+}
 
-export default function useClickOutside<T extends HTMLElement>({ handleMouseDownOutside, handleMouseDownInside, exceptions }: { handleMouseDownOutside: () => void, handleMouseDownInside?: () => void, exceptions?: string[] }) {
+export default function useClickOutside<T extends HTMLElement>({ handleMouseDownOutside, handleMouseDownInside, exceptions }: IUseClickOutside) {
     const nodeRef = useRef<T>(null);
     useEffect(() => {
         function handleMouse(e: MouseEvent) {

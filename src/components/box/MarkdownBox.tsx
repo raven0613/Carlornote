@@ -7,6 +7,7 @@ import EditIcon from '../svg/Edit';
 import OKIcon from '../svg/OK';
 import ExpandIcon from "../svg/Expand";
 import ShrinkIcon from "../svg/Shrink";
+import useClickOutside from "@/hooks/useClickOutside";
 const md = markdownit();
 
 // foundation 淺
@@ -114,6 +115,15 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
+    const nodeRef = useClickOutside<HTMLDivElement>({ 
+        handleMouseDownOutside: () => {
+            setMode("read");
+        } 
+    });
+    useEffect(() => {
+        // 為了 undo/redo 的時候位置要跟著跑
+        setPosition({ left: textData.left, top: textData.top })
+    }, [textData.left, textData.top]);
     // console.log("supportedLanguages", SyntaxHighlighter.supportedLanguages)
     // console.log("mode", mode)
 
@@ -123,7 +133,10 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
     }, [textData])
 
     return (
-        <>
+        <div ref={nodeRef} onDoubleClick={() => {
+            if (isPointerNone || isBoardLocked) return;
+            setMode("edit");
+        }}>
             <Box
                 handleMove={({ left, top }) => {
                     setPosition({ left, top });
@@ -163,6 +176,6 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
                         <OKIcon classProps='stroke-slate-700' />}
                 </button>
             </div>}
-        </>
+        </div>
     )
 }

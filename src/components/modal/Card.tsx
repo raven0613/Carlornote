@@ -229,7 +229,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                                         onClick={async (e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            const url = process.env.NODE_ENV === "production" ? "https://deck-crafter.vercel.app/" : "http://localhost:3000/";
+                                            const url = process.env.NODE_ENV === "production" ? "https://carlornote.vercel.app/" : "https://carlornote.vercel.app/";
                                             navigator.clipboard.writeText(`${url}card/${cardData.id.split("_")[1]}`);
                                             return true;
                                         }}

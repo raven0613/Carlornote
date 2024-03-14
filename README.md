@@ -2,7 +2,7 @@
 
 這是一個以卡片為單位，可以隨心所欲地切換卡片，紀錄文字或圖片的筆記工具。
 
-[DEMO](https://deck-crafter.vercel.app/)
+[DEMO](https://carlornote.vercel.app/)
 
 ![大圖](https://github.com/raven0613/deck_crafter/assets/93082842/d201fd58-609f-4298-a2da-34baab68c2f0)
 

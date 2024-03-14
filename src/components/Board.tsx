@@ -13,6 +13,7 @@ import CodeBox from "./box/CodeBox";
 import MarkdownBox from "./box/MarkdownBox";
 import CardBox from "./box/CardBox";
 import { StepType } from "@/app/page";
+import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
 
 // 看 board 離螢幕左和上有多少 px
 export const distenceToLeftTop = { left: 0, top: 0 };
@@ -33,36 +34,6 @@ export const draggingBoxHeight: Record<boxType, number> = {
     markdown: 300,
     card: 128,
     "": 0
-}
-
-export function getResizedSize(originWidth: number, originHeight: number) {
-    const imageAspectRatio = originWidth / originHeight;
-    let width = originWidth;
-    let height = originHeight;
-    if (originWidth > originHeight && originWidth >= 800) {
-        width = 800;
-        height = width / imageAspectRatio;
-    }
-    else if (originHeight > originWidth && originHeight >= 400) {
-        height = 400;
-        width = height * imageAspectRatio;
-    }
-    return { width, height }
-}
-
-export function handleChangeZIndex(id: string, to: "top" | "bottom", elements: IBoardElement[]) {
-    // console.log("id", id)
-    const filteredElements = elements.filter(item => item.id !== id);
-    const selectedElement = elements.find(item => item.id === id);
-    if (!selectedElement) return;
-    if (to === "bottom") {
-        if (selectedElement.id === elements.at(0)?.id) return;
-        return [selectedElement, ...filteredElements];
-    }
-    else if (to === "top") {
-        if (selectedElement.id === elements.at(-1)?.id) return;
-        return [...filteredElements, selectedElement];
-    }
 }
 
 export interface INewImageBoxProps {
@@ -206,7 +177,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }
         const newBoardElements = [...elements, newBoardElement]
         handleUpdateElementList(newBoardElements);
-        handlePushStep({ added: newBoardElement });
         setIsPointerNone(false);
         dispatch(closeModal({ type: "" }));
         return newBoardElements;
@@ -244,7 +214,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         if (res.success === false) return;
         if (!newBoardElement) return;
         const { width, height } = getResizedSize(res.data.width, res.data.height);
-        handleUpdateElementList(newBoardElement.map((item, index) => {
+        const updatedNewBoardElement: IBoardElement[] = newBoardElement.map((item, index) => {
             if (index === newBoardElement.length - 1) return {
                 ...item,
                 name: file.name,
@@ -253,22 +223,24 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 height
             };
             return item;
-        }))
+        })
+        handleUpdateElementList(updatedNewBoardElement)
+        handlePushStep({ added: updatedNewBoardElement.at(-1) as IBoardElement });
     }, [handleAddImageBox, handleUpdateElementList])
 
 
     // mouse up 拖曳後放開：drop 時加入 dragging box 資料
     useEffect(() => {
         function handlePutBoxOnBoard(e: MouseEvent) {
-            console.log("put box")
+            // console.log("put box")
             e.stopPropagation();
             e.preventDefault();
-            console.log((e.target as HTMLElement))
+            // console.log((e.target as HTMLElement))
             if (!(e.target instanceof HTMLElement)) return;
             // drop 時加入資料
             // console.log("draggingBox", draggingBox)
             if (!draggingBox) return;
-            console.log("ㄟ")
+            // console.log("ㄟ")
             handleAddBox({
                 type: draggingBox,
                 content: getContent(draggingBox),
@@ -473,6 +445,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                         if (item.id === data.id) return data;
                                         return item;
                                     }))
+                                    handlePushStep({ added: data });
                                 }}
                                 imageData={item}
                                 isSelected={selectedElementId === item.id}

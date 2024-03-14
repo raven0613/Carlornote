@@ -48,7 +48,8 @@ export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMo
         <>
             {codeMode === "edit" && <div className={`flex flex-col h-full w-full rounded-lg p-4 bg-[#282b2e] gap-2 text-slate-400 
             ${needFull ? (isFull ? "min-h-[30rem]" : "h-60") : "h-full"} 
-            `}>
+            `}
+            >
                 <input className="textInput h-8 w-full bg-white/5 rounded-md outline-none pl-2 pr-9 sm:pr-2" value={title}
                     onChange={(e) => {
                         setTitle(e.target.value);
@@ -177,7 +178,7 @@ interface ICodeBox {
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
-    scrollPosition:  { x: number, y: number };
+    scrollPosition: { x: number, y: number };
 }
 
 export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: ICodeBox) {
@@ -185,11 +186,23 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
     // console.log("CodeBox isSelected", isSelected)
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
+    const nodeRef = useClickOutside<HTMLDivElement>({ 
+        handleMouseDownOutside: () => {
+            setMode("read");
+        } 
+    });
 
+    useEffect(() => {
+        // 為了 undo/redo 的時候位置要跟著跑
+        setPosition({ left: textData.left, top: textData.top })
+    }, [textData.left, textData.top]);
     // console.log("supportedLanguages", SyntaxHighlighter.supportedLanguages)
     // console.log("mode", mode)
     return (
-        <>
+        <div ref={nodeRef} onDoubleClick={() => {
+            if (isPointerNone || isBoardLocked) return;
+            setMode("edit");
+        }}>
             <Box
                 handleMove={({ left, top }) => {
                     setPosition({ left, top });
@@ -222,6 +235,6 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                     setMode(mode);
                 }} defaultMode={mode} />
             </div>}
-        </>
+        </div>
     )
 }

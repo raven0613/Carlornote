@@ -29,8 +29,6 @@ export default function Home() {
     const allCards = useSelector((state: IState) => state.card);
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
-    const undoStepListRef = useRef<Array<IBoardElement | string>>([]);
-    const redoStepListRef = useRef<Array<IBoardElement | { deleted: IBoardElement, index: number }>>([]);
     console.log("回復", undoList)
     console.log("重來", redoList)
 
