@@ -1,6 +1,6 @@
 "use client"
 import { ICard } from "@/type/card";
-import { IAction } from "../store";
+import { IAction, store } from "../store";
 
 export const initCardState = [];
 const SET_CARDS = "SET_CARDS";
@@ -96,6 +96,22 @@ export function dirtyReducer(state: dirtyStateType = initDirtyState, action: IAc
     switch (action.type) {
         case SET_DIRTY_STATE: {
             return action.payload;
+        }
+        default: return state;
+    }
+}
+
+export const initTags = [];
+const SET_TAGS = "SET_TAGS";
+export const setTags = (payload: string[]) => ({ type: SET_TAGS, payload });
+
+export function cardTagsReducer(state: string[] = initTags, action: IAction<string[]>) {
+    // console.log("dirtyState payload", action.payload)
+    switch (action.type) {
+        case SET_TAGS: {
+            // const tags: string[] = cards.map(card => card.tags);
+            const tagSet = new Set<string>(action.payload);
+            return [...tagSet];
         }
         default: return state;
     }

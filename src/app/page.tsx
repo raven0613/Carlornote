@@ -7,7 +7,7 @@ import { handleUpdateCard } from "@/api/card";
 import { signOut, useSession } from "next-auth/react";
 import { IState } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
-import { clearDirtyCardId, selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
+import { clearDirtyCardId, selectCard, setDirtyCardId, setDirtyState, setTags, updateCards } from "@/redux/reducers/card";
 import CardList from "@/components/CardList";
 import Popup from "@/components/Popup";
 import { setUserPermission } from "@/redux/reducers/user";
@@ -29,8 +29,9 @@ export default function Home() {
     const allCards = useSelector((state: IState) => state.card);
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
-    console.log("回復", undoList)
-    console.log("重來", redoList)
+
+    // console.log("回復", undoList)
+    // console.log("重來", redoList)
 
     useEffect(() => {
         dispatch(setUserPermission("editable"));
@@ -39,8 +40,8 @@ export default function Home() {
     // console.log("user", user)
     // console.log("session", session)
 
-    console.log("draggingBox page", draggingBox)
-    // console.log("allCards page", allCards)
+    // console.log("draggingBox page", draggingBox)
+    console.log("allCards page", allCards)
     // console.log("dirtyState", dirtyState)
     // console.log("dirtyCards", dirtyCards)
     console.log("selectedCard page", selectedCard)
@@ -71,6 +72,13 @@ export default function Home() {
             if (time) clearInterval(time);
         }
     }, [allCards, dirtyCards, dirtyState, dispatch]);
+
+    // 儲存 tags
+    useEffect(() => {
+        if (!allCards) return;
+        const tags: string[] = allCards.reduce((pre: string[], curr: ICard) => [...pre, ...(curr.tags ?? [])], []);
+        dispatch(setTags(tags));
+    }, [allCards, dispatch])
 
     // 如果點選卡片要切換網址，以下為了按上一頁時也能抓到資料
     // useEffect(() => {

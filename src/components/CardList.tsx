@@ -32,6 +32,37 @@ function CardLoading({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
     </div>)
 }
 
+interface ITagList {
+    allTags: string[];
+}
+
+function TagList({ allTags }: ITagList) {
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const selectedTagSet = new Set<string>(selectedTags);
+    return (
+        <>
+            <div className={`flex flex-wrap absolute left-4 bottom-full mb-4 border border-slate-200 gap-2 w-60 h-40 p-3 rounded-lg bg-white shadow-lg shadow-black/20 overflow-y-scroll`}>
+                {allTags.map(tag => {
+                    return (
+                        <span key={tag} className={`py-0.5 px-2 h-fit rounded text-sm border border-seagull-400 cursor-pointer 
+                        ${selectedTagSet.has(tag) ? "bg-seagull-400 text-white" : "text-seagull-700"}`}
+                            onClick={() => {
+                                if (selectedTagSet.has(tag)) {
+                                    setSelectedTags(pre => pre.filter(t => t !== tag));
+                                    return;
+                                }
+                                setSelectedTags(pre => [...pre, tag]);
+                            }}
+                        >
+                            {tag}
+                        </span>
+                    )
+                })}
+            </div>
+        </>
+    )
+}
+
 interface ICardList {
     selectedCardId: string;
     handleSetSelectedCard: (id: string) => void;
@@ -50,6 +81,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const { width: windowWidth } = useWindowSize();
     const pathname = usePathname();
     const selectedCard = useSelector((state: IState) => state.selectedCard);
+    const allTags = useSelector((state: IState) => state.cardTags);
 
     useEffect(() => {
         if (!user) return setCardSize("hidden");
@@ -85,6 +117,8 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     handleSetSelectedCard("");
                 }}
             >
+                {/* <TagList allTags={allTags} /> */}
+
                 {/* bottom card info */}
                 {cardLize === "hidden" && <div className={`h-full w-1/2 absolute left-0 truncate leading-[2rem] px-4 text-sm`} onClick={(e) => {
                     e.preventDefault();

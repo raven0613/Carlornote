@@ -29,14 +29,14 @@ export function Button({ handleDrag, handleClick, children, type }: IButton) {
 
 interface IControlPanel {
     handleDrag: (type: boxType) => void;
-    isSelectingCard?: boolean;
+    isSelectingCard: boolean;
 }
 
 export default function ControlPanel({ handleDrag, isSelectingCard }: IControlPanel) {
     console.log("isSelectingCard", isSelectingCard)
     return (
         <>
-            <main className={`absolute ${isSelectingCard? "left-0" : "-left-16"} duration-150 top-8 grid grid-cols-1 grid-rows-4 gap-1.5 p-3 shadow-md shadow-black/40 rounded-r-lg bg-white`}>
+            <main className={`absolute ${isSelectingCard ? "left-0" : "-left-16"} duration-150 top-8 grid grid-cols-1 grid-rows-4 gap-1.5 p-3 shadow-md shadow-black/40 rounded-r-lg bg-white`}>
                 <Button handleDrag={handleDrag} type="text">
                     <TextIcon classProps="fill-slate-600" />
                 </Button>

@@ -228,8 +228,15 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                         `}
                         >
                             {/* info panel */}
-                            <section className="w-[22rem] h-full flex flex-col justify-between">
-
+                            <section className="w-[22rem] h-full flex flex-col gap-5">
+                                <div className="">
+                                    <span className="flex text-sm">
+                                        create: {cardData.createdAt}
+                                    </span>
+                                    <span className="flex text-sm">
+                                        update: {cardData.updatedAt}
+                                    </span>
+                                </div>
                                 {/* tag panel */}
                                 <div className="flex flex-col py-2 pr-6 gap-2 max-h-60">
                                     {/* title */}
@@ -288,15 +295,6 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                                             </span>
                                         ))}
                                     </div>
-                                </div>
-
-                                <div className="">
-                                    <span className="flex text-sm">
-                                        create: {cardData.createdAt}
-                                    </span>
-                                    <span className="flex text-sm">
-                                        update: {cardData.updatedAt}
-                                    </span>
                                 </div>
                             </section>
 

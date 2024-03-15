@@ -11,8 +11,6 @@ import CardList from "./CardList";
 import { usePathname, useRouter } from "next/navigation";
 import { outerPage } from "./Auth";
 import CheckWindow from "./modal/CheckWindow";
-import { handleDeleteCard } from "@/api/card";
-import { removeCard } from "@/redux/reducers/card";
 
 interface IProps {
     children: ReactNode;

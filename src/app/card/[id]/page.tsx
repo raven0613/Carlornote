@@ -9,7 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleDeleteCard } from "@/api/card";
 import { IState, store } from "@/redux/store";
 import { useSelector, useDispatch } from "react-redux";
-import { addCard, clearDirtyCardId, selectCard, setCards, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
+import { addCard, clearDirtyCardId, selectCard, setCards, setDirtyCardId, setDirtyState, setTags, updateCards } from "@/redux/reducers/card";
 import Board from "@/components/Board";
 import ControlPanel from "@/components/ControlPanel";
 import ElementModal from "@/components/modal/BoardElements";
@@ -115,6 +115,13 @@ export default function CardPage() {
         }
     }, [allCards, dirtyCards, dirtyState, dispatch]);
 
+    // 儲存 tags
+    useEffect(() => {
+        if (!allCards) return;
+        const tags: string[] = allCards.reduce((pre: string[], curr: ICard) => [...pre, ...(curr.tags ?? [])], []);
+        dispatch(setTags(tags));
+    }, [allCards, dispatch])
+
     // 如果點選卡片要切換網址，以下為了按上一頁時也能抓到資料
     // useEffect(() => {
     //     const cardId = pathname.split("/").at(-1);
@@ -125,7 +132,7 @@ export default function CardPage() {
         <main className="flex h-svh flex-col items-center justify-between overflow-hidden">
             {(windowWidth && windowWidth < 640) && <ElementModal permission={userPermission} />}
 
-            <ControlBar                 
+            <ControlBar
                 canEdit={userPermission === "editable"}
                 canUndo={undoList.length > 0}
                 canRedo={redoList.length > 0}
@@ -238,6 +245,7 @@ export default function CardPage() {
                     />
                 </>}
                 {userPermission === "editable" && <ControlPanel
+                    isSelectingCard={selectedCard != null}
                     handleDrag={(type) => {
                         if (!selectedCard) return;
                         setDraggingBox(type);
