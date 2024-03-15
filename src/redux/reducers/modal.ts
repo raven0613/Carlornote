@@ -3,7 +3,7 @@ import { IAction } from "../store";
 
 export interface IModalState {
     type: string[],
-    data?: any
+    props?: any
 }
 
 export interface IModalPayload {

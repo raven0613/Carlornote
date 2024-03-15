@@ -28,11 +28,11 @@ const SharedComponents = (props: IProps) => {
     const dirtyState = useSelector((state: IState) => state.dirtyState);
     const user = useSelector((state: IState) => state.user);
     const pathname = usePathname();
-    // console.log("modalProp", modalProp)
+
+    // console.log("SharedComponents modalProp", modalProp)
+    console.log("SharedComponents openModalType", openModalType)
     // console.log("selectedCard", selectedCard)
     // console.log("status", status)
-    // console.log("openModalType", openModalType)
-    const router = useRouter();
 
     // dev: 顯示所點選的元素
     useEffect(() => {
@@ -58,21 +58,13 @@ const SharedComponents = (props: IProps) => {
         <>
             {props.children}
 
-            {openModalType.includes("card") && <Modal
-                position="center"
-                isOpen={openModalType.includes("card")}
+            {openModalType.includes("card") && <Card
+                isSelected={false}
+                cardData={modalProp.data}
                 handleClose={() => {
-                    if (openModalType.includes("card")) dispatch(closeModal({ type: "", props: null }));
+                    // if (openModalType.includes("card")) dispatch(closeModal({ type: "", props: null }));
                 }}
-            >
-                {openModalType.includes("card") && <Card
-                    isSelected={false}
-                    cardData={modalProp}
-                    handleClose={() => {
-                        if (openModalType.includes("card")) dispatch(closeModal({ type: "", props: null }));
-                    }}
-                />}
-            </Modal>}
+            />}
 
             {userPermission === "editable" && <Modal
                 position="aside"
@@ -98,14 +90,14 @@ const SharedComponents = (props: IProps) => {
                 position="center"
                 isOpen={openModalType.includes("checkWindow")}
                 handleClose={() => {
-                    if (openModalType.includes("checkWindow")) dispatch(closeModal({ type: "", props: modalProp }))
+                    if (openModalType.includes("checkWindow")) dispatch(closeModal({ type: "checkWindow", props: modalProp }))
                 }}
                 top="top-48"
             >
                 {openModalType.includes("checkWindow") && <div className="w-fit h-fit hidden z-50 sm:block ">
                     <CheckWindow data={modalProp?.data} text={modalProp?.text}
                         handleClose={() => {
-                            if (openModalType.includes("card")) dispatch(closeModal({ type: "", props: null }));
+                            dispatch(closeModal({ type: "checkWindow", props: modalProp }));
                         }}
                         handleConfirm={modalProp.handleConfirm}
                     />

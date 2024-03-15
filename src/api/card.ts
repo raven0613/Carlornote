@@ -90,7 +90,7 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
             });
         }))
     } catch (error) {
-        // console.log("error", error)
+        console.log("error", error)
         // return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
         failedFetch.push(JSON.stringify(error));
     } finally {

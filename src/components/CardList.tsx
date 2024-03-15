@@ -194,7 +194,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                                             // setDirtyState("none");
                                         }}
                                         handleClickEdit={() => {
-                                            dispatch(openModal({ type: "card", props: item }));
+                                            dispatch(openModal({ type: "card", props: { data: item } }));
                                         }}
                                         handleDrag={() => handleDrag(item)}
                                     />
