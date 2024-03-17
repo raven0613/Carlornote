@@ -9,6 +9,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import TagIcon from "./svg/Tag";
+import useClickOutside from "@/hooks/useClickOutside";
+import SortIcon from "./svg/Sort";
+import { SortList, TagList, sortConditionType } from "./CardListPanel";
+import SortedIcon from "./svg/Sorted";
 
 const showCardAmounts = 10;
 
@@ -32,43 +37,12 @@ function CardLoading({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
     </div>)
 }
 
-interface ITagList {
-    allTags: string[];
-}
-
-function TagList({ allTags }: ITagList) {
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const selectedTagSet = new Set<string>(selectedTags);
-    return (
-        <>
-            <div className={`flex flex-wrap absolute left-4 bottom-full mb-4 border border-slate-200 gap-2 w-60 h-40 p-3 rounded-lg bg-white shadow-lg shadow-black/20 overflow-y-scroll`}>
-                {allTags.map(tag => {
-                    return (
-                        <span key={tag} className={`py-0.5 px-2 h-fit rounded text-sm border border-seagull-400 cursor-pointer 
-                        ${selectedTagSet.has(tag) ? "bg-seagull-400 text-white" : "text-seagull-700"}`}
-                            onClick={() => {
-                                if (selectedTagSet.has(tag)) {
-                                    setSelectedTags(pre => pre.filter(t => t !== tag));
-                                    return;
-                                }
-                                setSelectedTags(pre => [...pre, tag]);
-                            }}
-                        >
-                            {tag}
-                        </span>
-                    )
-                })}
-            </div>
-        </>
-    )
-}
-
 interface ICardList {
     selectedCardId: string;
     handleSetSelectedCard: (id: string) => void;
     handleDrag: (card: ICard) => void;
 }
-
+// TODO: 刪除的話 filteredCards 沒有跟著減少
 export default function CardList({ selectedCardId, handleSetSelectedCard, handleDrag }: ICardList) {
     const user = useSelector((state: IState) => state.user);
     const dispatch = useDispatch();
@@ -82,6 +56,17 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const pathname = usePathname();
     const selectedCard = useSelector((state: IState) => state.selectedCard);
     const allTags = useSelector((state: IState) => state.cardTags);
+    const [openedPanel, setOpenedPanel] = useState<"tag" | "sort" | "">("");
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const isFiltered = Boolean(selectedTags.length > 0);
+
+    // console.log("allCards", allCards)
+
+    const tagSet = new Set(selectedTags);
+    const filteredCards = (isFiltered && allCards) ? allCards.filter(card => card.tags?.some(t => tagSet.has(t))) : allCards;
+
+    // console.log("createdAt", allCards[0].createdAt)
+    // console.log("createdAt", new Date(allCards[0].createdAt).getTime())
 
     useEffect(() => {
         if (!user) return setCardSize("hidden");
@@ -89,7 +74,9 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
             const response = await handleGetCards(user?.id || "");
             if (response.status === "FAIL") return setCardState("error");
             setCardState("ok");
-            dispatch(setCards(JSON.parse(response.data)));
+            dispatch(setCards(JSON.parse(response.data).sort((a: ICard, b: ICard) => {
+                return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            })));
             // console.log("get data", JSON.parse(response.data))
         }
         setCardState("loading");
@@ -117,7 +104,56 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     handleSetSelectedCard("");
                 }}
             >
-                {/* <TagList allTags={allTags} /> */}
+                {/* tag list */}
+                {cardLize !== "hidden" && <button className={`absolute ${cardLize === "lg" ? "top-3" : "top-1"} left-3 w-6 h-6 p-0.5 rounded-full border border-seagull-500 hover:border-seagull-600 duration-150 ${isFiltered ? "bg-seagull-500 hover:bg-seagull-600" : ""}`}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpenedPanel(pre => pre === "tag" ? "" : "tag");
+                    }}
+                ><TagIcon classProps={`${isFiltered ? "text-white" : "text-seagull-400 hover:text-seagull-600"} duration-150`} /></button>}
+                <TagList allTags={allTags} isOpen={openedPanel === "tag"}
+                    selectedTagsProp={selectedTags}
+                    handleSelectTag={(tags: string[]) => {
+                        setSelectedTags(tags);
+
+                        if (tags.length === 0) {
+                            // setFilteredCards(allCards);
+                            return;
+                        }
+                        const tagSet = new Set(tags);
+                        // setFilteredCards(allCards.filter(card => card.tags?.some(t => tagSet.has(t))));
+                    }}
+                    handleClose={() => { setOpenedPanel("") }}
+                />
+                {/* sort panel */}
+                {cardLize !== "hidden" && <button className={`absolute ${cardLize === "lg" ? "top-3" : "top-1"} left-12 w-6 h-6 p-0.5 rounded-full border border-seagull-500 hover:border-seagull-600 duration-150`}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpenedPanel(pre => pre === "sort" ? "" : "sort");
+                    }}
+                ><SortedIcon classProps={`text-seagull-400 hover:text-seagull-600 duration-150`} /></button>}
+                <SortList isOpen={openedPanel === "sort"}
+                    handleSort={(condition: sortConditionType) => {
+                        if (condition.key === "name") {
+                            dispatch(setCards([...allCards].sort((a, b) => {
+                                if (condition.sort === "asc") {
+                                    return a.name.localeCompare(b.name)
+                                }
+                                return -a.name.localeCompare(b.name)
+                            })))
+                            return;
+                        }
+                        dispatch(setCards([...allCards].sort((a, b) => {
+                            if (condition.sort === "asc") {
+                                return new Date(a[condition.key] as string).getTime() - new Date(b[condition.key] as string).getTime()
+                            }
+                            return new Date(b[condition.key] as string).getTime() - new Date(a[condition.key] as string).getTime()
+                        })))
+                    }}
+                    handleClose={() => { setOpenedPanel("") }}
+                />
 
                 {/* bottom card info */}
                 {cardLize === "hidden" && <div className={`h-full w-1/2 absolute left-0 truncate leading-[2rem] px-4 text-sm`} onClick={(e) => {
@@ -167,6 +203,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         const card = JSON.parse(response.data) as ICard;
                         dispatch(addCard(card));
                         setAddCardState("ok");
+                        // TODO: 新增的卡片要馬上被 insertSort? 還是要保持在最後一張(目前)
                         // 新增的卡片要被選取並且卡片欄位要顯示(先不要)
                         // dispatch(selectCard(card));
                         // if (allCards.length - showCardAmounts + 1 >= 0) setWheelPx(allCards.length - showCardAmounts + 1);
@@ -213,9 +250,9 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         {cardState === "loading" && <CardLoading cardLize={cardLize} />}
                         {cardState === "error" && "Error"}
                         {(cardState === "ok" && allCards) &&
-                            allCards.slice(
-                                allCards.length <= showCardAmounts ? 0 : wheelPx,
-                                allCards.length <= showCardAmounts ? allCards.length : wheelPx + showCardAmounts
+                            filteredCards.slice(
+                                filteredCards.length <= showCardAmounts ? 0 : wheelPx,
+                                filteredCards.length <= showCardAmounts ? filteredCards.length : wheelPx + showCardAmounts
                             )
                                 .map((item) =>
                                     <CardWithHover key={item.id}

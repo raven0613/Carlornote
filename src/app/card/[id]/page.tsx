@@ -253,9 +253,6 @@ export default function CardPage() {
                 />}
             </section>
             <div className="w-full h-full sm:h-auto relative">
-                {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}
-                {dirtyState === "clear" && <p className={`cursor-default absolute top-1.5 left-2 animate-hide opacity-0 text-sm text-slate-500 z-20`}>已成功儲存</p>}
-
                 {(windowWidth && windowWidth >= 640) && <CardList selectedCardId={selectedCard?.id}
                     handleSetSelectedCard={(id: string) => {
                         // console.log("id", id)

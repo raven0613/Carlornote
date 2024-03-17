@@ -109,7 +109,6 @@ export function cardTagsReducer(state: string[] = initTags, action: IAction<stri
     // console.log("dirtyState payload", action.payload)
     switch (action.type) {
         case SET_TAGS: {
-            // const tags: string[] = cards.map(card => card.tags);
             const tagSet = new Set<string>(action.payload);
             return [...tagSet];
         }

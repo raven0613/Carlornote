@@ -58,10 +58,6 @@ const SharedComponents = (props: IProps) => {
 
             {openModalType.includes("card") && <Card
                 isSelected={false}
-                cardData={modalProp.data}
-                handleClose={() => {
-                    // if (openModalType.includes("card")) dispatch(closeModal({ type: "", props: null }));
-                }}
             />}
 
             {userPermission === "editable" && <Modal

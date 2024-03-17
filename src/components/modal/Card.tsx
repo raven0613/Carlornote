@@ -9,7 +9,7 @@ import { IBoardElement, ICard, boxType } from "@/type/card";
 import { v4 as uuidv4 } from 'uuid';
 import { handleDeleteCard, handleUpdateCard } from "@/api/card";
 import { INewImageBoxProps } from "@/components/Board";
-import { removeCard, updateCards } from "@/redux/reducers/card";
+import { removeCard, selectCard, updateCards } from "@/redux/reducers/card";
 import { useDispatch, useSelector } from "react-redux";
 import { ImageLoading } from "../ImageLoading";
 import DeleteIcon from "../svg/Delete";
@@ -71,24 +71,23 @@ function RadioOptions({ groupName, options, selectedValue, handleSelect, isDisab
 
 interface ICardModal {
     isSelected: boolean;
-    cardData: ICard;
     handleClose?: () => void;
 }
 
-export default function CardModal({ isSelected, cardData, handleClose }: ICardModal) {
-    console.log("cardData", cardData)
-    const [name, setName] = useState(cardData.name);
+export default function CardModal({ isSelected, handleClose }: ICardModal) {
+    const selectedCard = useSelector((state: IState) => state.selectedCard);
+    const [name, setName] = useState(selectedCard.name);
     const [inputUrl, setInputUrl] = useState("");
-    const [url, setUrl] = useState(cardData.imageUrl);
+    const [url, setUrl] = useState(selectedCard.imageUrl);
     const [tag, setTag] = useState("");
-    const [tagList, setTagList] = useState(cardData.tags ?? []);
+    const [tagList, setTagList] = useState(selectedCard.tags ?? []);
     const [tagWrong, setTagWrong] = useState("");
     const [email, setEmail] = useState("");
-    const [emailList, setEmailList] = useState(cardData.userList ?? []);
+    const [emailList, setEmailList] = useState(selectedCard.userList ?? []);
     const [emailErrorMsg, setEmailErrorMsg] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [visibility, setVisibility] = useState(cardData.visibility);
-    const [editability, setEditability] = useState(cardData.editability ?? "close");
+    const [visibility, setVisibility] = useState(selectedCard.visibility);
+    const [editability, setEditability] = useState(selectedCard.editability ?? "close");
     const [settingArea, setSettingArea] = useState<"info" | "access" | "user">("info");
     const [isTagEditing, setIsTagEditing] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
@@ -104,7 +103,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                     console.log("close")
                     if (isDirty) {
                         if (openModalType.at(-1) === "checkWindow") {
-                            dispatch(closeModal({ type: "checkWindow", props: { data: cardData } }));
+                            dispatch(closeModal({ type: "checkWindow", props: { data: selectedCard } }));
                             return;
                         }
                         dispatch(openModal({
@@ -114,7 +113,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                                 handleConfirm: async () => {
                                     dispatch(closeAllModal({ type: "" }));
                                 },
-                                data: cardData
+                                data: selectedCard
                             }
                         }));
                         return;
@@ -162,7 +161,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                             />
                             {(url) && <Image
                                 className={`rounded-md`} width={200} height={220} src={url}
-                                alt={`${cardData.name} image`}
+                                alt={`${selectedCard.name} image`}
                                 style={{
                                     objectFit: 'cover', // cover, contain, none
                                     width: '100%', height: '100%',
@@ -231,10 +230,10 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                             <section className="w-[22rem] h-full flex flex-col gap-5">
                                 <div className="">
                                     <span className="flex text-sm">
-                                        create: {cardData.createdAt}
+                                        create: {selectedCard.createdAt}
                                     </span>
                                     <span className="flex text-sm">
-                                        update: {cardData.updatedAt}
+                                        update: {selectedCard.updatedAt}
                                     </span>
                                 </div>
                                 {/* tag panel */}
@@ -313,7 +312,7 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                                                     e.preventDefault();
                                                     e.stopPropagation();
                                                     const url = process.env.NODE_ENV === "production" ? "https://carlornote.vercel.app/" : "https://carlornote.vercel.app/";
-                                                    navigator.clipboard.writeText(`${url}card/${cardData.id.split("_")[1]}`);
+                                                    navigator.clipboard.writeText(`${url}card/${selectedCard.id.split("_")[1]}`);
                                                     return true;
                                                 }}
                                                 className={`w-5 h-5 p-[4px] rounded-full bg-slate-100 cursor-pointer hover:scale-125 duration-200 ml-2
@@ -449,11 +448,11 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                                     type: "checkWindow",
                                     props: {
                                         text: "卡片刪除後無法復原，確定要刪除卡片嗎？",
-                                        data: cardData,
+                                        data: selectedCard,
                                         handleConfirm: async () => {
-                                            const response = await handleDeleteCard(cardData.id);
+                                            const response = await handleDeleteCard(selectedCard.id);
                                             if (response.status === "FAIL") return;
-                                            dispatch(removeCard(cardData.id));
+                                            dispatch(removeCard(selectedCard.id));
                                             dispatch(closeAllModal({ type: "" }));
                                         }
                                     }
@@ -469,14 +468,16 @@ export default function CardModal({ isSelected, cardData, handleClose }: ICardMo
                         {/* OK button */}
                         <button className="bg-green-400 w-6 h-6 p-[4px] rounded-full text-slate-100 hover:scale-125 duration-200"
                             onClick={async () => {
-                                const response = await handleUpdateCard([{ ...cardData, imageUrl: url, name, visibility, editability, userList: emailList, tags: tagList }]);
+                                const updatedCard = { ...selectedCard, imageUrl: url, name, visibility, editability, userList: emailList, tags: tagList };
+                                const response = await handleUpdateCard([updatedCard]);
                                 console.log("response", response)
                                 if (response.status === "FAIL") return setEmailErrorMsg("儲存失敗，請再試一次");
                                 const resData = JSON.parse(response.data);
                                 console.log("resData", resData)
                                 setIsDirty(false);
                                 dispatch(updateCards(resData));
-                                dispatch(closeAllModal({ type: "" }));
+                                dispatch(selectCard(updatedCard));
+                                dispatch(closeAllModal({ type: "", props: {} }));
                             }}
                         >
                             <OKIcon classProps="stroke-slate-700" />

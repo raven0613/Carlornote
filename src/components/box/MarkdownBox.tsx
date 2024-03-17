@@ -105,7 +105,7 @@ interface IMarkdownBox {
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
-    scrollPosition:  { x: number, y: number };
+    scrollPosition: { x: number, y: number };
 }
 
 export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: IMarkdownBox) {
@@ -115,10 +115,10 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
-    const nodeRef = useClickOutside<HTMLDivElement>({ 
+    const nodeRef = useClickOutside<HTMLDivElement>({
         handleMouseDownOutside: () => {
             setMode("read");
-        } 
+        }
     });
     useEffect(() => {
         // 為了 undo/redo 的時候位置要跟著跑
