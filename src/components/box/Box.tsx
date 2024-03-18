@@ -56,8 +56,8 @@ interface IBox {
     scrollPosition: { x: number, y: number };
 }
 
-type xDirection = "left" | "right";
-type yDirection = "top" | "bottom";
+export type xDirection = "left" | "right";
+export type yDirection = "top" | "bottom";
 
 export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone, elementPositions, scrollPosition }: IBox) {
 
@@ -231,8 +231,8 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     else if (e.clientX > pointerRef.current.x) moveDirectionRef.current.x = "right";
                     if (e.clientY < pointerRef.current.y) moveDirectionRef.current.y = "top";
                     else if (e.clientY > pointerRef.current.y) moveDirectionRef.current.y = "bottom";
-                    pointerRef.current.x = e.clientX;
-                    pointerRef.current.y = e.clientY;
+                    pointerRef.current.x = e.clientX - distenceToLeftTop.left;
+                    pointerRef.current.y = e.clientY - distenceToLeftTop.top;
                     // console.log("moveDirectionRef", moveDirectionRef.current)
                     // 找出最接近自己的要吸附的目標
                     const leftTarget = binarySearch(elementPositions.x, left, "before");

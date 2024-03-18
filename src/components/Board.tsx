@@ -14,6 +14,7 @@ import MarkdownBox from "./box/MarkdownBox";
 import CardBox from "./box/CardBox";
 import { StepType } from "@/app/page";
 import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
+import { xDirection, yDirection } from "./box/Box";
 
 // 看 board 離螢幕左和上有多少 px
 export const distenceToLeftTop = { left: 0, top: 0 };
@@ -78,6 +79,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     // console.log("selectedElementId", selectedElementId)
     const pointerRef = useRef({ x: 0, y: 0 });
+    const moveDirectionRef = useRef<{ x: xDirection, y: yDirection }>({ x: "left", y: "top" });
     const clickedPointRef = useRef({ startX: 0, startY: 0, endX: 0, endY: 0 });
     const [isLock, setIsLock] = useState(false);
     const [isPointerNone, setIsPointerNone] = useState(false);
@@ -91,12 +93,15 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }, []).sort((a, b) => a - b)
     });
     const wrapperRef = useRef<HTMLDivElement>(null);
+    const [isMoving, setIsMoving] = useState(false);
 
+    console.log("isMoving", isMoving)
     // console.log("draggingBox", draggingBox)
     // console.log("pointerRef", pointerRef.current)
     // console.log("Board isLock", isLock)
     // console.log("Board isPointerNone", isPointerNone)
     // console.log("permission", permission)
+    // console.log("selectedElementId", selectedElementId)
 
 
     useEffect(() => {
@@ -258,6 +263,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             // console.log((e.target as HTMLElement))
             // old(如果在 board 以外的地方放開) 停止 drop 流程
             handleMouseUp();
+            setIsMoving(false);
         }
         // dragend for cardBox, mouseup for others
         document.addEventListener("dragend", handlePutBoxOnBoard);
@@ -353,13 +359,16 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     }, [elements])
     // console.log("x", boardSize.x)
     // console.log("y", boardSize.y)
+
     return (
         <>
             <main ref={wrapperRef} className="boardElement absolute inset-0 items-center overflow-scroll min-w-full min-h-full bg-white/80"
             >
                 <div className="boardElement absolute top-0 flex" ref={boardRef}
-                    style={{ width: boardSize.x || "100%", height: boardSize.y || "100%" }}
-                    // style={{ scale: "70%" }}
+                    style={{
+                        width: boardSize.x || "100%", height: boardSize.y || "100%",
+                        scale: "100%", transformOrigin: "top left"
+                    }}
                     onDragOver={(e) => {
                         // 為了防止在圖片上方 drop 的時候變成在瀏覽器打開圖片的行為，需要將圖片設定成 pointer-events-none
                         e.preventDefault();
@@ -378,6 +387,33 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             endX: 0,
                             endY: 0
                         }
+                        setIsMoving(true);
+                    }}
+                    onMouseMove={(e) => {
+                        // TODO: drag move
+                        
+                        // if (!wrapperRef.current || !isMoving) return;
+                        // if (e.clientX < pointerRef.current.x) moveDirectionRef.current.x = "left";
+                        // else if (e.clientX > pointerRef.current.x) moveDirectionRef.current.x = "right";
+                        // if (e.clientY < pointerRef.current.y) moveDirectionRef.current.y = "top";
+                        // else if (e.clientY > pointerRef.current.y) moveDirectionRef.current.y = "bottom";
+
+                        // console.log("pointerRefY", pointerRef.current.y)
+                        // console.log("clientY", e.clientY)
+                        // console.log("moveDirectionRef", moveDirectionRef.current)
+
+                        // pointerRef.current = {
+                        //     x: e.clientX - distenceToLeftTop.left,
+                        //     y: e.clientY - distenceToLeftTop.top
+                        // };
+                        // const scrollTop = wrapperRef.current.scrollTop;
+                        // const scrollLeft = wrapperRef.current.scrollLeft;
+                        // const top = moveDirectionRef.current.y === "top"? scrollTop + 5 : scrollTop - 5;
+                        // const left = moveDirectionRef.current.x === "left"? scrollLeft + 5 : scrollLeft - 5;
+                        
+                        // wrapperRef.current.scrollTo({
+                        //     top, left, behavior: "auto"
+                        // })
                     }}
                     onMouseUp={(e) => {
                         clickedPointRef.current = {

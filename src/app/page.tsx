@@ -44,7 +44,7 @@ export default function Home() {
     // console.log("allCards page", allCards)
     // console.log("dirtyState", dirtyState)
     // console.log("dirtyCards", dirtyCards)
-    console.log("selectedCard page", selectedCard)
+    // console.log("selectedCard page", selectedCard)
 
     // 有修改的話 5 秒存檔一次
     useEffect(() => {
