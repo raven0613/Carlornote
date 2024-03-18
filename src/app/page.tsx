@@ -41,7 +41,7 @@ export default function Home() {
     // console.log("session", session)
 
     // console.log("draggingBox page", draggingBox)
-    console.log("allCards page", allCards)
+    // console.log("allCards page", allCards)
     // console.log("dirtyState", dirtyState)
     // console.log("dirtyCards", dirtyCards)
     console.log("selectedCard page", selectedCard)
@@ -87,7 +87,7 @@ export default function Home() {
     // }, [allCards, dispatch, pathname])
 
     return (
-        <main className="flex h-svh w-full flex-col items-center justify-between overflow-hidden">
+        <main className="mainpage flex h-svh w-full flex-col items-center justify-between overflow-hidden">
             <ControlBar
                 canEdit={true}
                 canUndo={undoList.length > 0}
@@ -218,7 +218,7 @@ export default function Home() {
                 />
             </section>
 
-            <div className="w-full h-full sm:h-fit relative sm:flex-grow-0 sm:flex-shrink-0">
+            <div className="card w-full h-full sm:h-fit relative sm:flex-grow-0 sm:flex-shrink-0">
                 <CardList selectedCardId={selectedCard?.id}
                     handleSetSelectedCard={(id: string) => {
                         // console.log("id", id)

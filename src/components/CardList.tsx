@@ -60,7 +60,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const isFiltered = Boolean(selectedTags.length > 0);
 
     // console.log("allCards", allCards)
-    console.log("wheelIdx", wheelIdx)
+    // console.log("wheelIdx", wheelIdx)
 
     const tagSet = new Set(selectedTags);
     const filteredCards = (isFiltered && allCards) ? allCards.filter(card => card.tags?.some(t => tagSet.has(t))) : allCards;

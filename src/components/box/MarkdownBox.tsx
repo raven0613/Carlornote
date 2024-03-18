@@ -8,7 +8,31 @@ import OKIcon from '../svg/OK';
 import ExpandIcon from "../svg/Expand";
 import ShrinkIcon from "../svg/Shrink";
 import useClickOutside from "@/hooks/useClickOutside";
+import DOMPurify from 'dompurify';
+import { Marked } from 'marked';
+import { markedHighlight } from "marked-highlight";
+import hljs from 'highlight.js';
+import 'highlight.js/styles/hybrid.css';
+// import 'highlight.js/styles/vs2015.css';
+// import 'highlight.js/styles/rainbow.css';
+// import 'highlight.js/styles/androidstudio.css';
+// import 'highlight.js/styles/an-old-hope.css';
+// import 'highlight.js/styles/github-dark.css';
 const md = markdownit();
+
+const marked = new Marked(
+    markedHighlight({
+        langPrefix: 'hljs language-',
+        highlight(code, lang, info) {
+            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+            return hljs.highlight(code, { language }).value;
+        }
+    })
+);
+marked.use({
+    async: false,
+    gfm: true
+});
 
 // foundation 淺
 // androidstudio 深
@@ -20,6 +44,13 @@ console.error = (...args: any) => {
     if (/defaultProps/.test(args[0])) return;
     error(...args);
 };
+
+function renderMarkdown(text: string) {
+    // const renderedHTML = md.render(text);
+    const renderedHTML = marked.parse(text) as string;
+    const sanitizeHTML = DOMPurify.sanitize(renderedHTML);
+    return { __html: sanitizeHTML };
+}
 
 interface IMarkdownCore {
     textData: IBoardElement;
@@ -70,7 +101,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                             behavior: "smooth"
                         });
                     }}
-                    dangerouslySetInnerHTML={{ __html: md.render(value) }}
+                    dangerouslySetInnerHTML={renderMarkdown(value)}
                 />
             </div>}
 
@@ -78,8 +109,8 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
             ${needFull ? (isFull ? "h-full max-h-[80vh] min-h-48" : "h-48") : "h-full"}
             `}
             >
-                <article className={`prose marker:text-slate-500 max-w-none w-full h-full
-                text-slate-700  p-4`} dangerouslySetInnerHTML={{ __html: md.render(value) }} />
+                <article className={`prose prose-pre:bg-[#1d1f21] marker:text-slate-700 max-w-none w-full h-full
+                text-slate-700  p-4`} dangerouslySetInnerHTML={renderMarkdown(value)} />
             </div>}
 
             {needFull && <button className="absolute top-4 right-4 z-20 w-8 h-8 hover:scale-110 duration-150"
@@ -111,7 +142,6 @@ interface IMarkdownBox {
 export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: IMarkdownBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
-    const [value, setValue] = useState(textData.content);
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
 
@@ -126,11 +156,6 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
     }, [textData.left, textData.top]);
     // console.log("supportedLanguages", SyntaxHighlighter.supportedLanguages)
     // console.log("mode", mode)
-
-    useEffect(() => {
-        if (!textData) return;
-        setValue(textData.content);
-    }, [textData])
 
     return (
         <div ref={nodeRef} onDoubleClick={() => {
