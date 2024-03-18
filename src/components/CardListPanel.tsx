@@ -44,7 +44,7 @@ export function SortList({ sortConditionProp, handleSort, isOpen, handleClose }:
                         }}
                     >
                         <option value="createdAt" className="">創建時間（預設）</option>
-                        <option value="updatedAt" className="">修改時間</option>
+                        <option value="updatedAt" className="">更新時間</option>
                         <option value="name" className="">名稱</option>
                     </select>
                     <button className=""

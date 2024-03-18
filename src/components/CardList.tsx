@@ -14,8 +14,7 @@ import useClickOutside from "@/hooks/useClickOutside";
 import SortIcon from "./svg/Sort";
 import { SortList, TagList, sortConditionType } from "./CardListPanel";
 import SortedIcon from "./svg/Sorted";
-
-const showCardAmounts = 10;
+import SrollBar from "./ScrollBar";
 
 function FakeCard({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
     return (
@@ -28,8 +27,8 @@ function FakeCard({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
     )
 }
 
-function CardLoading({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
-    const list = Array.from({ length: showCardAmounts });
+function CardLoading({ cardLize, length }: { cardLize: "hidden" | "sm" | "lg", length: number }) {
+    const list = Array.from({ length });
     return (<div className="w-full h-full flex">
         {list.map((_item, index) => (
             <FakeCard cardLize={cardLize} key={index} />
@@ -47,7 +46,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const user = useSelector((state: IState) => state.user);
     const dispatch = useDispatch();
     const allCards = useSelector((state: IState) => state.card);
-    const [wheelPx, setWheelPx] = useState(0);
+    const [wheelIdx, setWheelIdx] = useState(0);
     const [showCardAmounts, setSowCardAmounts] = useState(5);
     const [cardState, setCardState] = useState<"loading" | "ok" | "error">("loading");
     const [addCardState, setAddCardState] = useState<"loading" | "ok" | "error">("ok");
@@ -61,6 +60,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const isFiltered = Boolean(selectedTags.length > 0);
 
     // console.log("allCards", allCards)
+    console.log("wheelIdx", wheelIdx)
 
     const tagSet = new Set(selectedTags);
     const filteredCards = (isFiltered && allCards) ? allCards.filter(card => card.tags?.some(t => tagSet.has(t))) : allCards;
@@ -116,13 +116,6 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     selectedTagsProp={selectedTags}
                     handleSelectTag={(tags: string[]) => {
                         setSelectedTags(tags);
-
-                        if (tags.length === 0) {
-                            // setFilteredCards(allCards);
-                            return;
-                        }
-                        const tagSet = new Set(tags);
-                        // setFilteredCards(allCards.filter(card => card.tags?.some(t => tagSet.has(t))));
                     }}
                     handleClose={() => { setOpenedPanel("") }}
                 />
@@ -133,7 +126,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         e.stopPropagation();
                         setOpenedPanel(pre => pre === "sort" ? "" : "sort");
                     }}
-                ><SortedIcon classProps={`text-seagull-400 hover:text-seagull-600 duration-150`} /></button>}
+                ><SortIcon classProps={`text-seagull-400 hover:text-seagull-600 duration-150`} /></button>}
                 <SortList isOpen={openedPanel === "sort"}
                     handleSort={(condition: sortConditionType) => {
                         if (condition.key === "name") {
@@ -217,7 +210,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 px-8 min-[400px]:px-12 min-[560px]:px-14
                 sm:hidden overflow-scroll gap-4 justify-items-center"
                 >
-                    {allCards.map(item => {
+                    {filteredCards.map(item => {
                         return (
                             <Link scroll={false} key={item.id} href={`/card/${item.id.split("card_")[1]}`} className="w-full h-full">
                                 <Card
@@ -232,27 +225,27 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 </div>
 
                 {/* pc */}
-                {allCards.length > 0 ?
+                {filteredCards.length > 0 ?
                     <div className={`hidden sm:flex w-auto h-full items-end ${cardLize === "lg" ? "pb-4" : "pb-2"}`}
                         onWheel={(e) => {
                             // console.log(e.deltaX)
                             // console.log(e.deltaY)
-                            if (e.deltaY > 0) setWheelPx(pre => {
-                                if (pre + showCardAmounts >= allCards.length) return allCards.length - showCardAmounts;
+                            if (e.deltaY > 0) setWheelIdx(pre => {
+                                if (pre + showCardAmounts >= filteredCards.length) return filteredCards.length - showCardAmounts;
                                 return pre + 1
                             });
-                            else setWheelPx(pre => {
+                            else setWheelIdx(pre => {
                                 if (pre <= 0) return 0;
                                 return pre - 1
                             });
                         }}
                     >
-                        {cardState === "loading" && <CardLoading cardLize={cardLize} />}
+                        {cardState === "loading" && <CardLoading cardLize={cardLize} length={showCardAmounts} />}
                         {cardState === "error" && "Error"}
                         {(cardState === "ok" && allCards) &&
                             filteredCards.slice(
-                                filteredCards.length <= showCardAmounts ? 0 : wheelPx,
-                                filteredCards.length <= showCardAmounts ? filteredCards.length : wheelPx + showCardAmounts
+                                filteredCards.length <= showCardAmounts ? 0 : wheelIdx,
+                                filteredCards.length <= showCardAmounts ? filteredCards.length : wheelIdx + showCardAmounts
                             )
                                 .map((item) =>
                                     <CardWithHover key={item.id}
@@ -304,7 +297,15 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         }}
                     >-</button>
                 </div>}
+
+                <SrollBar isFull={filteredCards.length <= showCardAmounts} startIndex={wheelIdx} barItemsLength={showCardAmounts} totalItemsLength={filteredCards.length} showingPos={cardBarMap[cardLize]} />
             </section>
         </>
     )
+}
+
+const cardBarMap: Record<"lg" | "sm" | "hidden", "base" | "bottom" | "none"> = {
+    lg: "base",
+    sm: "bottom",
+    hidden: "none"
 }
