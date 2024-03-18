@@ -88,6 +88,7 @@
 
 只要將下方的卡片直接拖曳到白板上，就可以產生具有該卡片連結的卡片，閱讀者可以從一張卡片直接跳到連結的卡片
 
+![cardbox](https://i.imgur.com/9yu3AXm.gif)
 
 ### 自由操作方塊
 
@@ -100,26 +101,47 @@
 
 點擊 undo 與 redo icon 可以回復或重作步驟，需注意切換卡片後保存的步驟將會重置
 
-![復原重複](https://cdn.discordapp.com/attachments/1164423317239889931/1217512744824340560/BOX.gif?ex=66044c1a&is=65f1d71a&hm=a17c000e82a28b2e9c6fb3b1a6a17d27b4f9803ded0c07d0a24c7095dd1bb124&)
+![復原重複](https://i.imgur.com/gJmugcH.gif)
 
-## 卡片的權限設定
+
+## 自由切換卡片
+
+Carlornote 提供自由切換卡片、自由編輯的環境，同時隨著卡片的累積，會需要依據不同的條件來進行篩選和排序  
+我們可以點選 tags 來篩選，以及依據創建、編輯時間、卡片名稱來進行排序
+
+![tags篩選](https://i.imgur.com/Vbn9Mh1.gif)
+
+### 卡片的 tags 設定
+
+點選下方卡片的編輯 icon，在跳出的 modal 視窗上點選編輯按鈕，可以設定卡片的 tags
+輸入 tag 後按「+」便可以新增 tag，在編輯模式中也可以刪除 tag
+
+最後點選右下方的勾勾才會儲存卡片 tags 設定
+
+![tags設定](https://i.imgur.com/PHZhBhD.gif)
+
+### 卡片的權限設定
 
 - 卡片權限設定
 
 點選下方卡片的編輯 icon，在跳出的 modal 視窗上可以設定卡片的觀看以及編輯權限  
 當選擇私密觀看後，編輯權限便會關閉；當選擇限制觀看後，編輯權限便不能選擇公開
 
-![卡片權限](https://cdn.discordapp.com/attachments/1164423317239889931/1217512743607992360/11e359e89712d14e.gif?ex=66044c1a&is=65f1d71a&hm=453f4e67e4ec3455857dbe46da5ae457d8b4051ba5a06a0708b2beb17287c812&)
+![卡片權限](https://i.imgur.com/jDxmgKj.png)
 
 - 權限名單設定
 
 modal 視窗右下角可以設定權限名單，可以加入其他使用者的 e-mail，再將觀看權限或是編輯權限設定為「限制」，就可以只開放給特定的使用者觀看或是編輯卡片
 
-![權限名單](https://cdn.discordapp.com/attachments/1164423317239889931/1217512744287342712/4add30ab904129dd.gif?ex=66044c1a&is=65f1d71a&hm=6e96e39950c3476e77a274d8e3e841fd295080298328ed18b4bf6509837db0c3&)
+![權限名單](https://i.imgur.com/YNI7x34.png)
 
 最後必須點擊綠色勾勾按鈕，才會儲存設定結果
 
-## 使用手機操作 deck crafter
+
+
+
+
+## 使用手機操作 Carlornote
 
 電腦版的右側小耳朵點開，會將卡片上的所有元素，依照圖層上下來顯示，在手機上操作時，會以操作這個區塊為主，點選方塊後會顯示所有可操作按鈕
 

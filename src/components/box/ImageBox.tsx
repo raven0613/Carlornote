@@ -150,7 +150,9 @@ export default function ImageBox({ imageData, handleUpdateElement, handleImgOnLo
             scrollPosition={scrollPosition}
         >
             <ImageCore imageData={imageData} handleOnLoad={(card) => {
+                console.log("handleOnLoad1")
                 if (isBoardLocked) return;
+                console.log("handleOnLoad2")
                 handleImgOnLoad(card);
             }} />
         </Box>
