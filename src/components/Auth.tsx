@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ImageLoading } from "./ImageLoading";
 import { IState } from "@/redux/store";
 
-export const outerPage = ["/login", "/signup", "/logout"];
+export const outerPage = ["/login", "/signup", "/logout", "/intro"];
 
 interface IProps {
     children: ReactNode;

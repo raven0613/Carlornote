@@ -57,6 +57,22 @@ body {
   background-color: transparent;
 }
 
+.font-signika {
+  font-family: "Signika", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-variation-settings:
+    "GRAD" 0;
+}
+
+.madimi-one-regular {
+  font-family: "Madimi One", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+
 /* Custom Theme for highlight.js */
 
 /* .hljs {
