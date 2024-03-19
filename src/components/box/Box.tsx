@@ -142,7 +142,11 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     height: size.height,
                     transition: "border-color 0.15s ease",
                     opacity: data.opacity
-                }}>
+                }}
+                onMouseUp={() => {
+                    console.log("ㄟㄟ")
+                }}
+            >
                 {children}
             </div>
         </>
@@ -175,6 +179,9 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     height: size.height,
                     transition: "border-color 0.15s ease",
                     opacity: data.opacity
+                }}
+                onMouseUp={() => {
+                    console.log("ㄟ")
                 }}
                 onMouseDown={(e) => {
                     // 紀錄點擊的時候的位置

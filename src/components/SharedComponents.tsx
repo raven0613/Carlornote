@@ -42,6 +42,16 @@ const SharedComponents = (props: IProps) => {
         document.addEventListener("click", handleMouse);
         return () => document.removeEventListener("click", handleMouse);
     }, []);
+    // dev: 顯示所點選的元素
+    useEffect(() => {
+        function handleMouse(e: MouseEvent) {
+            // e.stopPropagation();
+            // e.preventDefault();
+            // console.log((e.target as HTMLElement))
+        }
+        document.addEventListener("mouseup", handleMouse);
+        return () => document.removeEventListener("mouseup", handleMouse);
+    }, []);
 
     useEffect(() => {
         function handleMouse(e: MouseEvent) {

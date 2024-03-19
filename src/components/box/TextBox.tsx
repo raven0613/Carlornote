@@ -40,7 +40,7 @@ interface ITextBox {
     handleChangeZIndex: (id: string) => void;
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
-    scrollPosition:  { x: number, y: number };
+    scrollPosition: { x: number, y: number };
 }
 
 export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: ITextBox) {
@@ -73,6 +73,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
         setValue(textData.content);
     }, [textData.content])
 
+    // TODO: 這邊 textarea 的 disabled 會造成白板拖曳的時候 onMouseUp 不起作用
     return (
         <>
             {isColorOpen && <div className="absolute z-10" ref={nodeRef}
