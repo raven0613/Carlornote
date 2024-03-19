@@ -166,7 +166,7 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
                 handleMove={({ left, top }) => {
                     setPosition({ left, top });
                 }}
-                isLocked={isBoardLocked}
+                isLocked={isBoardLocked || mode === "edit"}
                 isShadowElement={isShadow}
                 handleUpdate={handleUpdateElement}
                 data={textData}

@@ -73,7 +73,6 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
     const moveDirectionRef = useRef<{ x: xDirection, y: yDirection }>({ x: "left", y: "top" });
     const pointerRef = useRef({ x: 0, y: 0 });
-    const [isDragging, setIsDragging] = useState(false);
     const [isLock, setIsLock] = useState(false);
     // 把自己原本的位置過濾掉
     const otherPositionsRef = useRef({
@@ -183,7 +182,6 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                         toBoxLeft: e.clientX - distenceToLeftTop.left - e.currentTarget.offsetLeft,
                         toBoxTop: e.clientY - distenceToLeftTop.top - e.currentTarget.offsetTop
                     };
-                    // setIsDragging(true);
                     clickedRef.current = e.target;
                 }}
                 onDragStart={(e: DragEvent) => {
@@ -194,7 +192,6 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     e.dataTransfer.setDragImage(image, window.outerWidth, window.outerHeight);
                     e.dataTransfer.effectAllowed = "copyMove";
                     setIsEditMode(true);
-                    setIsDragging(true);
                 }}
                 onDragEnd={(e: DragEvent) => {
                     // 這時候才存資料
@@ -205,7 +202,6 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                         y: elementPositions.y.filter(yAxis => yAxis !== data.top && yAxis !== data.top + data.height)
                     };
                     handleSetDirty();
-                    setIsDragging(false);
                     // 如果是 selected狀態，移動完不要關閉 edit mode
                     if (isSelected) return;
                     setIsEditMode(false);

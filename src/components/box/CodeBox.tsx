@@ -207,7 +207,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                 handleMove={({ left, top }) => {
                     setPosition({ left, top });
                 }}
-                isLocked={isBoardLocked}
+                isLocked={isBoardLocked || mode === "edit"}
                 isShadowElement={isShadow}
                 handleUpdate={handleUpdateElement}
                 data={textData}

@@ -205,7 +205,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 newBoardElement = handleAddImageBox({
                     name: "",
                     content: "",
-                    position: { left: pointerRef.current.x, top: pointerRef.current.y },
+                    position: { left: pointerRef.current.x + (wrapperRef.current?.scrollLeft ?? 0), top: pointerRef.current.y + (wrapperRef.current?.scrollTop ?? 0) },
                     size: { width, height }
                 }) ?? [];
                 // console.log("newBoardElement", newBoardElement)
@@ -295,7 +295,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 handleAddBox({
                     type: "text",
                     content: pastedText,
-                    position: { left: pointerRef.current.x, top: pointerRef.current.y },
+                    position: { left: pointerRef.current.x + (wrapperRef.current?.scrollLeft ?? 0), top: pointerRef.current.y + (wrapperRef.current?.scrollTop ?? 0) },
                     size: { width: draggingBoxWidth["text"], height: draggingBoxHeight["text"] }
                 })
             }
