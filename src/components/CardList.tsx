@@ -41,7 +41,7 @@ interface ICardList {
     handleSetSelectedCard: (id: string) => void;
     handleDrag: (card: ICard) => void;
 }
-// TODO: 刪除的話 filteredCards 沒有跟著減少
+
 export default function CardList({ selectedCardId, handleSetSelectedCard, handleDrag }: ICardList) {
     const user = useSelector((state: IState) => state.user);
     const dispatch = useDispatch();

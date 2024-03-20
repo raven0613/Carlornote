@@ -5,6 +5,7 @@ import Popup from "./Popup";
 import { signOut } from "next-auth/react";
 import { removeUser } from "@/redux/reducers/user";
 import UndoRedoIcon from "./svg/UndoRedo";
+import SearchPanel from "./SearchPanel";
 
 interface IControlBar {
     handleRedo: () => void;
@@ -23,10 +24,10 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
 
     return (
         <div className="hidden sm:flex fixed top-2 right-10 z-30 gap-2 items-center justify-center">
-
             {dirtyCards.length > 0 && <p className="cursor-default text-sm text-seagull-700/80 z-20 pr-2">正在儲存...</p>}
             {dirtyState === "clear" && <p className={`cursor-default animate-hide opacity-0 text-sm text-seagull-700/80 z-20 pr-2`}>已成功儲存</p>}
 
+            <SearchPanel />
             {canEdit && <>
                 <button disabled={!canUndo} className={`w-7 h-7 pt-0.5 ${canUndo ? "text-seagull-500" : "text-seagull-200 cursor-default"}`}
                     onClick={() => {
