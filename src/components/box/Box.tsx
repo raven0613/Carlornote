@@ -3,6 +3,7 @@ import { IBoardElement } from "@/type/card";
 import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } from "react";
 import RotateIcon from "../svg/Rotate";
 import { distenceToLeftTop } from "@/components/Board";
+import useMousemoveDirection from "@/hooks/useMousemoveDirection";
 
 const degreeMappings = [
     { range: [-5, 5], value: 0 },
@@ -71,15 +72,13 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     const [position, setPosition] = useState({ left, top });
     const [radius, setRadius] = useState(0);
     const leftTopRef = useRef({ toBoxLeft: 0, toBoxTop: 0 });
-    const moveDirectionRef = useRef<{ x: xDirection, y: yDirection }>({ x: "left", y: "top" });
-    const pointerRef = useRef({ x: 0, y: 0 });
     const [isLock, setIsLock] = useState(false);
     // 把自己原本的位置過濾掉
     const otherPositionsRef = useRef({
         x: elementPositions.x.filter(xAxis => xAxis !== data.left && xAxis !== data.left + data.width),
         y: elementPositions.y.filter(yAxis => yAxis !== data.top && yAxis !== data.top + data.height)
     });
-
+    const mouseMoveResult = useMousemoveDirection();
     // console.log("scrollPosition", scrollPosition)
     // console.log("isDragging", isDragging)
     // console.log("isEditMode", isEditMode)
@@ -223,20 +222,10 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     e.preventDefault();
                     if (!leftTopRef.current) return;
                     if (!e.clientX && !e.clientY) return;
-                    // console.log("clientY", e.clientY + distenceToLeftTop.top)
-                    // console.log("top", position.top)
-                    // console.log("elementPositions", elementPositions)
 
                     let left = e.clientX - distenceToLeftTop.left - leftTopRef.current.toBoxLeft;
                     let top = e.clientY - distenceToLeftTop.top - leftTopRef.current.toBoxTop;
 
-                    if (e.clientX < pointerRef.current.x) moveDirectionRef.current.x = "left";
-                    else if (e.clientX > pointerRef.current.x) moveDirectionRef.current.x = "right";
-                    if (e.clientY < pointerRef.current.y) moveDirectionRef.current.y = "top";
-                    else if (e.clientY > pointerRef.current.y) moveDirectionRef.current.y = "bottom";
-                    pointerRef.current.x = e.clientX - distenceToLeftTop.left;
-                    pointerRef.current.y = e.clientY - distenceToLeftTop.top;
-                    // console.log("moveDirectionRef", moveDirectionRef.current)
                     // 找出最接近自己的要吸附的目標
                     const leftTarget = binarySearch(elementPositions.x, left, "before");
                     const rightTarget = binarySearch(elementPositions.x, left + width, "after");
@@ -249,12 +238,12 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     const newBottom = top + height >= bottomTarget - 5 && top + height <= bottomTarget + 5 ? bottomTarget - height : top;
 
                     setPosition({
-                        left: moveDirectionRef.current.x === "left" ? newLeft : newRight,
-                        top: moveDirectionRef.current.y === "top" ? newTop : newBottom
+                        left: mouseMoveResult.x === "left" ? newLeft : newRight,
+                        top: mouseMoveResult.y === "top" ? newTop : newBottom
                     })
                     handleMove({
-                        left: moveDirectionRef.current.x === "left" ? newLeft : newRight,
-                        top: moveDirectionRef.current.y === "top" ? newTop : newBottom
+                        left: mouseMoveResult.x === "left" ? newLeft : newRight,
+                        top: mouseMoveResult.y === "top" ? newTop : newBottom
                     })
                 }}
                 onClick={(e) => {

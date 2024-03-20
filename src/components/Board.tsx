@@ -15,6 +15,7 @@ import CardBox from "./box/CardBox";
 import { StepType } from "@/app/page";
 import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
 import { xDirection, yDirection } from "./box/Box";
+import useMousemoveDirection from "@/hooks/useMousemoveDirection";
 
 // 看 board 離螢幕左和上有多少 px
 export const distenceToLeftTop = { left: 0, top: 0 };
@@ -81,8 +82,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // 用來記錄拖曳圖片進來時候的滑鼠位置
     const pointerRef = useRef({ x: 0, y: 0 });
     // 用來記錄拖曳白板時候的滑鼠位置
-    const draggingPosRef = useRef({ x: 0, y: 0 });
-    const moveDirectionRef = useRef<{ x: xDirection, y: yDirection }>({ x: "left", y: "top" });
     const clickedPointRef = useRef({ startX: 0, startY: 0, endX: 0, endY: 0 });
     const [isLock, setIsLock] = useState(false);
     const [isPointerNone, setIsPointerNone] = useState(false);
@@ -105,6 +104,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // console.log("Board isPointerNone", isPointerNone)
     // console.log("permission", permission)
     // console.log("selectedElementId", selectedElementId)
+    const mouseMoveResult = useMousemoveDirection();
 
 
     useEffect(() => {
@@ -365,9 +365,9 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     return (
         <>
-            <main ref={wrapperRef} className="boardElement absolute inset-0 items-center overflow-scroll min-w-full min-h-full bg-white/80"
+            <main ref={wrapperRef} className="boardElement absolute inset-0 items-center overflow-scroll min-w-full min-h-full bg-white/80 "
             >
-                <div className="boardElement absolute top-0 flex" ref={boardRef}
+                <div className={`boardElement absolute top-0 flex ${isMoving ? " cursor-grabbing" : "cursor-default"}`} ref={boardRef}
                     style={{
                         width: boardSize.x || "100%", height: boardSize.y || "100%",
                         scale: "100%", transformOrigin: "top left"
@@ -386,42 +386,35 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         setIsMoving(false);
                     }}
                     onMouseDown={(e) => {
+                        console.log("ㄟ", e.button)
                         clickedPointRef.current = {
                             startX: e.clientX - distenceToLeftTop.left,
                             startY: e.clientY - distenceToLeftTop.top,
                             endX: 0,
                             endY: 0
                         }
-                        // 紀錄點擊當下初始位置
-                        draggingPosRef.current = {
-                            x: e.clientX - distenceToLeftTop.left,
-                            y: e.clientY - distenceToLeftTop.top
-                        };
+                        // 按滑鼠中鍵才觸發 board 移動
+                        if (e.button !== 1) return;
+                        e.preventDefault();
+                        e.stopPropagation();
                         setIsMoving(true);
                     }}
                     onMouseMove={(e) => {
-                        // TODO: 在白板的字上面放開的話 setIsMoving 不會變 false
                         if (!wrapperRef.current || !isMoving) return;
-                        if (e.clientX < draggingPosRef.current.x) moveDirectionRef.current.x = "left";
-                        else if (e.clientX > draggingPosRef.current.x) moveDirectionRef.current.x = "right";
-                        if (e.clientY < draggingPosRef.current.y) moveDirectionRef.current.y = "top";
-                        else if (e.clientY > draggingPosRef.current.y) moveDirectionRef.current.y = "bottom";
 
                         const scrollTop = wrapperRef.current.scrollTop;
                         const scrollLeft = wrapperRef.current.scrollLeft;
-                        const yDistense = Math.abs(e.clientY - draggingPosRef.current.y);
-                        const xDistense = Math.abs(e.clientX - draggingPosRef.current.x);
                         // console.log("yDistense", yDistense)
-                        const top = moveDirectionRef.current.y === "top" ? scrollTop + yDistense : scrollTop - yDistense;
-                        const left = moveDirectionRef.current.x === "left" ? scrollLeft + xDistense : scrollLeft - xDistense;
+                        const top = mouseMoveResult.y === "top" ?
+                            scrollTop + mouseMoveResult.yDistence :
+                            scrollTop - mouseMoveResult.yDistence;
+                        const left = mouseMoveResult.x === "left" ?
+                            scrollLeft + mouseMoveResult.xDistence :
+                            scrollLeft - mouseMoveResult.xDistence;
+
                         wrapperRef.current.scrollTo({
                             top, left, behavior: "auto"
                         })
-                        // 紀錄現在新位置
-                        draggingPosRef.current = {
-                            x: e.clientX - distenceToLeftTop.left,
-                            y: e.clientY - distenceToLeftTop.top
-                        };
                     }}
                     onMouseLeave={() => {
                         setIsMoving(false);
@@ -436,7 +429,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         setIsMoving(false);
                     }}
                 >
-                    <input id="board_input" name="board_input" type="file" className="boardElement board_input opacity-0 w-full h-full bg-red-200 z-0"
+                    <input id="board_input" name="board_input" type="file" className={`boardElement board_input opacity-0 w-full h-full bg-red-200 z-0 ${isMoving ? " cursor-grabbing" : "cursor-default"}`}
                         onChange={async (e) => {
                             console.log("image drop")
                             e.preventDefault()
