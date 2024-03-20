@@ -24,6 +24,8 @@ console.error = (...args: any) => {
     error(...args);
 };
 
+const spaces = "\t";
+
 const supportedLanguage = ["css", "c", "csharp", "django", "dockerfile", "go", "http", "java", "javascript", "json", "jsx", "kotlin", "nginx", "objectivec", "php-template", "php", "powershell", "python", "r", "scss", "sql", "swift", "typescript", "tsx", "xml"]
 
 interface ICodeCore {
@@ -61,6 +63,44 @@ export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMo
                         setValue(e.target.value);
                         handleUpdateElement({ ...textData, content: e.target.value });
                         handleSetDirty();
+                        console.log("start", e.currentTarget.selectionStart)
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.shiftKey && e.key === "Tab") {
+                            e.preventDefault();
+                            const selectionStart = e.currentTarget.selectionStart;
+                            const selectionEnd = e.currentTarget.selectionEnd;
+                            if (selectionStart === selectionEnd) {
+                                const newText = `${value.slice(0, selectionStart - 1)}${value.slice(selectionEnd)}`
+                                setValue(newText);
+                                handleUpdateElement({ ...textData, content: newText });
+                                return;
+                            }
+
+
+                            console.log("start", e.currentTarget.selectionStart)
+                            console.log("end", e.currentTarget.selectionEnd)
+                            // console.log(JSON.stringify(result))
+                            return;
+                        }
+                        if (e.key === "Tab") {
+                            e.preventDefault();
+                            const selectionStart = e.currentTarget.selectionStart;
+                            const selectionEnd = e.currentTarget.selectionEnd;
+                            if (selectionStart === selectionEnd) {
+                                const newText = `${value.slice(0, selectionStart)}\t${value.slice(selectionEnd)}`
+                                setValue(newText);
+                                handleUpdateElement({ ...textData, content: newText });
+                                // e.currentTarget.setSelectionRange(selectionStart, selectionEnd);
+                                return;
+                            }
+
+
+                            console.log("start", e.currentTarget.selectionStart)
+                            console.log("end", e.currentTarget.selectionEnd)
+                            // console.log(JSON.stringify(result))
+                        }
+
                     }}
                     className={`textbox_textarea textInput w-full flex-1 p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5
                     `}
@@ -186,10 +226,10 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
     // console.log("CodeBox isSelected", isSelected)
     const [mode, setMode] = useState<"read" | "edit">("read");
     const [position, setPosition] = useState({ left: textData.left, top: textData.top });
-    const nodeRef = useClickOutside<HTMLDivElement>({ 
+    const nodeRef = useClickOutside<HTMLDivElement>({
         handleMouseDownOutside: () => {
             setMode("read");
-        } 
+        }
     });
 
     useEffect(() => {

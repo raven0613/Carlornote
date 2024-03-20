@@ -240,7 +240,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // mouse up 拖曳後放開：drop 時加入 dragging box 資料
     useEffect(() => {
         function handlePutBoxOnBoard(e: MouseEvent) {
-            console.log("put box")
+            // console.log("put box")
             e.stopPropagation();
             e.preventDefault();
             // console.log((e.target as HTMLElement))
@@ -378,7 +378,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         setIsPointerNone(true);
                     }}
                     onDragEnd={(e) => {
-                        console.log("drag end")
+                        // console.log("drag end")
                         setIsPointerNone(false);
                         setIsMoving(false);
                     }}
@@ -386,7 +386,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         setIsMoving(false);
                     }}
                     onMouseDown={(e) => {
-                        console.log("ㄟ", e.button)
                         clickedPointRef.current = {
                             startX: e.clientX - distenceToLeftTop.left,
                             startY: e.clientY - distenceToLeftTop.top,

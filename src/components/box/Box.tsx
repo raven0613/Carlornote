@@ -143,7 +143,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     opacity: data.opacity
                 }}
                 onMouseUp={() => {
-                    console.log("ㄟㄟ")
+                    // console.log("ㄟㄟ")
                 }}
             >
                 {children}

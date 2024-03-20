@@ -12,7 +12,9 @@ interface IMousemoveResult {
 
 export default function useMousemoveDirection(): IMousemoveResult {
     const pointer = useRef<{ x: number, y: number }>({ x: 0, y: 0 });
-    const moveRef = useRef<IMousemoveResult>({ x: "left", y: "top", xDistence: 0, yDistence: 0 });
+    const moveRef = useRef<IMousemoveResult>({ 
+        x: "left", y: "top", xDistence: 0, yDistence: 0 
+    });
     
     useEffect(() => {
         function handleMouse(e: MouseEvent) {

@@ -28,7 +28,7 @@ const SharedComponents = (props: IProps) => {
     const pathname = usePathname();
 
     // console.log("SharedComponents modalProp", modalProp)
-    console.log("SharedComponents openModalType", openModalType)
+    // console.log("SharedComponents openModalType", openModalType)
     // console.log("selectedCard", selectedCard)
     // console.log("status", status)
 
