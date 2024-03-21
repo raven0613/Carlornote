@@ -12,6 +12,7 @@ import EditIcon from '../svg/Edit';
 import OKIcon from '../svg/OK';
 import ShrinkIcon from '../svg/Shrink';
 import ExpandIcon from '../svg/Expand';
+import Textarea from '../Textarea';
 
 // foundation 淺
 // androidstudio 深
@@ -23,8 +24,6 @@ console.error = (...args: any) => {
     if (/defaultProps/.test(args[0])) return;
     error(...args);
 };
-
-const spaces = "\t";
 
 const supportedLanguage = ["css", "c", "csharp", "django", "dockerfile", "go", "http", "java", "javascript", "json", "jsx", "kotlin", "nginx", "objectivec", "php-template", "php", "powershell", "python", "r", "scss", "sql", "swift", "typescript", "tsx", "xml"]
 
@@ -38,13 +37,7 @@ interface ICodeCore {
 
 export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMode, needFull }: ICodeCore) {
     const [title, setTitle] = useState(textData.name);
-    const [value, setValue] = useState(textData.content);
     const [isFull, setIsFull] = useState(false);
-
-    useEffect(() => {
-        if (textData.content === value) return;
-        setValue(textData.content);
-    }, [textData.content, value])
 
     return (
         <>
@@ -58,54 +51,13 @@ export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMo
                         handleUpdateElement({ ...textData, name: e.target.value });
                         handleSetDirty();
                     }} />
-                <textarea
-                    onChange={(e) => {
-                        setValue(e.target.value);
-                        handleUpdateElement({ ...textData, content: e.target.value });
+
+                <Textarea text={textData.content}
+                    handleUpdate={(value) => {
+                        handleUpdateElement({ ...textData, content: value });
                         handleSetDirty();
-                        console.log("start", e.currentTarget.selectionStart)
                     }}
-                    onKeyDown={(e) => {
-                        if (e.shiftKey && e.key === "Tab") {
-                            e.preventDefault();
-                            const selectionStart = e.currentTarget.selectionStart;
-                            const selectionEnd = e.currentTarget.selectionEnd;
-                            if (selectionStart === selectionEnd) {
-                                const newText = `${value.slice(0, selectionStart - 1)}${value.slice(selectionEnd)}`
-                                setValue(newText);
-                                handleUpdateElement({ ...textData, content: newText });
-                                return;
-                            }
-
-
-                            console.log("start", e.currentTarget.selectionStart)
-                            console.log("end", e.currentTarget.selectionEnd)
-                            // console.log(JSON.stringify(result))
-                            return;
-                        }
-                        if (e.key === "Tab") {
-                            e.preventDefault();
-                            const selectionStart = e.currentTarget.selectionStart;
-                            const selectionEnd = e.currentTarget.selectionEnd;
-                            if (selectionStart === selectionEnd) {
-                                const newText = `${value.slice(0, selectionStart)}\t${value.slice(selectionEnd)}`
-                                setValue(newText);
-                                handleUpdateElement({ ...textData, content: newText });
-                                // e.currentTarget.setSelectionRange(selectionStart, selectionEnd);
-                                return;
-                            }
-
-
-                            console.log("start", e.currentTarget.selectionStart)
-                            console.log("end", e.currentTarget.selectionEnd)
-                            // console.log(JSON.stringify(result))
-                        }
-
-                    }}
-                    className={`textbox_textarea textInput w-full flex-1 p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5
-                    `}
-                    value={value}>
-                </textarea>
+                />
                 {/* full icon */}
                 {needFull && <button className="absolute top-4 right-6 z-20 w-8 h-8 hover:scale-110 duration-150"
                     onClick={() => {
@@ -136,7 +88,7 @@ export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMo
                         </select>
                         <button className='w-5 h-5 leading-5 rounded-[3px] border border-white/30 shrink-0 p-1 group hover:border-white/50 duration-150 hover:bg-white/10'
                             onClick={() => {
-                                navigator.clipboard.writeText(value);
+                                navigator.clipboard.writeText(textData.content);
                             }}
                         >
                             <CopyIcon classProps="stroke-white/50 group-hover:stroke-white/80  duration-150" />
@@ -154,7 +106,7 @@ export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMo
                             borderRadius: "1rem",
                             fontSize: "0.9rem",
                         }} language={textData.programmingLanguage ?? supportedLanguage[0]} style={anOldHope} wrapLongLines>
-                        {value}
+                        {textData.content}
                     </SyntaxHighlighter>
                 </div>
 

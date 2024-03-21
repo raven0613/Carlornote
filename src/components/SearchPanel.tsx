@@ -30,8 +30,8 @@ export default function SearchPanel() {
             setIsOpen(false);
         }
     })
-    console.log("allCards", allCards)
-    console.log("result", result)
+    // console.log("allCards", allCards)
+    // console.log("result", result)
 
     // 有修改的話 0.5 秒搜尋一次
     useEffect(() => {
