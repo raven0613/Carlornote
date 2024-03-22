@@ -1,17 +1,23 @@
 import useClickOutside from "@/hooks/useClickOutside"
+import { selectCard } from "@/redux/reducers/card";
 import { IState } from "@/redux/store";
 import { ICard } from "@/type/card";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-function Card({ cardData }: { cardData: ICard }) {
+function Card({ cardData, handleClick }: { cardData: ICard, handleClick: () => void }) {
     return (
         <>
-            <div className={`w-full h-20 border-b border-slate-200 cursor-pointer flex items-center px-2`}>
+            <div className={`w-full h-20 shrink-0 border-b border-slate-200 cursor-pointer flex items-center px-2`}
+                onClick={() => {
+                    handleClick();
+                }}
+            >
                 {/* 圖片 */}
                 <div className={`w-16 h-16 rounded-sm bg-seagull-300 shrink-0`}></div>
                 <div className="h-full p-2">
-                    <p className={`text-sm pb-0.5 text-slate-800 text-start`}>{cardData.name}</p>
+                    <p className={`text-sm pb-0.5 text-slate-800 text-start`}>{cardData.name ?? "無標題"}</p>
                     <span className={`block w-full text-slate-400 text-start`}>文字文字文字</span>
                 </div>
             </div>
@@ -20,6 +26,9 @@ function Card({ cardData }: { cardData: ICard }) {
 }
 
 export default function SearchPanel() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [inputValue, setInputValue] = useState("");
@@ -77,11 +86,18 @@ export default function SearchPanel() {
                     }}
                 />
 
-                <div className={`w-full min-h-12 border-t border-slate-200 text-slate-400 text-sm max-h-80 overflow-scroll`}>
-                    {(result.length === 0 && !isLoading) ? "沒有結果" : ""}
-                    {isLoading ? "loading" : ""}
+                <div className={`w-full min-h-12 border-t border-slate-200 text-slate-400 text-sm max-h-80 overflow-scroll flex flex-col justify-start`}>
+                    {(result.length === 0 && !isLoading) && <p className="mt-3.5">沒有結果</p>}
+                    {isLoading && <p className="mt-3.5">loading</p>}
+                    
                     {result.length > 0 && result.map(item => (
-                        <Card key={item.id} cardData={item} />
+                        <Card key={item.id} cardData={item} handleClick={() => {
+                            if (pathname === "/") {
+                                dispatch(selectCard(item));
+                                return;
+                            }
+                            router.push(`/card/${item.id.split("_")[1]}`);
+                        }} />
                     ))}
                 </div>
             </div>}

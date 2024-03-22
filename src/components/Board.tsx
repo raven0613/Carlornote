@@ -480,13 +480,13 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 isBoardLocked={isLock || item.isLock}
                                 handleUpdateElement={handleBoxUpdateElement}
                                 handleImgOnLoad={(data) => {
+                                    // 第一次輸入到 url input 的時候，content 會設為 image
+                                    if (item.content !== "image") return;
                                     handleUpdateElementList(elements.map((item) => {
                                         if (item.id === data.id) return data;
                                         return item;
                                     }))
-                                    // console.log("item", item)
                                     // 第一次輸入到 url input 的時候，content 會設為 image，只有這一次需要推到 undoList，同一張圖之後每次的 image onLoad 都不需要推到 undoList
-                                    if (item.content !== "image") return;
                                     handlePushStep({ added: data });
                                 }}
                                 imageData={item}
