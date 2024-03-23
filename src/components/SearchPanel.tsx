@@ -3,22 +3,49 @@ import { selectCard } from "@/redux/reducers/card";
 import { IState } from "@/redux/store";
 import { ICard } from "@/type/card";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
+import Image from "next/image";
+import EmptyImageIcon from "./svg/EmptyImage";
+import SearchIcon from "./svg/Search";
+import CloseIcon from "./svg/Close";
+import { v4 as uuidv4 } from 'uuid';
+import BarLoader from "react-spinners/BarLoader";
 
-function Card({ cardData, handleClick }: { cardData: ICard, handleClick: () => void }) {
+function Card({ cardData, summary, handleClick, isDisabled }: { cardData: ICard, summary: string[], handleClick: () => void, isDisabled: boolean }) {
     return (
         <>
-            <div className={`w-full h-20 shrink-0 border-b border-slate-200 cursor-pointer flex items-center px-2`}
+            <div className={`w-full h-20 shrink-0 border-b border-slate-200  flex items-center px-2 hover:bg-slate-100 duration-150 ${isDisabled ? "pointer-events-none blur-[2px]" : "cursor-pointer"}`}
                 onClick={() => {
                     handleClick();
                 }}
             >
                 {/* 圖片 */}
-                <div className={`w-16 h-16 rounded-sm bg-seagull-300 shrink-0`}></div>
-                <div className="h-full p-2">
-                    <p className={`text-sm pb-0.5 text-slate-800 text-start`}>{cardData.name ?? "無標題"}</p>
-                    <span className={`block w-full text-slate-400 text-start`}>文字文字文字</span>
+                <div className={`w-16 h-16 rounded-sm bg-seagull-300 shrink-0 mr-1`}>
+                    {cardData.imageUrl && <Image
+                        className={`rounded-md`} width={150} height={150} src={cardData.imageUrl}
+                        priority={true}
+                        alt={cardData.name}
+                        style={{
+                            objectFit: 'cover', // cover, contain, none
+                            width: '100%', height: '100%',
+                        }}
+                        onLoad={(e) => {
+                            // console.log("onLoad")
+                        }}
+                        onError={() => {
+                        }}
+                    />}
+                </div>
+                <div className="h-full p-2 w-[18.5rem]">
+                    <p className={`text-sm pb-0.5 text-slate-900 text-start w-full truncate`}>{cardData.name ?? "無標題"}</p>
+                    {summary.map((item, i) => {
+                        const unique = uuidv4();
+                        if (i > 1) return;
+                        return (
+                            <span key={`${item}_${unique}`} className={`block w-full text-slate-400 text-start truncate`}>{item.replaceAll("\n", " ")}</span>
+                        )
+                    })}
                 </div>
             </div>
         </>
@@ -32,7 +59,7 @@ export default function SearchPanel() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [inputValue, setInputValue] = useState("");
-    const [result, setResult] = useState<ICard[]>([]);
+    const [result, setResult] = useState<{ cardData: ICard, summary: string[] }[]>([]);
     const allCards = useSelector((state: IState) => state.card);
     const nodeRef = useClickOutside<HTMLDivElement>({
         handleMouseDownOutside: () => {
@@ -54,10 +81,21 @@ export default function SearchPanel() {
         setIsLoading(true);
 
         time = setInterval(async () => {
-            setResult(allCards.filter(card => {
-                return card.boardElement.some(ele => ele.type !== "image" &&
-                    (ele.content.toLowerCase().includes(inputValue.toLowerCase()) || ele.name.toLowerCase().includes(inputValue.toLowerCase())))
-            }))
+            const input = inputValue.toLowerCase();
+            const result = allCards.map(card => {
+                const targetElement = card.boardElement.filter(item =>
+                    item.content.toLowerCase().includes(input)
+                    || ((item.type === "code" || item.type === "card") && item.name.toLowerCase().includes(input)));
+                if (targetElement.length === 0) return { cardData: card, summary: [] };
+                const summary = targetElement.map(ele => {
+                    if ((ele.type === "code" || ele.type === "card") && ele.name.toLowerCase().includes(input)) return ele.name;
+                    const splitContents = ele.content.toLowerCase().split(input);
+                    return `${splitContents[0].length > 10 ? `...${splitContents[0].slice(-10)}` : splitContents[0]}${inputValue}${splitContents[1].length > 50 ? splitContents[1].slice(0, 50) : splitContents[1]}`;
+                })
+                const summarySet = new Set(summary);
+                return { cardData: card, summary: [...summarySet] }
+            })
+            setResult(result.filter(card => card.summary.length > 0));
 
             console.log(inputValue)
             setIsLoading(false);
@@ -70,37 +108,55 @@ export default function SearchPanel() {
     }, [allCards, inputValue]);
 
     return (
-        <button className={`relative w-6 h-6 rounded-full bg-seagull-500`}
-            onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+        <button className={`relative w-6 h-6 rounded-full bg-seagull-300 hover:bg-seagull-500 duration-150`}
+            onMouseDown={(e) => {
+                // e.preventDefault();
+                // e.stopPropagation();
                 setIsOpen(true);
             }}
         >
+            <SearchIcon classProps="w-full h-full absolute top-1/2 -translate-y-1/2 p-1 text-white pointer-events-none" />
 
-            {isOpen && <div ref={nodeRef} className={`absolute top-10 right-0 cursor-default shadow-md shadow-slate-800/30 w-[25rem] h-fit bg-white rounded-lg `}>
+            <div ref={nodeRef} className={`absolute top-10 right-0 cursor-default shadow-md shadow-slate-800/30 w-[25rem] h-fit bg-white rounded-lg duration-150 
+            ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
 
-                <input type="text" className="outline-none w-[17rem] h-8 rounded border border-seafull-400 px-2 text-sm mx-auto my-5" value={inputValue}
+                <input type="text" autoFocus className="outline-none w-[18rem] h-8 rounded border border-seafull-400 px-2 text-sm mx-auto my-5" value={inputValue} placeholder="請輸入搜尋關鍵字"
                     onChange={(e) => {
+
                         setInputValue(e.target.value);
                     }}
                 />
+                <div className="w-6 h-6 hover:bg-slate-200 duration-150 absolute top-[1.6rem] right-6 cursor-pointer rounded-full"
+                    onClick={() => {
+                        setInputValue("");
+                    }}
+                >
+                    <CloseIcon classProps="pointer-events-none" />
+                </div>
+
+                {isLoading && <BarLoader
+                    color="#5bbbd5"
+                    cssOverride={{ width: "100%" }}
+                    loading={isLoading}
+                />}
 
                 <div className={`w-full min-h-12 border-t border-slate-200 text-slate-400 text-sm max-h-80 overflow-scroll flex flex-col justify-start`}>
                     {(result.length === 0 && !isLoading) && <p className="mt-3.5">沒有結果</p>}
-                    {isLoading && <p className="mt-3.5">loading</p>}
-                    
+
+
                     {result.length > 0 && result.map(item => (
-                        <Card key={item.id} cardData={item} handleClick={() => {
-                            if (pathname === "/") {
-                                dispatch(selectCard(item));
-                                return;
-                            }
-                            router.push(`/card/${item.id.split("_")[1]}`);
-                        }} />
+                        <Card key={item.cardData.id} cardData={item.cardData}
+                            isDisabled={isLoading}
+                            summary={item.summary} handleClick={() => {
+                                if (pathname === "/") {
+                                    dispatch(selectCard(item.cardData));
+                                    return;
+                                }
+                                router.push(`/card/${item.cardData.id.split("_")[1]}`);
+                            }} />
                     ))}
                 </div>
-            </div>}
+            </div>
         </button>
     )
 }

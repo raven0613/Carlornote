@@ -27,7 +27,6 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
             {dirtyCards.length > 0 && <p className="cursor-default text-sm text-seagull-700/80 z-20 pr-2">正在儲存...</p>}
             {dirtyState === "clear" && <p className={`cursor-default animate-hide opacity-0 text-sm text-seagull-700/80 z-20 pr-2`}>已成功儲存</p>}
 
-            <SearchPanel />
             {canEdit && <>
                 <button disabled={!canUndo} className={`w-7 h-7 pt-0.5 ${canUndo ? "text-seagull-500" : "text-seagull-200 cursor-default"}`}
                     onClick={() => {
@@ -37,7 +36,7 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                 >
                     <UndoRedoIcon />
                 </button>
-                <button disabled={!canRedo} className={`w-7 h-7 pt-0.5 ${canRedo ? "text-seagull-500" : "text-seagull-200 cursor-default"}`}
+                <button disabled={!canRedo} className={`w-7 h-7 pt-0.5 ${canRedo ? "text-seagull-500" : "text-seagull-200 cursor-default mr-2"}`}
                     onClick={() => {
                         if (!canRedo) return;
                         handleRedo();
@@ -46,7 +45,9 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                     <UndoRedoIcon classProps="-scale-x-100" />
                 </button>
             </>}
-            <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative ml-4"
+
+            <SearchPanel />
+            <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative ml-2 hover:bg-seagull-500 duration-150"
                 onClick={() => {
                     setOpenPopup("setting");
                 }}

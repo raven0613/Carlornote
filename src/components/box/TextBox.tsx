@@ -110,7 +110,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                 elementPositions={elementPositions}
                 scrollPosition={scrollPosition}
             >
-                <textarea id={textData.id} disabled={isBoardLocked}
+                <textarea id={textData.id}
                     onChange={(e) => {
                         if (isBoardLocked) return;
                         setValue(e.target.value);
