@@ -128,9 +128,10 @@ interface IImageBox {
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
     scrollPosition: { x: number, y: number };
+    distenceToLeftTop?: { left: number, top: number }
 }
 
-export default function ImageBox({ imageData, handleUpdateElement, handleImgOnLoad, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: IImageBox) {
+export default function ImageBox({ imageData, handleUpdateElement, handleImgOnLoad, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition, distenceToLeftTop }: IImageBox) {
     // console.log("imageData", imageData)
     return (
         <Box
@@ -148,6 +149,7 @@ export default function ImageBox({ imageData, handleUpdateElement, handleImgOnLo
             isPointerNone={isPointerNone}
             elementPositions={elementPositions}
             scrollPosition={scrollPosition}
+            distenceToLeftTop={distenceToLeftTop}
         >
             <ImageCore imageData={imageData} handleOnLoad={(card) => {
                 console.log("handleOnLoad1")

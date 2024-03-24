@@ -62,8 +62,7 @@ body {
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
-  font-variation-settings:
-    "GRAD" 0;
+  font-variation-settings: "GRAD" 0;
 }
 
 .madimi-one-regular {
@@ -72,7 +71,10 @@ body {
   font-style: normal;
 }
 
-
+::selection {
+  color: #1e596e;
+  background: #c6e6f1;
+}
 /* Custom Theme for highlight.js */
 
 /* .hljs {

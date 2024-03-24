@@ -8,7 +8,7 @@ import OKIcon from '../svg/OK';
 import ExpandIcon from "../svg/Expand";
 import ShrinkIcon from "../svg/Shrink";
 import useClickOutside from "@/hooks/useClickOutside";
-import DOMPurify from 'dompurify';
+import DOMPurify from "isomorphic-dompurify";
 import { Marked } from 'marked';
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
@@ -137,9 +137,10 @@ interface IMarkdownBox {
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
     scrollPosition: { x: number, y: number };
+    distenceToLeftTop?: { left: number, top: number }
 }
 
-export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: IMarkdownBox) {
+export default function MarkdownBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition, distenceToLeftTop }: IMarkdownBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
     const [mode, setMode] = useState<"read" | "edit">("read");
@@ -178,6 +179,7 @@ export default function MarkdownBox({ textData, handleUpdateElement, handleClick
                 isPointerNone={isPointerNone}
                 elementPositions={elementPositions}
                 scrollPosition={scrollPosition}
+                distenceToLeftTop={distenceToLeftTop}
             >
                 <MarkdownCore
                     handleUpdateElement={handleUpdateElement}

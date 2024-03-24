@@ -41,9 +41,10 @@ interface ITextBox {
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
     scrollPosition: { x: number, y: number };
+    distenceToLeftTop?: { left: number, top: number }
 }
 
-export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: ITextBox) {
+export default function TextBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition, distenceToLeftTop }: ITextBox) {
     // console.log(textData)
     // console.log("isSelected", isSelected)
     const [value, setValue] = useState(textData.content);
@@ -109,6 +110,7 @@ export default function TextBox({ textData, handleUpdateElement, handleClick, is
                 isPointerNone={isPointerNone}
                 elementPositions={elementPositions}
                 scrollPosition={scrollPosition}
+                distenceToLeftTop={distenceToLeftTop}
             >
                 <textarea id={textData.id}
                     onChange={(e) => {

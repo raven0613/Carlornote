@@ -18,7 +18,7 @@ import { xDirection, yDirection } from "./box/Box";
 import useMousemoveDirection from "@/hooks/useMousemoveDirection";
 
 // 看 board 離螢幕左和上有多少 px
-export const distenceToLeftTop = { left: 0, top: 0 };
+// export const distenceToLeftTop = { left: 0, top: 0 };
 
 export const draggingBoxWidth: Record<boxType, number> = {
     text: 200,
@@ -72,11 +72,12 @@ interface IBoard {
     handleSetDirty: () => void;
     permission: "editable" | "readable" | "none";
     handlePushStep: (step: StepType) => void;
+    distenceToLeftTop?: { left: number, top: number }
 }
 
-export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, draggingCard, handlePushStep }: IBoard) {
+export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, draggingCard, handlePushStep, distenceToLeftTop = { left: 0, top: 0 } }: IBoard) {
     const boardRef = useRef<HTMLDivElement>(null)
-    // console.log("Board elements", elements)
+    console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     // console.log("selectedElementId", selectedElementId)
     // 用來記錄拖曳圖片進來時候的滑鼠位置
@@ -104,6 +105,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // console.log("Board isPointerNone", isPointerNone)
     // console.log("permission", permission)
     // console.log("selectedElementId", selectedElementId)
+    // console.log("distenceToLeftTop", distenceToLeftTop)
     const mouseMoveResult = useMousemoveDirection();
 
 
@@ -198,7 +200,8 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
         // 使用 FileReader 預覽圖片
         const reader = new FileReader();
-        reader.onload = function () {
+        reader.onload = function (e) {
+            // console.log("文件内容:", e.target?.result);
             const base64 = reader.result as string;
             const img = new Image();
             img.src = base64;
@@ -275,7 +278,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
             document.removeEventListener("dragend", handlePutBoxOnBoard);
             document.removeEventListener("mouseup", handlePutBoxOnBoard);
         }
-    }, [draggingBox, handleAddBox, handleMouseUp, handleSetDirty, draggingCard]);
+    }, [draggingBox, handleAddBox, handleMouseUp, handleSetDirty, draggingCard, distenceToLeftTop.left, distenceToLeftTop.top]);
 
     // paste
     useEffect(() => {
@@ -428,14 +431,16 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         setIsMoving(false);
                     }}
                 >
-                    <input id="board_input" name="board_input" type="file" className={`boardElement board_input opacity-0 w-full h-full bg-red-200 z-0 ${isMoving ? " cursor-grabbing" : "cursor-default"}`}
+                    <input id="board_input" name="board_input" type="file" accept="image/*,.gif" className={`boardElement board_input opacity-0 w-full h-full bg-red-200 z-0 ${isMoving ? " cursor-grabbing" : "cursor-default"}`}
                         onChange={async (e) => {
+                            // TODO: 
                             console.log("image drop")
                             e.preventDefault()
                             e.stopPropagation()
                             if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
-                            console.log("image drop2")
                             const file = e.currentTarget.files[0];
+                            if (!file.type.includes("image")) return;
+                            // console.log("image drop2", file.type)
                             imageUpload(file);
                             handleSetDirty();
                             // 如果是上傳一樣的圖片會無法觸發 onChange，所以必須把值歸零
@@ -473,6 +478,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 }}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                                 scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                                distenceToLeftTop={distenceToLeftTop}
                             />
                         )
                         if (item.type === "image") return (
@@ -502,6 +508,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 isPointerNone={isPointerNone}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                                 scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                                distenceToLeftTop={distenceToLeftTop}
                             />
                         )
                         if (item.type === "code") return (
@@ -521,6 +528,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 isPointerNone={isPointerNone}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                                 scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                                distenceToLeftTop={distenceToLeftTop}
                             />
                         )
                         if (item.type === "markdown") return (
@@ -540,6 +548,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 isPointerNone={isPointerNone}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                                 scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                                distenceToLeftTop={distenceToLeftTop}
                             />
                         )
                         if (item.type === "card") return (
@@ -559,6 +568,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                                 isPointerNone={isPointerNone}
                                 elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                                 scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                                distenceToLeftTop={distenceToLeftTop}
                             />
                         )
                         return <></>
@@ -587,6 +597,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         handleChangeZIndex={() => { }}
                         elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                         scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                        distenceToLeftTop={distenceToLeftTop}
                     />}
                     {draggingBox === "image" && <ImageBox
                         isBoardLocked={isLock}
@@ -612,6 +623,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         handleChangeZIndex={() => { }}
                         elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                         scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                        distenceToLeftTop={distenceToLeftTop}
                     />}
                     {draggingBox === "code" && <CodeBox
                         isBoardLocked={isLock}
@@ -636,6 +648,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         handleChangeZIndex={() => { }}
                         elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                         scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                        distenceToLeftTop={distenceToLeftTop}
                     />}
                     {draggingBox === "markdown" && <MarkdownBox
                         isBoardLocked={isLock}
@@ -660,6 +673,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         handleChangeZIndex={() => { }}
                         elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                         scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                        distenceToLeftTop={distenceToLeftTop}
                     />}
                     {draggingBox === "card" && <CardBox
                         isBoardLocked={isLock}
@@ -684,6 +698,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                         handleChangeZIndex={() => { }}
                         elementPositions={{ x: existPositionsRef.current.x, y: existPositionsRef.current.y }}
                         scrollPosition={{ x: wrapperRef.current?.scrollLeft ?? 0, y: wrapperRef.current?.scrollTop ?? 0 }}
+                        distenceToLeftTop={distenceToLeftTop}
                     />}
                 </div>
             </main>

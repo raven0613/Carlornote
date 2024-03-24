@@ -30,9 +30,10 @@ interface ICardBox {
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
     scrollPosition: { x: number, y: number };
+    distenceToLeftTop?: { left: number, top: number }
 }
 
-export default function CardBox({ cardData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: ICardBox) {
+export default function CardBox({ cardData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition, distenceToLeftTop }: ICardBox) {
     // console.log("cardData", cardData)
     // console.log("CodeBox isSelected", isSelected)
     const [mode, setMode] = useState<"read" | "edit">("read");
@@ -59,6 +60,7 @@ export default function CardBox({ cardData, handleUpdateElement, handleClick, is
                 isPointerNone={isPointerNone}
                 elementPositions={elementPositions}
                 scrollPosition={scrollPosition}
+                distenceToLeftTop={distenceToLeftTop}
             >
                 <Link href={`/card/${cardData.cardData?.id.split("_")[1]}`}
                     rel="preconnect"

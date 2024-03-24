@@ -2,7 +2,7 @@
 import { IBoardElement } from "@/type/card";
 import React, { ReactNode, RefObject, useEffect, useRef, useState, DragEvent } from "react";
 import RotateIcon from "../svg/Rotate";
-import { distenceToLeftTop } from "@/components/Board";
+// import { distenceToLeftTop } from "@/components/Board";
 import useMousemoveDirection from "@/hooks/useMousemoveDirection";
 
 const degreeMappings = [
@@ -55,12 +55,13 @@ interface IBox {
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
     scrollPosition: { x: number, y: number };
+    distenceToLeftTop?: { left: number, top: number }
 }
 
 export type xDirection = "left" | "right";
 export type yDirection = "top" | "bottom";
 
-export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone, elementPositions, scrollPosition }: IBox) {
+export default function Box({ data, handleUpdate, handleClick, children, isShadowElement, isLocked, handleDelete, handleSetDirty, handleChangeZIndex, isImage, isSelected, handleMove, isPointerNone, elementPositions, scrollPosition, distenceToLeftTop = { left: 0, top: 0 } }: IBox) {
 
     // console.log(data.name, isSelected)
     const { width, height, rotation, left, top } = data;
@@ -117,7 +118,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
         }
         document.addEventListener("mousemove", handleMouse);
         return () => document.removeEventListener("mousemove", handleMouse);
-    }, [isShadowElement, scrollPosition]);
+    }, [distenceToLeftTop.left, distenceToLeftTop.top, isShadowElement, scrollPosition]);
 
     const boxOutline = () => {
         let style = "border hover:border-slate-400";

@@ -171,9 +171,10 @@ interface ICodeBox {
     isPointerNone?: boolean;
     elementPositions: { x: number[], y: number[] };
     scrollPosition: { x: number, y: number };
+    distenceToLeftTop?: { left: number, top: number }
 }
 
-export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition }: ICodeBox) {
+export default function CodeBox({ textData, handleUpdateElement, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition, distenceToLeftTop }: ICodeBox) {
     // console.log(textData)
     // console.log("CodeBox isSelected", isSelected)
     const [mode, setMode] = useState<"read" | "edit">("read");
@@ -211,6 +212,7 @@ export default function CodeBox({ textData, handleUpdateElement, handleClick, is
                 isPointerNone={isPointerNone}
                 elementPositions={elementPositions}
                 scrollPosition={scrollPosition}
+                distenceToLeftTop={distenceToLeftTop}
             >
                 <CodeCore
                     handleUpdateElement={handleUpdateElement}
