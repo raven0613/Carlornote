@@ -1,20 +1,20 @@
-import { handleAddCard, handleDeleteCard, handleUpdateCard, handleGetCards } from "@/api/card";
+import { handleAddCard, handleGetCards } from "@/api/card";
 import Card, { CardWithHover } from "@/components/Card";
 import useWindowSize from "@/hooks/useWindowSize";
-import { addCard, removeCard, selectCard, setCards, updateCards } from "@/redux/reducers/card";
-import { openModal } from "@/redux/reducers/modal";
+import { addCard, setCards } from "@/redux/reducers/card";
+import { closeAllModal, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { ICard } from "@/type/card";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TagIcon from "./svg/Tag";
-import useClickOutside from "@/hooks/useClickOutside";
 import SortIcon from "./svg/Sort";
-import { SortList, TagList, sortConditionType } from "./CardListPanel";
-import SortedIcon from "./svg/Sorted";
+import { SortCore, SortPanel, TagCore, TagPanel, sortConditionType } from "./CardListPanel";
 import SrollBar from "./ScrollBar";
+import CloseIcon from "./svg/Close";
+import useTouchmoveDirection from "@/hooks/useTouchmoveDirection";
 
 function FakeCard({ cardLize }: { cardLize: "hidden" | "sm" | "lg" }) {
     return (
@@ -55,10 +55,13 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const pathname = usePathname();
     const selectedCard = useSelector((state: IState) => state.selectedCard);
     const allTags = useSelector((state: IState) => state.cardTags);
-    const [openedPanel, setOpenedPanel] = useState<"tag" | "sort" | "">("");
+    const [openedPanel, setOpenedPanel] = useState<"tag" | "sort" | "mobileFilter" | "">("");
+    const { type: openModalType, props: modalProp } = useSelector((state: IState) => state.modal)
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const isFiltered = Boolean(selectedTags.length > 0);
+    const touchMoveResult = useTouchmoveDirection();
 
+    // console.log("touchMoveResult", touchMoveResult)
     // console.log("allCards", allCards)
     // console.log("wheelIdx", wheelIdx)
 
@@ -90,6 +93,24 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
         else setSowCardAmounts(10);
     }, [windowWidth]);
 
+    function handleSort(condition: sortConditionType) {
+        if (condition.key === "name") {
+            dispatch(setCards([...allCards].sort((a, b) => {
+                if (condition.sort === "asc") {
+                    return a.name.localeCompare(b.name)
+                }
+                return -a.name.localeCompare(b.name)
+            })))
+            return;
+        }
+        dispatch(setCards([...allCards].sort((a, b) => {
+            if (condition.sort === "asc") {
+                return new Date(a[condition.key] as string).getTime() - new Date(b[condition.key] as string).getTime()
+            }
+            return new Date(b[condition.key] as string).getTime() - new Date(a[condition.key] as string).getTime()
+        })))
+    }
+
     // 手機版 list 佔整頁
     return (
         <>
@@ -112,13 +133,14 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         setOpenedPanel(pre => pre === "tag" ? "" : "tag");
                     }}
                 ><TagIcon classProps={`${isFiltered ? "text-white" : "text-seagull-400 hover:text-seagull-600"} duration-150`} /></button>}
-                <TagList allTags={allTags} isOpen={openedPanel === "tag"}
+                <TagPanel allTags={allTags} isOpen={openedPanel === "tag"}
                     selectedTagsProp={selectedTags}
                     handleSelectTag={(tags: string[]) => {
                         setSelectedTags(tags);
                     }}
                     handleClose={() => { setOpenedPanel("") }}
                 />
+
                 {/* sort panel */}
                 {cardLize !== "hidden" && <button className={`absolute ${cardLize === "lg" ? "top-3" : "top-1"} left-12 w-6 h-6 p-0.5 rounded-full border border-seagull-500 hover:border-seagull-600 duration-150`}
                     onClick={(e) => {
@@ -127,24 +149,8 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         setOpenedPanel(pre => pre === "sort" ? "" : "sort");
                     }}
                 ><SortIcon classProps={`text-seagull-400 hover:text-seagull-600 duration-150`} /></button>}
-                <SortList isOpen={openedPanel === "sort"}
-                    handleSort={(condition: sortConditionType) => {
-                        if (condition.key === "name") {
-                            dispatch(setCards([...allCards].sort((a, b) => {
-                                if (condition.sort === "asc") {
-                                    return a.name.localeCompare(b.name)
-                                }
-                                return -a.name.localeCompare(b.name)
-                            })))
-                            return;
-                        }
-                        dispatch(setCards([...allCards].sort((a, b) => {
-                            if (condition.sort === "asc") {
-                                return new Date(a[condition.key] as string).getTime() - new Date(b[condition.key] as string).getTime()
-                            }
-                            return new Date(b[condition.key] as string).getTime() - new Date(a[condition.key] as string).getTime()
-                        })))
-                    }}
+                <SortPanel isOpen={openedPanel === "sort"}
+                    handleSort={handleSort}
                     handleClose={() => { setOpenedPanel("") }}
                 />
 
@@ -157,7 +163,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 </div>}
 
                 {/* normal card info */}
-                {selectedCard && <div className={`${cardLize === "hidden" ? "-right-[15rem]" : "right-0"} flex flex-col h-full w-[15rem] duration-150 absolute   leading-[2rem] pl-4 pr-7 pb-2 text-sm rounded-l-xl shadow-[40px_35px_60px_15px_rgba(0,0,0,0.3)] overflow-y-scroll`} onClick={(e) => {
+                {selectedCard && <div className={`${cardLize === "hidden" ? "-right-[15rem]" : "right-0"} hidden sm:flex flex-col h-full w-[15rem] duration-150 absolute   leading-[2rem] pl-4 pr-7 pb-2 text-sm rounded-l-xl shadow-[40px_35px_60px_15px_rgba(0,0,0,0.3)] overflow-y-scroll`} onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                 }}
@@ -172,7 +178,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
 
                 {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
-                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-30 bottom-6 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-30 bottom-20 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:left-12 sm:bottom-1/2 sm:translate-y-1/2 
                 text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 hover:bg-seagull-600 duration-150 ${cardLize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
@@ -205,7 +211,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 >+</button>
 
                 {/* mobile */}
-                <div className="fixed inset-x-0 top-16 bottom-0 pb-10
+                <div className="fixed inset-x-0 top-12 bottom-[3.7rem] pb-4 pt-4
                 grid grid-cols-1 min-[320px]:grid-cols-2 min-[560px]:grid-cols-3 auto-rows-[16rem] min-[320px]:auto-rows-[12rem] min-[450px]:auto-rows-[14rem] min-[500px]:auto-rows-[16rem] min-[560px]:auto-rows-[12rem]
                 px-8 min-[400px]:px-12 min-[560px]:px-14
                 sm:hidden overflow-scroll gap-4 justify-items-center"
@@ -223,6 +229,27 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         )
                     })}
                 </div>
+
+                {/* mobile filter */}
+                {(openModalType[0] === "mobileFilter" || openedPanel === "") && <div className={`sm:hidden flex flex-col gap-4 absolute inset-x-0 bottom-16 p-4 h-[40%] z-40 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)] overflow-y-scroll bg-white rounded-t-lg duration-150 ease-in-out ${openModalType[0] === "mobileFilter" ? "translate-y-0" : "translate-y-full"}`}
+                onTouchMove={() => {
+                    if (touchMoveResult.y === "bottom") dispatch(closeAllModal());
+                }}
+                >
+                    <SortCore handleSort={handleSort} />
+                    <TagCore allTags={allTags}
+                        selectedTagsProp={selectedTags}
+                        handleSelectTag={(tags: string[]) => {
+                            setSelectedTags(tags);
+                        }}
+                    />
+                    <span className="w-8 h-8 absolute top-[6px] right-0 duration-150 ease-in-out cursor-pointer"
+                        onClick={() => {
+                            console.log("ㄟ")
+                            dispatch(closeAllModal());
+                        }}><CloseIcon classProps="pointer-events-none" />
+                    </span>
+                </div>}
 
                 {/* pc */}
                 {filteredCards.length > 0 ?

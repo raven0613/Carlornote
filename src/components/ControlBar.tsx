@@ -5,7 +5,7 @@ import Popup from "./Popup";
 import { signOut } from "next-auth/react";
 import { removeUser } from "@/redux/reducers/user";
 import UndoRedoIcon from "./svg/UndoRedo";
-import SearchPanel from "./SearchPanel";
+import SearchGroup from "./SearchPanel";
 
 interface IControlBar {
     handleRedo: () => void;
@@ -46,7 +46,7 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                 </button>
             </>}
 
-            <SearchPanel />
+            <SearchGroup />
             <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative ml-2 hover:bg-seagull-500 duration-150"
                 onClick={() => {
                     setOpenPopup("setting");

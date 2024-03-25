@@ -11,6 +11,7 @@ import SearchIcon from "./svg/Search";
 import CloseIcon from "./svg/Close";
 import { v4 as uuidv4 } from 'uuid';
 import BarLoader from "react-spinners/BarLoader";
+import { closeAllModal } from "@/redux/reducers/modal";
 
 function Card({ cardData, summary, handleClick, isDisabled }: { cardData: ICard, summary: string[], handleClick: () => void, isDisabled: boolean }) {
     return (
@@ -52,20 +53,15 @@ function Card({ cardData, summary, handleClick, isDisabled }: { cardData: ICard,
     )
 }
 
-export default function SearchPanel() {
+export function SearchPanel() {
     const router = useRouter();
     const pathname = usePathname();
     const dispatch = useDispatch();
-    const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [inputValue, setInputValue] = useState("");
     const [result, setResult] = useState<{ cardData: ICard, summary: string[] }[]>([]);
     const allCards = useSelector((state: IState) => state.card);
-    const nodeRef = useClickOutside<HTMLDivElement>({
-        handleMouseDownOutside: () => {
-            setIsOpen(false);
-        }
-    })
+
     // console.log("allCards", allCards)
     // console.log("result", result)
 
@@ -108,6 +104,55 @@ export default function SearchPanel() {
     }, [allCards, inputValue]);
 
     return (
+        <>
+            <div className="flex items-center justify-center pl-5 pr-12">
+                <input type="text" autoFocus className="outline-none flex-1 h-8 rounded border border-seafull-400 px-2 text-sm mx-auto my-5" value={inputValue} placeholder="請輸入搜尋關鍵字"
+                    onChange={(e) => {
+                        setInputValue(e.target.value);
+                    }}
+                />
+                <div className="w-6 h-6 hover:bg-slate-200 duration-150 absolute top-[1.6rem] right-4 cursor-pointer rounded-full"
+                    onClick={() => {
+                        setInputValue("");
+                    }}
+                >
+                    <CloseIcon classProps="pointer-events-none" />
+                </div>
+            </div>
+
+
+            {isLoading && <BarLoader
+                color="#5bbbd5"
+                cssOverride={{ width: "100%" }}
+                loading={isLoading}
+            />}
+
+            <div className={`w-full min-h-12 border-t border-slate-200 text-slate-400 text-sm max-h-full pb-16 sm:max-h-80 overflow-scroll flex flex-col justify-start`}>
+                {(result.length === 0 && !isLoading) && <p className="mt-3.5 text-center">沒有結果</p>}
+                {result.length > 0 && result.map(item => (
+                    <Card key={item.cardData.id} cardData={item.cardData}
+                        isDisabled={isLoading}
+                        summary={item.summary} handleClick={() => {
+                            if (pathname === "/") {
+                                dispatch(selectCard(item.cardData));
+                                return;
+                            }
+                            router.push(`/card/${item.cardData.id.split("_")[1]}`);
+                        }} />
+                ))}
+            </div>
+        </>
+    )
+}
+
+export default function SearchGroup() {
+    const [isOpen, setIsOpen] = useState(false);
+    const nodeRef = useClickOutside<HTMLDivElement>({
+        handleMouseDownOutside: () => {
+            setIsOpen(false);
+        }
+    })
+    return (
         <button className={`relative w-6 h-6 rounded-full bg-seagull-300 hover:bg-seagull-500 duration-150`}
             onMouseDown={(e) => {
                 // e.preventDefault();
@@ -117,45 +162,9 @@ export default function SearchPanel() {
         >
             <SearchIcon classProps="w-full h-full absolute top-1/2 -translate-y-1/2 p-1 text-white pointer-events-none" />
 
-            <div ref={nodeRef} className={`absolute top-10 right-0 cursor-default shadow-md shadow-slate-800/30 w-[25rem] h-fit bg-white rounded-lg duration-150 
-            ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-
-                <input type="text" autoFocus className="outline-none w-[18rem] h-8 rounded border border-seafull-400 px-2 text-sm mx-auto my-5" value={inputValue} placeholder="請輸入搜尋關鍵字"
-                    onChange={(e) => {
-
-                        setInputValue(e.target.value);
-                    }}
-                />
-                <div className="w-6 h-6 hover:bg-slate-200 duration-150 absolute top-[1.6rem] right-6 cursor-pointer rounded-full"
-                    onClick={() => {
-                        setInputValue("");
-                    }}
-                >
-                    <CloseIcon classProps="pointer-events-none" />
-                </div>
-
-                {isLoading && <BarLoader
-                    color="#5bbbd5"
-                    cssOverride={{ width: "100%" }}
-                    loading={isLoading}
-                />}
-
-                <div className={`w-full min-h-12 border-t border-slate-200 text-slate-400 text-sm max-h-80 overflow-scroll flex flex-col justify-start`}>
-                    {(result.length === 0 && !isLoading) && <p className="mt-3.5">沒有結果</p>}
-
-
-                    {result.length > 0 && result.map(item => (
-                        <Card key={item.cardData.id} cardData={item.cardData}
-                            isDisabled={isLoading}
-                            summary={item.summary} handleClick={() => {
-                                if (pathname === "/") {
-                                    dispatch(selectCard(item.cardData));
-                                    return;
-                                }
-                                router.push(`/card/${item.cardData.id.split("_")[1]}`);
-                            }} />
-                    ))}
-                </div>
+            <div ref={nodeRef} className={`absolute top-10 right-0 cursor-default shadow-md shadow-slate-800/30 w-[25rem] h-fit bg-white rounded-lg duration-150 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            >
+                <SearchPanel />
             </div>
         </button>
     )

@@ -11,6 +11,7 @@ import CardList from "./CardList";
 import { usePathname, useRouter } from "next/navigation";
 import { outerPage } from "./Auth";
 import CheckWindow from "./modal/CheckWindow";
+import { SearchPanel } from "./SearchPanel";
 
 interface IProps {
     children: ReactNode;
@@ -107,6 +108,12 @@ const SharedComponents = (props: IProps) => {
                     />
                 </div>}
             </Modal>}
+
+            {/* mobile search */}
+            <div className={`block sm:hidden fixed z-40 top-12 bottom-16 inset-x-0 cursor-default shadow-md shadow-slate-800/30 bg-white duration-150 ${openModalType[0] === "mobileSearch" ? "translate-y-0" : "translate-y-full"}`}
+            >
+                <SearchPanel />
+            </div>
 
             {/* {user && <div className="w-full h-full sm:h-auto fixed bottom-0 inset-x-0">
                 {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}
