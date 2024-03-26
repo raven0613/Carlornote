@@ -74,6 +74,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
     return (
         <>
             {articleMode === "edit" && <div className="h-full w-full rounded-xl p-4 bg-[#282c2e] text-slate-400 relative">
+                {/* 編輯 */}
                 <textarea ref={textareaRef}
                     onWheel={(e) => {
                         const ratio = e.currentTarget.scrollTop / e.currentTarget.scrollHeight;
@@ -93,7 +94,8 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                     `}
                     value={value}>
                 </textarea>
-                <article ref={articleRef} className="prose max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30"
+                {/* 預覽 */}
+                <article ref={articleRef} className="hidden sm:block prose max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30"
                     onWheel={(e) => {
                         const ratio = e.currentTarget.scrollTop / e.currentTarget.scrollHeight;
                         textareaRef.current?.scrollTo({

@@ -10,11 +10,12 @@ interface IButton {
     handleClick?: () => void;
     children: ReactNode;
     type: boxType;
+    classProps?: string;
 }
 
-export function Button({ handleDrag, handleClick, children, type }: IButton) {
+export function Button({ handleDrag, handleClick, children, type, classProps }: IButton) {
     return (
-        <button className="p-1 w-10 h-10 bg-transparent border border-slate-300 rounded-md hover:scale-105 duration-200"
+        <button className={`p-1 w-10 h-10 border  rounded-md hover:scale-105 duration-200 ${classProps? classProps : "bg-transparent border-slate-300"}`}
             onMouseDown={() => {
                 handleDrag && handleDrag(type);
             }}

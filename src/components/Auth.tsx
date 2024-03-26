@@ -3,7 +3,7 @@ import { handleGetUserByEmail } from "@/api/user";
 import { addUser } from "@/redux/reducers/user";
 
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ImageLoading } from "./ImageLoading";
@@ -20,12 +20,16 @@ const Auth = (props: IProps) => {
     const dispatch = useDispatch();
     const pathname = usePathname();
     const user = useSelector((state: IState) => state.user);
+    const router = useRouter();
     // console.log("Auth status", status)
     // console.log("Auth session", session)
     // console.log("Auth user", user)
 
     useEffect(() => {
-        if (status !== "authenticated") return;
+        console.time("auth")
+        if (status !== "loading") console.timeEnd("auth")
+
+        if (status !== "authenticated") return router.push("/login");
         async function handleCheckUser(): Promise<void> {
             const getUserRes = await handleGetUserByEmail(session?.user?.email ?? "");
             // console.log("userRes", getUserRes)
@@ -41,7 +45,11 @@ const Auth = (props: IProps) => {
     }, [dispatch, session?.user?.email, status])
 
     if (outerPage.includes(pathname)) return <>{props.children}</>
-    if (status === "loading" || (status === "authenticated" && !user)) return <main className="w-full h-screen"><ImageLoading /></main>
+    if (status === "loading" || (status === "authenticated" && !user)) return (
+        <main className="w-full h-screen">
+            <ImageLoading />
+        </main>
+    )
 
     return (
         <>{props.children}</>

@@ -1,7 +1,7 @@
 "use client"
-import { IBoardElement, ICard } from "@/type/card";
+import { IBoardElement, ICard, boxType } from "@/type/card";
 import { useDispatch, useSelector } from "react-redux";
-import { closeModal, openModal } from "@/redux/reducers/modal";
+import { closeAllModal, closeModal, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { selectElementId } from "@/redux/reducers/boardElement";
 import { ImageCore } from "../box/ImageBox";
@@ -28,6 +28,8 @@ import { handlePostImgur } from "@/api/imgur";
 import useClickOutside from "@/hooks/useClickOutside";
 import Card from "@/components/Card";
 import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
+import CloseIcon from "../svg/Close";
+import useTouchmoveDirection from "@/hooks/useTouchmoveDirection";
 
 interface IButton {
     children: ReactNode;
@@ -60,6 +62,12 @@ export default function ElementModal({ permission }: IElementModal) {
     const textRef = useAutosizedTextarea<HTMLTextAreaElement>(selectedCard?.boardElement.find(item => item.id === selectedElementId)?.content ?? "", true);
     const isLock = (permission && permission !== "editable") ? true : false;
     const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
+    const [filterType, setFilterType] = useState<boxType[]>([]);
+    const filterTypeSet = new Set(filterType);
+    const filteredElements = selectedCard?.boardElement.filter(item => {
+        if (filterTypeSet.size === 0) return true;
+        return filterTypeSet.has(item.type);
+    }) ?? [];
     const nodeRef = useClickOutside<HTMLButtonElement>({
         handleMouseDownOutside: () => {
             setIsAddPanelOpen(false);
@@ -69,7 +77,10 @@ export default function ElementModal({ permission }: IElementModal) {
         },
     })
     // console.log("permission", permission)
+    // console.log("filterType", filterType)
+    // console.log("filteredElements", filteredElements)
     // console.log("isLock", isLock)
+    const touchMoveResult = useTouchmoveDirection();
 
     function save(updatedCard: ICard) {
         // console.log("updatedCard", updatedCard)
@@ -81,7 +92,7 @@ export default function ElementModal({ permission }: IElementModal) {
     return (
         <>
             {/* panel */}
-            <main className="fixed inset-x-0 bottom-0 top-12 sm:top-0 w-full sm:relative sm:w-96 sm:h-svh sm:rounded-xl bg-white overflow-y-scroll pt-4 sm:py-2 pl-2 pr-2 z-20 sm:z-50" onClick={(e) => {
+            <main className="elementPanel fixed inset-x-0 bottom-16 top-12 sm:top-0 w-full sm:relative sm:w-96 sm:h-svh sm:rounded-xl bg-white overflow-y-scroll pt-4 sm:py-2 pl-2 pr-2 z-20 sm:z-50" onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 dispatch(selectElementId(""));
@@ -89,7 +100,7 @@ export default function ElementModal({ permission }: IElementModal) {
                 {/* wrapper */}
                 <div className="w-full h-fit flex flex-col-reverse">
                     {/* elements */}
-                    {selectedCard && selectedCard.boardElement.map((item: IBoardElement) => {
+                    {filteredElements.map((item: IBoardElement) => {
                         return (
                             <div key={item.id} className={`w-full h-auto mb-2 rounded-lg border-slate-300 border relative`}
                                 onClick={(e) => {
@@ -306,7 +317,7 @@ export default function ElementModal({ permission }: IElementModal) {
                                     className={`flex items-center justify-center relative h-fit`}
                                 >
                                     <Card url={item.cardData?.imageUrl ?? ""} name={item.cardData?.name ?? ""} cardLize={"lg"}
-                                        classProps={``} 
+                                        classProps={``}
                                     />
                                 </div>}
                             </div>
@@ -318,8 +329,8 @@ export default function ElementModal({ permission }: IElementModal) {
             {/* mobile add button */}
             {!isLock && <>
                 {/* add panel */}
-                <div className={`fixed duration-150 overflow-hidden
-                ${isAddPanelOpen ? "top-[80%] opacity-100" : "top-[100%] opacity-0"}
+                <div className={`fixed duration-200 ease-in-out overflow-hidden origin-bottom bottom-0
+                ${isAddPanelOpen ? "opacity-100 -translate-y-44" : "translate-y-0 opacity-0"}
                 left-1/2 -translate-x-1/2 bg-slate-100 shadow-md shadow-black/30 flex gap-2 p-2 z-40 rounded-xl`}>
                     <AddBoxButton
                         handleClick={() => {
@@ -446,7 +457,7 @@ export default function ElementModal({ permission }: IElementModal) {
                 </div>
                 {/* add button */}
                 <button ref={nodeRef} type="button"
-                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-50 top-[90%] left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-40 bottom-24 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:hidden
                 text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 duration-150 hover:bg-seagull-600`}
                     onClick={async (e) => {
@@ -457,6 +468,67 @@ export default function ElementModal({ permission }: IElementModal) {
                     }}
                 >+</button>
             </>}
+            {/* mobile filter */}
+            <div className={`sm:hidden items-center flex gap-4 absolute inset-x-0 bottom-16 p-8 z-40 overflow-y-scroll bg-white rounded-t-lg duration-150 ease-in-out 
+            ${openModalType[0] === "mobileFilter" ? "h-[12%] translate-y-0 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)]" : "translate-y-full h-16"}`}
+                onTouchMove={() => {
+                    if (touchMoveResult.y === "bottom") dispatch(closeAllModal());
+                }}
+            >
+                <AddBoxButton
+                    handleClick={() => {
+                        if (filterTypeSet.has("text")) {
+                            setFilterType(pre => pre.filter(item => item !== "text"));
+                            return;
+                        }
+                        setFilterType(pre => [...pre, "text"]);
+                    }} type={"text"}
+                    classProps={`${filterTypeSet.has("text")? "bg-seagull-200 border-seagull-600" : ""}`}
+                >
+                    <TextIcon classProps="fill-slate-600" />
+                </AddBoxButton>
+                <AddBoxButton
+                    handleClick={() => {
+                        if (filterTypeSet.has("image")) {
+                            setFilterType(pre => pre.filter(item => item !== "image"));
+                            return;
+                        }
+                        setFilterType(pre => [...pre, "image"]);
+                    }} type={"image"}
+                    classProps={`${filterTypeSet.has("image")? "bg-seagull-200 border-seagull-600" : ""}`}
+                >
+                    <ImageIcon classProps="stroke-slate-600" />
+                </AddBoxButton>
+                <AddBoxButton
+                    handleClick={() => {
+                        if (filterTypeSet.has("code")) {
+                            setFilterType(pre => pre.filter(item => item !== "code"));
+                            return;
+                        }
+                        setFilterType(pre => [...pre, "code"]);
+                    }} type={"code"}
+                    classProps={`${filterTypeSet.has("code")? "bg-seagull-200 border-seagull-600" : ""}`}
+                >
+                    <CodeIcon classProps="text-slate-600" />
+                </AddBoxButton>
+                <AddBoxButton
+                    handleClick={() => {
+                        if (filterTypeSet.has("markdown")) {
+                            setFilterType(pre => pre.filter(item => item !== "markdown"));
+                            return;
+                        }
+                        setFilterType(pre => [...pre, "markdown"]);
+                    }} type={"markdown"}
+                    classProps={`${filterTypeSet.has("markdown")? "bg-seagull-200 border-seagull-600" : ""}`}
+                >
+                    <NoteIcon classProps="text-slate-600" />
+                </AddBoxButton>
+                <span className="w-8 h-8 absolute top-[6px] right-0 duration-150 ease-in-out cursor-pointer"
+                    onClick={() => {
+                        dispatch(closeAllModal());
+                    }}><CloseIcon classProps="pointer-events-none" />
+                </span>
+            </div>
         </>
     )
 }

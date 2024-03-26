@@ -19,7 +19,9 @@ export default function CheckWindow({ data, handleClose, handleConfirm, text }: 
                     <button className="checkWindow w-12 h-8 rounded-md border border-sky-500 hover:bg-sky-200 duration-150" onClick={() => {
                         handleConfirm();
                     }}>確定</button>
-                    <button className="w-12 h-8 bg-sky-500 rounded-md text-white hover:bg-sky-700 duration-150">取消</button>
+                    <button className="w-12 h-8 bg-sky-500 rounded-md text-white hover:bg-sky-700 duration-150" onClick={() => {
+                        handleClose();
+                    }}>取消</button>
                 </div>
             </div>
         </>

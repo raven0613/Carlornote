@@ -30,8 +30,8 @@ export default function useTouchmoveDirection(): IMoveResult {
 
     useEffect(() => {
         function handleMove(e: TouchEvent) {
-            console.log("e.touches[0].clientX", e.touches[0].clientX)
-            console.log("pointer.current.x", pointer.current.x)
+            // console.log("e.touches[0].clientX", e.touches[0].clientX)
+            // console.log("pointer.current.x", pointer.current.x)
             // 與舊的位置比對計算，移動方向變了才存入
             if (e.touches[0].clientX < pointer.current.x) setDirection(pre => ({ ...pre, x: "left" }));
             else if (e.touches[0].clientX > pointer.current.x) setDirection(pre => ({ ...pre, x: "right" }));

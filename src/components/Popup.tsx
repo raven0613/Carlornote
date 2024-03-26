@@ -34,7 +34,7 @@ export default function Popup({ options = [], isOpen, handleClose, classPorops }
             {isOpen && options.map(item => {
                 return (
                     item.isLink ?
-                        <Link scroll={false} key={uuidv4()} href={item.href ?? ""} as={item.hrefAs} className={`px-5 py-1.5 flex items-center gap-4 hover:bg-slate-200 text-sm ${item.classProps}`}
+                        <Link prefetch scroll={false} key={uuidv4()} href={item.href ?? ""} as={item.hrefAs} className={`px-5 py-1.5 flex items-center gap-4 hover:bg-slate-200 text-sm ${item.classProps}`}
                             onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
                                 item.handleClick(e);
                             }}

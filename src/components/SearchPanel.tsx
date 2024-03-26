@@ -105,13 +105,13 @@ export function SearchPanel() {
 
     return (
         <>
-            <div className="flex items-center justify-center pl-5 pr-12">
-                <input type="text" autoFocus className="outline-none flex-1 h-8 rounded border border-seafull-400 px-2 text-sm mx-auto my-5" value={inputValue} placeholder="請輸入搜尋關鍵字"
+            <div className="flex items-center justify-center px-5">
+                <input type="text" autoFocus className="outline-none flex-1 h-8 rounded border border-seafull-400 pl-2 pr-7 text-sm mx-auto my-5" value={inputValue} placeholder="請輸入搜尋關鍵字"
                     onChange={(e) => {
                         setInputValue(e.target.value);
                     }}
                 />
-                <div className="w-6 h-6 hover:bg-slate-200 duration-150 absolute top-[1.6rem] right-4 cursor-pointer rounded-full"
+                <div className="w-6 h-6 hover:bg-slate-200 duration-150 absolute top-[1.5rem] right-6 cursor-pointer rounded-sm"
                     onClick={() => {
                         setInputValue("");
                     }}
@@ -129,6 +129,7 @@ export function SearchPanel() {
 
             <div className={`w-full min-h-12 border-t border-slate-200 text-slate-400 text-sm max-h-full pb-16 sm:max-h-80 overflow-scroll flex flex-col justify-start`}>
                 {(result.length === 0 && !isLoading) && <p className="mt-3.5 text-center">沒有結果</p>}
+                {(result.length > 0 && !isLoading) && <p className="mt-3.5 text-center">共 {result.length} 筆結果</p>}
                 {result.length > 0 && result.map(item => (
                     <Card key={item.cardData.id} cardData={item.cardData}
                         isDisabled={isLoading}
@@ -138,6 +139,7 @@ export function SearchPanel() {
                                 return;
                             }
                             router.push(`/card/${item.cardData.id.split("_")[1]}`);
+                            dispatch(closeAllModal());
                         }} />
                 ))}
             </div>

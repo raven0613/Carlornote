@@ -97,9 +97,9 @@ const SharedComponents = (props: IProps) => {
                 handleClose={() => {
                     if (openModalType.includes("checkWindow")) dispatch(closeModal({ type: "checkWindow", props: modalProp }))
                 }}
-                top="top-48"
+                top="top-1/2 -translate-y-1/2 sm:top-48 sm:translate-y-0"
             >
-                {openModalType.includes("checkWindow") && <div className="w-fit h-fit hidden z-50 sm:block ">
+                {openModalType.includes("checkWindow") && <div className="w-fit h-fit z-50">
                     <CheckWindow data={modalProp?.data} text={modalProp?.text}
                         handleClose={() => {
                             dispatch(closeModal({ type: "checkWindow", props: modalProp }));
