@@ -50,7 +50,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const [showCardAmounts, setSowCardAmounts] = useState(5);
     const [cardState, setCardState] = useState<"loading" | "ok" | "error">("loading");
     const [addCardState, setAddCardState] = useState<"loading" | "ok" | "error">("ok");
-    const [cardLize, setCardSize] = useState<"hidden" | "sm" | "lg">("lg");
+    const [cardSize, setCardSize] = useState<"hidden" | "sm" | "lg">("hidden");
     const { width: windowWidth } = useWindowSize();
     const pathname = usePathname();
     const selectedCard = useSelector((state: IState) => state.selectedCard);
@@ -72,7 +72,6 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     // console.log("createdAt", new Date(allCards[0].createdAt).getTime())
 
     useEffect(() => {
-        if (!user) return setCardSize("hidden");
         async function handleFetchCard() {
             const response = await handleGetCards(user?.id || "");
             if (response.status === "FAIL") return setCardState("error");
@@ -80,7 +79,8 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
             dispatch(setCards(JSON.parse(response.data).sort((a: ICard, b: ICard) => {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             })));
-            // console.log("get data", JSON.parse(response.data))
+            setCardSize("lg");
+            console.log("get data", JSON.parse(response.data))
         }
         setCardState("loading");
         handleFetchCard();
@@ -115,8 +115,8 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     return (
         <>
             <section className={`w-full h-full sm:px-28 flex sm:items-center sm:justify-center relative border-t-slate-200/70
-                ${cardLize === "lg" ? "sm:h-[10rem]" : `${cardLize === "sm" ? "sm:h-[7rem]" : "sm:h-[2rem]"}`}
-                ${cardLize === "hidden" ? "bg-[#f8f8f8] border-t-[1px]" : "border-t-[3px]"}
+                ${cardSize === "lg" ? "sm:h-[10rem]" : `${cardSize === "sm" ? "sm:h-[7rem]" : "sm:h-[2rem]"}`}
+                ${cardSize === "hidden" ? "bg-[#f8f8f8] border-t-[1px]" : "border-t-[3px]"}
                 duration-150
             `}
                 onClick={() => {
@@ -126,7 +126,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 }}
             >
                 {/* tag list */}
-                {cardLize !== "hidden" && <button className={`absolute ${cardLize === "lg" ? "top-3" : "top-1"} left-3 w-6 h-6 p-0.5 rounded-full border border-seagull-500 hover:border-seagull-600 duration-150 ${isFiltered ? "bg-seagull-500 hover:bg-seagull-600" : ""}`}
+                {cardSize !== "hidden" && <button className={`absolute ${cardSize === "lg" ? "top-3" : "top-1"} left-3 w-6 h-6 p-0.5 rounded-full border border-seagull-500 hover:border-seagull-600 duration-150 ${isFiltered ? "bg-seagull-500 hover:bg-seagull-600" : ""}`}
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -142,7 +142,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 />
 
                 {/* sort panel */}
-                {cardLize !== "hidden" && <button className={`absolute ${cardLize === "lg" ? "top-3" : "top-1"} left-12 w-6 h-6 p-0.5 rounded-full border border-seagull-500 hover:border-seagull-600 duration-150`}
+                {cardSize !== "hidden" && <button className={`absolute ${cardSize === "lg" ? "top-3" : "top-1"} left-12 w-6 h-6 p-0.5 rounded-full border border-seagull-500 hover:border-seagull-600 duration-150`}
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -155,7 +155,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 />
 
                 {/* bottom card info */}
-                {cardLize === "hidden" && <div className={`h-full w-1/2 absolute left-0 truncate leading-[2rem] px-4 text-sm`} onClick={(e) => {
+                {cardSize === "hidden" && <div className={`h-full w-1/2 absolute left-0 truncate leading-[2rem] px-4 text-sm`} onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                 }}>
@@ -163,7 +163,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 </div>}
 
                 {/* normal card info */}
-                {selectedCard && <div className={`${cardLize === "hidden" ? "-right-[15rem]" : "right-0"} hidden sm:flex flex-col h-full w-[15rem] duration-150 absolute   leading-[2rem] pl-4 pr-7 pb-2 text-sm rounded-l-xl shadow-[40px_35px_60px_15px_rgba(0,0,0,0.3)] overflow-y-scroll`} onClick={(e) => {
+                {selectedCard && <div className={`${cardSize === "hidden" ? "-right-[15rem]" : "right-0"} hidden sm:flex flex-col h-full w-[15rem] duration-150 absolute   leading-[2rem] pl-4 pr-7 pb-2 text-sm rounded-l-xl shadow-[40px_35px_60px_15px_rgba(0,0,0,0.3)] overflow-y-scroll`} onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                 }}
@@ -180,7 +180,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
                     className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-30 bottom-20 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:left-12 sm:bottom-1/2 sm:translate-y-1/2 
-                text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 hover:bg-seagull-600 duration-150 ${cardLize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 hover:bg-seagull-600 duration-150 ${cardSize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
                         // 之後再新增公開匿名卡片
                         if (!user?.id) return;
@@ -223,7 +223,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                                     url={item.imageUrl}
                                     name={item.name}
                                     classProps={""}
-                                    cardLize={cardLize}
+                                    cardLize={cardSize}
                                 />
                             </Link>
                         )
@@ -233,9 +233,9 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 {/* mobile filter */}
                 {(openModalType[0] === "mobileFilter" || openedPanel === "") && <div className={`sm:hidden flex flex-col gap-4 absolute inset-x-0 bottom-0 p-4 h-[40%] z-40 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)] overflow-y-scroll bg-white rounded-t-lg duration-150 ease-in-out 
                 ${openModalType[0] === "mobileFilter" ? "translate-y-0" : "translate-y-full"}`}
-                onTouchMove={() => {
-                    if (touchMoveResult.y === "bottom") dispatch(closeAllModal());
-                }}
+                    onTouchMove={() => {
+                        if (touchMoveResult.y === "bottom") dispatch(closeAllModal());
+                    }}
                 >
                     <SortCore handleSort={handleSort} />
                     <TagCore allTags={allTags}
@@ -253,71 +253,68 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 </div>}
 
                 {/* pc */}
-                {filteredCards.length > 0 ?
-                    <div className={`hidden sm:flex w-auto h-full items-end ${cardLize === "lg" ? "pb-4" : "pb-2"}`}
-                        onWheel={(e) => {
-                            // console.log(e.deltaX)
-                            // console.log(e.deltaY)
-                            if (e.deltaY > 0) setWheelIdx(pre => {
-                                if (pre + showCardAmounts >= filteredCards.length) return filteredCards.length - showCardAmounts;
-                                return pre + 1
-                            });
-                            else setWheelIdx(pre => {
-                                if (pre <= 0) return 0;
-                                return pre - 1
-                            });
-                        }}
-                    >
-                        {cardState === "loading" && <CardLoading cardLize={cardLize} length={showCardAmounts} />}
-                        {cardState === "error" && "Error"}
-                        {(cardState === "ok" && allCards) &&
-                            filteredCards.slice(
-                                filteredCards.length <= showCardAmounts ? 0 : wheelIdx,
-                                filteredCards.length <= showCardAmounts ? filteredCards.length : wheelIdx + showCardAmounts
-                            )
-                                .map((item) =>
-                                    <CardWithHover key={item.id}
-                                        name={item.name}
-                                        url={item.imageUrl}
-                                        isSelected={selectedCardId === item.id}
-                                        cardLize={cardLize}
-                                        handleClick={() => {
-                                            handleSetSelectedCard(item.id);
-                                            // setDirtyState("none");
-                                        }}
-                                        handleClickEdit={() => {
-                                            dispatch(openModal({ type: "card", props: { data: item } }));
-                                        }}
-                                        handleDrag={() => handleDrag(item)}
-                                    />
-                                )}
-                    </div>
-                    :
-                    <p className="text-slate-600">{user && "卡片盒空空如也，新增一張卡片吧"}</p>}
+                <div className={`hidden sm:flex w-auto h-full items-end ${cardSize === "lg" ? "pb-4" : "pb-2"}`}
+                    onWheel={(e) => {
+                        // console.log(e.deltaX)
+                        // console.log(e.deltaY)
+                        if (e.deltaY > 0) setWheelIdx(pre => {
+                            if (pre + showCardAmounts >= filteredCards.length) return filteredCards.length - showCardAmounts;
+                            return pre + 1
+                        });
+                        else setWheelIdx(pre => {
+                            if (pre <= 0) return 0;
+                            return pre - 1
+                        });
+                    }}
+                >
+                    {cardState === "loading" && <CardLoading cardLize={cardSize} length={showCardAmounts} />}
+                    {cardState === "error" && "Error"}
+                    {(cardState === "ok" && allCards) &&
+                        filteredCards.slice(
+                            filteredCards.length <= showCardAmounts ? 0 : wheelIdx,
+                            filteredCards.length <= showCardAmounts ? filteredCards.length : wheelIdx + showCardAmounts
+                        )
+                            .map((item) =>
+                                <CardWithHover key={item.id}
+                                    name={item.name}
+                                    url={item.imageUrl}
+                                    isSelected={selectedCardId === item.id}
+                                    cardLize={cardSize}
+                                    handleClick={() => {
+                                        handleSetSelectedCard(item.id);
+                                        // setDirtyState("none");
+                                    }}
+                                    handleClickEdit={() => {
+                                        dispatch(openModal({ type: "card", props: { data: item } }));
+                                    }}
+                                    handleDrag={() => handleDrag(item)}
+                                />
+                            )}
+                </div>
 
                 {/* pc control button */}
-                {user && <div className={`hidden sm:flex absolute right-3 text-xs gap-2 ${cardLize === "hidden" ? "" : "flex-col"}`}>
-                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 relative ${cardLize === "lg" ? "bg-seagull-600" : "bg-seagull-200"}`}
+                {user && <div className={`hidden sm:flex absolute right-3 text-xs gap-2 ${cardSize === "hidden" ? "" : "flex-col"}`}>
+                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 relative ${cardSize === "lg" ? "bg-seagull-600" : "bg-seagull-200"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             setCardSize("lg");
                         }}
                     >
-                        <span className={`absolute w-[0.5rem] h-[0.65rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardLize === "lg" ? "bg-seagull-100" : "bg-seagull-700"}`} />
+                        <span className={`absolute w-[0.5rem] h-[0.65rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardSize === "lg" ? "bg-seagull-100" : "bg-seagull-700"}`} />
                     </button>
 
-                    <button className={`w-5 h-5 rounded-full hover:scale-125 duration-150 hover:shadow-sm ${cardLize === "sm" ? "bg-seagull-600" : "bg-seagull-200"}`}
+                    <button className={`w-5 h-5 rounded-full hover:scale-125 duration-150 hover:shadow-sm ${cardSize === "sm" ? "bg-seagull-600" : "bg-seagull-200"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             setCardSize("sm");
                         }}
                     >
-                        <span className={`absolute w-[0.5rem] h-[0.5rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardLize === "sm" ? "bg-seagull-100" : "bg-seagull-700"}`} />
+                        <span className={`absolute w-[0.5rem] h-[0.5rem] rounded-[0.1rem] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${cardSize === "sm" ? "bg-seagull-100" : "bg-seagull-700"}`} />
                     </button>
 
-                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm  font-semibold ${cardLize === "hidden" ? "bg-seagull-600 text-seagull-200" : "bg-seagull-200 text-seagull-700"}`}
+                    <button className={`w-5 h-5 bg-seagull-200 rounded-full hover:scale-125 duration-150 hover:shadow-sm  font-semibold ${cardSize === "hidden" ? "bg-seagull-600 text-seagull-200" : "bg-seagull-200 text-seagull-700"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -326,7 +323,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     >-</button>
                 </div>}
 
-                <SrollBar isFull={filteredCards.length <= showCardAmounts} startIndex={wheelIdx} barItemsLength={showCardAmounts} totalItemsLength={filteredCards.length} showingPos={cardBarMap[cardLize]} />
+                <SrollBar isFull={filteredCards.length <= showCardAmounts} startIndex={wheelIdx} barItemsLength={showCardAmounts} totalItemsLength={filteredCards.length} showingPos={cardBarMap[cardSize]} />
             </section>
         </>
     )

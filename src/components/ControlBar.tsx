@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { removeUser } from "@/redux/reducers/user";
 import UndoRedoIcon from "./svg/UndoRedo";
 import SearchGroup from "./SearchPanel";
+import Link from "next/link";
 
 interface IControlBar {
     handleRedo: () => void;
@@ -46,8 +47,8 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                 </button>
             </>}
 
-            <SearchGroup />
-            <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative ml-2 hover:bg-seagull-500 duration-150"
+            {user && <SearchGroup />}
+            {user && <button type="button" className="w-6 h-6 bg-seagull-300 rounded-full relative ml-2 duration-150"
                 onClick={() => {
                     setOpenPopup("setting");
                 }}
@@ -68,7 +69,14 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                     handleClose={() => setOpenPopup(null)}
                     classPorops="top-6 right-2/4"
                 />
-            </button>
+            </button>}
+            {!user && <Link prefetch scroll={false} href={"/login"} className={`border bg-transparent border-seagull-400 text-seagull-600 px-2 py-1 rounded relative overflow-hidden z-10 duration-150
+            before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:-z-10 before:rounded-full before:opacity-0 before:w-5 before:h-5 hover:before:scale-[700%] before:bg-seagull-500  hover:before:opacity-100 before:duration-150 hover:text-white/80
+            backdrop-blur-lg
+            `}
+            >
+                登入或創建帳號
+            </Link>}
         </div>
     )
 }

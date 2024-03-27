@@ -22,17 +22,21 @@ const Auth = (props: IProps) => {
     const user = useSelector((state: IState) => state.user);
     const router = useRouter();
     // console.log("Auth status", status)
-    // console.log("Auth session", session)
-    // console.log("Auth user", user)
+    console.log("Auth session", session)
+    console.log("Auth user", user)
 
     useEffect(() => {
         console.time("auth")
         if (status !== "loading") console.timeEnd("auth")
-
-        if (status !== "authenticated") return router.push("/login");
+        
+        if (status === "loading") return;
+        // 在主頁沒有登入就導到登入頁
+        if (pathname === "/" && status === "unauthenticated") return router.push("/login");
+        // 在主頁以外的頁面，例如卡片頁可能沒登入也可以看，但沒登入就不要去 fetch user
+        if (status === "unauthenticated") return;
         async function handleCheckUser(): Promise<void> {
             const getUserRes = await handleGetUserByEmail(session?.user?.email ?? "");
-            // console.log("userRes", getUserRes)
+            console.log("userRes", getUserRes)
             if (getUserRes.status === "FAIL") return handleCheckUser();
 
             const registeredUser = JSON.parse(getUserRes.data);
