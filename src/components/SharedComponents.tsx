@@ -40,7 +40,7 @@ const SharedComponents = (props: IProps) => {
         function handleMouse(e: MouseEvent) {
             // e.stopPropagation();
             // e.preventDefault();
-            // console.log((e.target as HTMLElement))
+            console.log((e.target as HTMLElement))
         }
         document.addEventListener("click", handleMouse);
         return () => document.removeEventListener("click", handleMouse);
@@ -74,7 +74,7 @@ const SharedComponents = (props: IProps) => {
                 isOpen={openModalType.includes("card") || openModalType[0] === "mobileCardSetting"}
                 handleClose={() => {
                     // 電腦版會讀這邊
-                    // console.log("close")
+                    console.log("close")
                     if (isCardSettingDirty) {
                         if (openModalType.at(-1) === "checkWindow") {
                             dispatch(closeModal({ type: "checkWindow", props: { data: selectedCard } }));

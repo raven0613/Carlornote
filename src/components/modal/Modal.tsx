@@ -14,6 +14,7 @@ interface IModal {
 export default function Modal({ isOpen, handleClose, children, position, top }: IModal) {
     const nodeRef = useClickOutside<HTMLDivElement>({
         handleMouseDownOutside: () => {
+            // console.log("點外面")
             handleClose();
         },
         exceptions: ["checkWindow"]
@@ -23,7 +24,7 @@ export default function Modal({ isOpen, handleClose, children, position, top }: 
 
     if (position === "full") return (
         <>
-            <div className={`fullModal block sm:hidden fixed top-12 bottom-16 inset-x-0 cursor-default duration-200 ease-out z-40 ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
+            <div ref={nodeRef} className={`fullModal block sm:hidden fixed top-12 bottom-16 inset-x-0 cursor-default duration-200 ease-out z-40 ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
                 {children}
             </div>
         </>

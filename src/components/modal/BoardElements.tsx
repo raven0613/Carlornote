@@ -68,6 +68,8 @@ export default function ElementModal({ permission }: IElementModal) {
         if (filterTypeSet.size === 0) return true;
         return filterTypeSet.has(item.type);
     }) ?? [];
+    const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
+    const dirtyState = useSelector((state: IState) => state.dirtyState);
     const nodeRef = useClickOutside<HTMLButtonElement>({
         handleMouseDownOutside: () => {
             setIsAddPanelOpen(false);
@@ -97,6 +99,9 @@ export default function ElementModal({ permission }: IElementModal) {
                 e.stopPropagation();
                 dispatch(selectElementId(""));
             }}>
+                {dirtyCards.length > 0 && <p className="block sm:hidden w-full h-8 leading-8  text-center cursor-default text-sm text-seagull-700/80 z-20 pr-2 backdrop-blur-xl fixed top-12">正在儲存...</p>}
+                {dirtyState === "clear" && <p className={`block sm:hidden w-full h-8 leading-8  text-center cursor-default animate-hide opacity-0 text-sm text-seagull-700/80 z-20 pr-2 backdrop-blur-xl fixed top-12`}>已成功儲存</p>}
+                
                 {/* wrapper */}
                 <div className="w-full h-fit flex flex-col-reverse">
                     {/* elements */}
@@ -484,7 +489,7 @@ export default function ElementModal({ permission }: IElementModal) {
                         }
                         setFilterType(pre => [...pre, "text"]);
                     }} type={"text"}
-                    classProps={`${filterTypeSet.has("text")? "bg-seagull-200 border-seagull-600" : ""}`}
+                    classProps={`${filterTypeSet.has("text") ? "bg-seagull-200 border-seagull-600" : ""}`}
                 >
                     <TextIcon classProps="fill-slate-600" />
                 </AddBoxButton>
@@ -496,7 +501,7 @@ export default function ElementModal({ permission }: IElementModal) {
                         }
                         setFilterType(pre => [...pre, "image"]);
                     }} type={"image"}
-                    classProps={`${filterTypeSet.has("image")? "bg-seagull-200 border-seagull-600" : ""}`}
+                    classProps={`${filterTypeSet.has("image") ? "bg-seagull-200 border-seagull-600" : ""}`}
                 >
                     <ImageIcon classProps="stroke-slate-600" />
                 </AddBoxButton>
@@ -508,7 +513,7 @@ export default function ElementModal({ permission }: IElementModal) {
                         }
                         setFilterType(pre => [...pre, "code"]);
                     }} type={"code"}
-                    classProps={`${filterTypeSet.has("code")? "bg-seagull-200 border-seagull-600" : ""}`}
+                    classProps={`${filterTypeSet.has("code") ? "bg-seagull-200 border-seagull-600" : ""}`}
                 >
                     <CodeIcon classProps="text-slate-600" />
                 </AddBoxButton>
@@ -520,7 +525,7 @@ export default function ElementModal({ permission }: IElementModal) {
                         }
                         setFilterType(pre => [...pre, "markdown"]);
                     }} type={"markdown"}
-                    classProps={`${filterTypeSet.has("markdown")? "bg-seagull-200 border-seagull-600" : ""}`}
+                    classProps={`${filterTypeSet.has("markdown") ? "bg-seagull-200 border-seagull-600" : ""}`}
                 >
                     <NoteIcon classProps="text-slate-600" />
                 </AddBoxButton>

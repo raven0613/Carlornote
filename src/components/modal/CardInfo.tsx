@@ -20,6 +20,7 @@ import ArrowIcon from "../svg/Arrow";
 import EditIcon from "../svg/Edit";
 import Modal from "./Modal";
 import { IState } from "@/redux/store";
+import { useRouter } from "next/navigation";
 
 function getTimeString(GMTTimeString: string) {
     const date = new Date(GMTTimeString);
@@ -98,7 +99,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
     const [settingArea, setSettingArea] = useState<"info" | "access" | "user">("info");
     const [isTagEditing, setIsTagEditing] = useState(false);
     const dispatch = useDispatch();
-    const { type: openModalType, props: modalProp } = useSelector((state: IState) => state.modal)
+    const router = useRouter();
     // console.log("modalProp", modalProp)
     // console.log("openModalType", openModalType)
 
@@ -216,7 +217,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                     </div>
                     {/* info setting */}
                     <div
-                        className={`w-full sm:w-[44rem] flex flex-col sm:flex-row duration-200 h-full sm:pb-8 ease-out
+                        className={`w-full sm:w-[44rem] flex flex-col sm:flex-row duration-200 h-full pb-8 ease-out
                             ${settingArea === "info" ? "sm:translate-x-0" : "sm:-translate-x-1/2"}
                         `}
                     >
@@ -437,9 +438,9 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                     {settingArea === "access" ? "權限名單設定" : "卡片權限設定"}
                 </span>
 
-                <div className="absolute -bottom-8 right-0 flex gap-4">
+                <div className="sm:absolute sm:-bottom-8 sm:right-0 flex items-center justify-center flex-row-reverse sm:flex-row w-full sm:w-fit gap-4">
                     {/* delete */}
-                    <div
+                    <button
                         onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -453,20 +454,25 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                                         if (response.status === "FAIL") return;
                                         dispatch(removeCard(selectedCard.id));
                                         dispatch(closeAllModal({ type: "" }));
+                                        router.push("/");
                                     }
                                 }
                             }));
                         }}
-                        className={`w-6 h-6 p-[3px] rounded-full  bg-red-500 cursor-pointer hover:scale-125 duration-200 
+                        className={`w-20 h-8 sm:w-6 sm:h-6 sm:p-[3px] rounded-md sm:rounded-full bg-red-500 cursor-pointer hover:sm:scale-125 duration-200 
                                 `}
                     >
-                        <DeleteIcon classProps="stroke-slate-800 stroke-1" />
-                    </div>
+                        <span className="sm:hidden text-slate-100 leading-8 m-auto">刪除卡片</span>
+                        <DeleteIcon classProps="stroke-slate-800 stroke-1 hidden sm:block" />
+                    </button>
 
 
                     {/* OK button */}
-                    <button className="bg-green-400 w-6 h-6 p-[4px] rounded-full text-slate-100 hover:scale-125 duration-200"
-                        onClick={async () => {
+                    <button className="sm:bg-green-400 w-20 h-8 bg-seagull-500 sm:w-6 sm:h-6 sm:p-[4px] rounded-md sm:rounded-full  hover:sm:scale-125 duration-200"
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log("儲存卡片設定")
                             const updatedCard = { ...selectedCard, imageUrl: url, name, visibility, editability, userList: emailList, tags: tagList };
                             const response = await handleUpdateCard([updatedCard]);
                             console.log("response", response)
@@ -480,7 +486,8 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                             dispatch(closeAllModal({ type: "", props: {} }));
                         }}
                     >
-                        <OKIcon classProps="stroke-slate-700" />
+                        <span className="sm:hidden text-slate-100 leading-8">儲存</span>
+                        <OKIcon classProps="stroke-slate-700 hidden sm:block" />
                     </button>
                 </div>
             </div >
