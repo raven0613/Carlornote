@@ -457,8 +457,6 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             // e.stopPropagation();
                             dispatch(selectElementId(""));
                         }}
-                        onDrop={(e) => {
-                        }}
                     />
 
                     {elements && elements.map(item => {

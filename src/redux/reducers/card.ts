@@ -101,6 +101,22 @@ export function dirtyReducer(state: dirtyStateType = initDirtyState, action: IAc
     }
 }
 
+// for mobile
+export const initDirtyCardSettingState = false;
+const SET_CARD_SETTING_IS_DIRTY = "SET_CARD_SETTING_IS_DIRTY";
+export const setCardSettingIsDirty = (payload: boolean) => ({ type: SET_CARD_SETTING_IS_DIRTY, payload });
+
+export function cardSettingIsDirtyReducer(state: boolean = initDirtyCardSettingState, action: IAction<boolean>) {
+    // console.log("dirtyCards payload", action.payload)
+    switch (action.type) {
+        case SET_CARD_SETTING_IS_DIRTY: {
+            console.log("dirty", action.payload)
+            return action.payload;
+        }
+        default: return state;
+    }
+}
+
 export const initTags = [];
 const SET_TAGS = "SET_TAGS";
 export const setTags = (payload: string[]) => ({ type: SET_TAGS, payload });

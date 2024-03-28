@@ -2,7 +2,7 @@
 import { combineReducers, legacy_createStore as createStore } from 'redux';
 import { initUserState, userReducer, userPermissionReducer, initUserPermissionState } from './reducers/user';
 import { IBoardElement, ICard } from '@/type/card';
-import { cardsReducer, dirtyCardsIdReducer, selectedCardReducer, dirtyStateType, dirtyReducer, cardTagsReducer, initCardState, initSelectedCardState, initDirtyCardsIdState, initDirtyState, initTags } from './reducers/card';
+import { cardsReducer, dirtyCardsIdReducer, selectedCardReducer, dirtyStateType, dirtyReducer, cardTagsReducer, initCardState, initSelectedCardState, initDirtyCardsIdState, initDirtyState, initTags, cardSettingIsDirtyReducer } from './reducers/card';
 import { modalReducer, IModalPayload, IModalState, initModalState } from './reducers/modal';
 import { initSelectedElementState, selectedElementIdReducer } from './reducers/boardElement';
 import { IUser } from '@/type/user';
@@ -16,6 +16,7 @@ export interface IState {
     selectedElementId: string,
     dirtyCardsId: string[],
     dirtyState: dirtyStateType,
+    isCardSettingDirty: boolean,
     cardTags: string[],
     userPermission: "editable" | "readable"
 }
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
     selectedElementId: selectedElementIdReducer,
     dirtyCardsId: dirtyCardsIdReducer,
     dirtyState: dirtyReducer,
+    isCardSettingDirty: cardSettingIsDirtyReducer,
     cardTags: cardTagsReducer,
     userPermission: userPermissionReducer
 });

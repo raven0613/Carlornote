@@ -108,7 +108,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
             </div>}
 
             {articleMode === "read" && <div className={`w-full relative bg-[#e9e6e2] rounded-lg overflow-y-scroll pb-2
-            ${needFull ? (isFull ? "h-full max-h-[80vh] min-h-48" : "h-48") : "h-full"}
+            ${needFull ? (isFull ? "h-full max-h-[70vh] min-h-48" : "h-48") : "h-full"}
             `}
             >
                 <article className={`prose prose-pre:bg-[#1d1f21] marker:text-slate-700 max-w-none w-full h-full

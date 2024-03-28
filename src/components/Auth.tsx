@@ -22,8 +22,8 @@ const Auth = (props: IProps) => {
     const user = useSelector((state: IState) => state.user);
     const router = useRouter();
     // console.log("Auth status", status)
-    console.log("Auth session", session)
-    console.log("Auth user", user)
+    // console.log("Auth session", session)
+    // console.log("Auth user", user)
 
     useEffect(() => {
         console.time("auth")
@@ -36,7 +36,7 @@ const Auth = (props: IProps) => {
         if (status === "unauthenticated") return;
         async function handleCheckUser(): Promise<void> {
             const getUserRes = await handleGetUserByEmail(session?.user?.email ?? "");
-            console.log("userRes", getUserRes)
+            // console.log("userRes", getUserRes)
             if (getUserRes.status === "FAIL") return handleCheckUser();
 
             const registeredUser = JSON.parse(getUserRes.data);
@@ -46,7 +46,7 @@ const Auth = (props: IProps) => {
             // 有沒有有 session 卻沒找到 user 的狀況?
         }
         handleCheckUser();
-    }, [dispatch, session?.user?.email, status])
+    }, [dispatch, session?.user?.email, status, pathname, router])
 
     if (outerPage.includes(pathname)) return <>{props.children}</>
     if (status === "loading" || (status === "authenticated" && !user)) return (

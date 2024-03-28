@@ -330,7 +330,7 @@ export default function ElementModal({ permission }: IElementModal) {
             {!isLock && <>
                 {/* add panel */}
                 <div className={`fixed duration-200 ease-in-out overflow-hidden origin-bottom bottom-0
-                ${isAddPanelOpen ? "opacity-100 -translate-y-44" : "translate-y-0 opacity-0"}
+                ${isAddPanelOpen ? "opacity-100 -translate-y-40" : "translate-y-0 opacity-0"}
                 left-1/2 -translate-x-1/2 bg-slate-100 shadow-md shadow-black/30 flex gap-2 p-2 z-40 rounded-xl`}>
                     <AddBoxButton
                         handleClick={() => {
@@ -455,9 +455,10 @@ export default function ElementModal({ permission }: IElementModal) {
                         <NoteIcon classProps="text-slate-600" />
                     </AddBoxButton>
                 </div>
+
                 {/* add button */}
                 <button ref={nodeRef} type="button"
-                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-40 bottom-24 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-40 bottom-20 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
                 sm:hidden
                 text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 duration-150 hover:bg-seagull-600`}
                     onClick={async (e) => {
@@ -469,8 +470,8 @@ export default function ElementModal({ permission }: IElementModal) {
                 >+</button>
             </>}
             {/* mobile filter */}
-            <div className={`sm:hidden items-center flex gap-4 absolute inset-x-0 bottom-16 p-8 z-40 overflow-y-scroll bg-white rounded-t-lg duration-150 ease-in-out 
-            ${openModalType[0] === "mobileFilter" ? "h-[12%] translate-y-0 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)]" : "translate-y-full h-16"}`}
+            <div className={`sm:hidden items-center flex gap-4 absolute inset-x-0 bottom-16 p-8 z-40 bg-white rounded-t-lg duration-150 ease-in-out 
+            ${openModalType[0] === "mobileFilter" ? "h-[15%] translate-y-0 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)] overflow-y-scroll" : "translate-y-full h-0"}`}
                 onTouchMove={() => {
                     if (touchMoveResult.y === "bottom") dispatch(closeAllModal());
                 }}

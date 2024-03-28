@@ -97,7 +97,7 @@ export function CodeCore({ textData, handleUpdateElement, handleSetDirty, codeMo
                 </div>
                 {/* code */}
                 <div className={`w-full rounded-lg
-                ${needFull ? (isFull ? "h-full max-h-[80vh] min-h-48 overflow-y-scroll" : "h-48") : "h-full"} 
+                ${needFull ? (isFull ? "h-full max-h-[70vh] min-h-48 overflow-y-scroll" : "h-48") : "h-full"} 
                 `}>
                     <SyntaxHighlighter
                         customStyle={{

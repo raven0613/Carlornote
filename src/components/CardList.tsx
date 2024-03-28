@@ -80,7 +80,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             })));
             setCardSize("lg");
-            console.log("get data", JSON.parse(response.data))
+            // console.log("get data", JSON.parse(response.data))
         }
         setCardState("loading");
         handleFetchCard();

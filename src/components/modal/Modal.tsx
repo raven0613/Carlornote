@@ -7,7 +7,7 @@ interface IModal {
     isOpen: boolean;
     handleClose: () => void;
     children: ReactNode;
-    position: "center" | "aside"
+    position: "center" | "aside" | "full"
     top?: string;
 }
 
@@ -19,14 +19,24 @@ export default function Modal({ isOpen, handleClose, children, position, top }: 
         exceptions: ["checkWindow"]
     })
     // console.log("nodeRef", nodeRef)
+    // console.log("position", position)
+
+    if (position === "full") return (
+        <>
+            <div className={`fullModal block sm:hidden fixed top-12 bottom-16 inset-x-0 cursor-default duration-200 ease-out z-40 ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
+                {children}
+            </div>
+        </>
+    )
     if (position === "center") return (
         <>
-            {isOpen && <>
-                <div className="fixed inset-0 bg-slate-800/70 z-50"></div>
-                <div ref={nodeRef} className={`flex flex-col fixed w-fit min-w-10 min-h-10 h-fit  left-1/2 -translate-x-1/2 z-50 ${top ? top : "top-36"}`}>
+            <>
+                <div className={`fixed inset-0 bg-slate-800/70 z-50 duration-150 ease-out ${isOpen? "opacity-100" : "opacity-0 pointer-events-none"}`}></div>
+                <div ref={nodeRef} className={`flex flex-col fixed w-fit min-w-10 min-h-10 h-fit  left-1/2 -translate-x-1/2 z-50 duration-150 ease-out ${top ? top : "top-36"} ${isOpen? "opacity-100" : "opacity-0"}
+                `}>
                     {children}
                 </div>
-            </>}
+            </>
         </>
     )
     if (position === "aside") return (

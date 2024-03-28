@@ -7,7 +7,8 @@ interface ICheckWindow {
 }
 
 export default function CheckWindow({ data, handleClose, handleConfirm, text }: ICheckWindow) {
-    console.log("data", data)
+    // console.log("data", data)
+    console.log("handleConfirm", handleConfirm)
     return (
         <>
             <div className={`checkWindow w-72 h-48 bg-white shadow-md rounded-md px-10 py-12 flex flex-col justify-between items-center`} onClick={(e) => {

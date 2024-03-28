@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import { ReactNode, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Card from "@/components/modal/Card";
+import CardInfo from "@/components/modal/CardInfo";
 import Modal from "@/components/modal/Modal";
 import { closeAllModal, closeModal, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
@@ -12,6 +12,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { outerPage } from "./Auth";
 import CheckWindow from "./modal/CheckWindow";
 import { SearchPanel } from "./SearchPanel";
+import { setCardSettingIsDirty } from "@/redux/reducers/card";
 
 interface IProps {
     children: ReactNode;
@@ -27,6 +28,7 @@ const SharedComponents = (props: IProps) => {
     const dirtyState = useSelector((state: IState) => state.dirtyState);
     const user = useSelector((state: IState) => state.user);
     const pathname = usePathname();
+    const isCardSettingDirty = useSelector((state: IState) => state.isCardSettingDirty)
 
     // console.log("SharedComponents modalProp", modalProp)
     // console.log("SharedComponents openModalType", openModalType)
@@ -67,10 +69,39 @@ const SharedComponents = (props: IProps) => {
         <>
             {props.children}
 
-            {openModalType.includes("card") && <Card
-                isSelected={false}
-            />}
+            {selectedCard && <Modal
+                position={openModalType.includes("card") ? "center" : "full"}
+                isOpen={openModalType.includes("card") || openModalType[0] === "mobileCardSetting"}
+                handleClose={() => {
+                    // 電腦版會讀這邊
+                    // console.log("close")
+                    if (isCardSettingDirty) {
+                        if (openModalType.at(-1) === "checkWindow") {
+                            dispatch(closeModal({ type: "checkWindow", props: { data: selectedCard } }));
+                            return;
+                        }
+                        dispatch(openModal({
+                            type: "checkWindow",
+                            props: {
+                                text: "改動尚未儲存，確定要關閉視窗嗎？",
+                                handleConfirm: () => {
+                                    console.log("confirm")
+                                    dispatch(setCardSettingIsDirty(false));
+                                    dispatch(closeAllModal({ type: "" }));
+                                },
+                                data: selectedCard
+                            }
+                        }));
+                        return;
+                    }
+                    if (openModalType.includes("card")) dispatch(closeModal({ type: "card", props: null }));
+                }}
+            >
+                {/* card setting */}
+                <CardInfo isSelected={false} />
+            </Modal>}
 
+            {/* side boardElements */}
             {userPermission === "editable" && <Modal
                 position="aside"
                 isOpen={openModalType.includes("boardElements")}
@@ -91,11 +122,16 @@ const SharedComponents = (props: IProps) => {
                     }}>
                 </div>
             </Modal>}
+
+            {/* checkWindow */}
             {userPermission === "editable" && <Modal
                 position="center"
                 isOpen={openModalType.includes("checkWindow")}
                 handleClose={() => {
-                    if (openModalType.includes("checkWindow")) dispatch(closeModal({ type: "checkWindow", props: modalProp }))
+                    if (openModalType.includes("checkWindow")) {
+                        dispatch(closeModal({ type: "checkWindow", props: modalProp }));
+                        dispatch(setCardSettingIsDirty(false));
+                    }
                 }}
                 top="top-1/2 -translate-y-1/2 sm:top-48 sm:translate-y-0"
             >
@@ -110,10 +146,12 @@ const SharedComponents = (props: IProps) => {
             </Modal>}
 
             {/* mobile search */}
-            <div className={`block sm:hidden fixed z-40 top-12 bottom-16 inset-x-0 cursor-default shadow-md shadow-slate-800/30 bg-white duration-150 ${openModalType[0] === "mobileSearch" ? "translate-y-0" : "translate-y-full"}`}
+            <Modal
+                isOpen={openModalType[0] === "mobileSearch"}
+                handleClose={() => { }} position={"full"}
             >
                 <SearchPanel />
-            </div>
+            </Modal>
 
             {/* {user && <div className="w-full h-full sm:h-auto fixed bottom-0 inset-x-0">
                 {dirtyCards.length > 0 && <p className="cursor-default absolute top-1.5 left-2 text-sm text-slate-500 z-20">正在儲存...</p>}
