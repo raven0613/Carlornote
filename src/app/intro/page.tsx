@@ -1,32 +1,12 @@
-"use client"
-import { IBoardElement, ICard, boxType } from "@/type/card";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
-import ControlPanel from "@/components/ControlPanel";
-import Board from "@/components/Board";
-import { Suspense, useRef, useState } from "react";
+import { } from "react";
 import 'dompurify';
+import BoardGroup from "@/components/BoardGroup";
 
 // https://fonts.google.com/selection/embed
 
 export default function Intro() {
-    const { data: session, status } = useSession();
-    const [card, setCard] = useState<ICard>({
-        id: "",
-        authorId: "",
-        userList: [],
-        boardElement: defaultElements,
-        visibility: "private",
-        editability: "close",
-        createdAt: "",
-        updatedAt: "",
-        imageUrl: "",
-        name: "",
-        tags: []
-    });
-    const [draggingBox, setDraggingBox] = useState<boxType>("");
-    const boardWrapperRef = useRef<HTMLDivElement>(null);
-    const boardSectionRef = useRef<HTMLDivElement>(null);
+    // const boardSectionRef = useRef<HTMLDivElement>(null);
 
     return (
         <main className="flex flex-col w-full">
@@ -40,12 +20,14 @@ export default function Intro() {
                 </div>
             </header>
 
-            <button className="w-20 h-20 rounded-full fixed right-5 bottom-5 bg-seagull-700 text-white/80 z-10" onClick={() => {
-                scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                })
-            }}>TOP</button>
+            <button className="w-20 h-20 rounded-full fixed right-5 bottom-5 bg-seagull-700 text-white/80 z-10"
+            // onClick={() => {
+            //     scrollTo({
+            //         top: 0,
+            //         behavior: "smooth"
+            //     })
+            // }}
+            >TOP</button>
 
             <section className={`flex h-svh w-full items-center bg-gradient-to-tr from-orange-50 to-cyan-50 relative`}>
                 <div className="absolute left-24 bottom-10 h-[40%] w-[30rem]  text-5xl font-signika flex flex-col items-center z-10">
@@ -66,9 +48,11 @@ export default function Intro() {
                     <div className="w-[5rem] h-[7rem] bg-seagull-800 absolute -bottom-10 right-48 rounded-md shadow-md skew-y-6 hover:-rotate-1 hover:skew-y-3 hover:scale-105 origin-[90%_10%] duration-150 ease-out hover:shadow-seagull-950/40 z-0 hover:z-10" />
                     <div className="w-[20rem] h-[12rem] bg-seagull-700 absolute -bottom-5 left-30 rounded-md shadow-md skew-y-6 hover:skew-y-3 hover:-rotate-1 hover:scale-105 origin-[90%_10%] duration-150 ease-out hover:shadow-lg hover:shadow-seagull-950/40 z-0 hover:z-10" />
                 </div>
-                <div className="absolute bottom-2 w-20 left-1/2 -translate-x-1/2 text-center font-signika h-6 border-b border-seagull-700 text-seagull-700 hover:w-28 duration-150 cursor-pointer hover:scale-105" onClick={() => {
-                    boardSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
-                }}>Try now</div>
+                <div className="absolute bottom-2 w-20 left-1/2 -translate-x-1/2 text-center font-signika h-6 border-b border-seagull-700 text-seagull-700 hover:w-28 duration-150 cursor-pointer hover:scale-105"
+                // onClick={() => {
+                //     boardSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
+                // }}
+                >Try now</div>
             </section>
 
             {/* 三個特色 */}
@@ -101,11 +85,6 @@ export default function Intro() {
                             width: '100%', height: '',
                             boxShadow: "2px 5px 20px rgba(0, 0, 0, 0.3)"
                         }}
-                        onLoad={(e) => {
-                            // console.log("onLoad")
-                        }}
-                        onError={() => {
-                        }}
                     />
                 </div>
             </section>
@@ -116,7 +95,9 @@ export default function Intro() {
             <section className={`flex h-80 w-full items-center bg-seagull-700`}>
                 完成的卡片範例
             </section> */}
-            <section ref={boardSectionRef} className={`hidden sm:flex flex-col gap-2 pt-5 h-svh w-full items-center justify-center bg-seagull-200 relative`}
+
+            {/* ref={boardSectionRef} */}
+            <section className={`hidden sm:flex flex-col gap-2 pt-5 h-svh w-full items-center justify-center bg-seagull-200 relative`}
                 style={{
                     backgroundImage: "radial-gradient(rgb(100 100 120) 1px, transparent 0)",
                     backgroundSize: "15px 15px",
@@ -126,34 +107,7 @@ export default function Intro() {
                 <span className="w-[90%] text-5xl font-serif text-seagull-800">Try It
                     <span className="pl-5 text-xl font-sans text-seagull-800">Do Something on the Board</span>
                 </span>
-
-                <div ref={boardWrapperRef} className=" justify-center items-center w-[90%] h-[80%] rounded-lg overflow-hidden shadow-lg shadow-black/20 px-0 pt-0 relative bg-white"
-                >
-                    <Board
-                        distenceToLeftTop={{ left: boardWrapperRef.current?.offsetLeft ?? 0, top: boardWrapperRef.current?.getBoundingClientRect().top ?? 0 }}
-                        handlePushStep={() => { }}
-                        elements={card.boardElement}
-                        handleUpdateElementList={(allElement: IBoardElement[]) => {
-                            // console.log("update allElement list", allElement)
-                            setCard(pre => {
-                                return { ...pre, boardElement: allElement };
-                            });
-                        }}
-                        draggingBox={draggingBox}
-                        handleMouseUp={() => {
-                            setDraggingBox("");
-                        }}
-                        handleSetDirty={() => {
-                        }}
-                        permission={"editable"}
-                    />
-                    <ControlPanel
-                        isSelectingCard={true}
-                        handleDrag={(type) => {
-                            setDraggingBox(type);
-                        }}
-                    />
-                </div>
+                <BoardGroup />
             </section>
             <footer className={`flex h-20 w-full items-center bg-seagull-900 justify-center gap-96`}>
                 <div className="w-28 madimi-one-regular text-2xl cursor-default">
@@ -165,114 +119,3 @@ export default function Intro() {
         </main>
     );
 }
-
-const defaultElements: IBoardElement[] = [
-    {
-        id: "element_599a35ee-88f1-460f-b148-e6126547e000",
-        type: "markdown",
-        name: "",
-        content: "## Markdown\n\n### Double click me",
-        width: 550,
-        height: 295,
-        rotation: 0,
-        left: 140,
-        top: 270,
-        radius: 0,
-        opacity: 100,
-        isLock: false,
-    },
-    {
-        id: "element_599a35ee-88f1-460f-b148-e6126547e662",
-        type: "code",
-        name: "Double click me",
-        content: "console.log(\"Hello Carlornote!\")",
-        width: 480,
-        height: 260,
-        rotation: 0,
-        left: 745,
-        top: 65,
-        radius: 0,
-        opacity: 100,
-        isLock: false,
-        programmingLanguage: "typescript"
-    },
-    {
-        id: "element_057f69d1-6d0b-463b-a6e9-5b323b77fecd",
-        type: "text",
-        name: "",
-        content: "Drag me!",
-        width: 200,
-        height: 60,
-        textColor: "#009688",
-        fontSize: "2xl",
-        fontWeight: "extraBold",
-        rotation: -14.44,
-        left: 89,
-        top: 28,
-        radius: 0,
-        opacity: 100,
-        isLock: false
-    },
-    {
-        id: "element_83e86f64-3a51-47c9-bde8-4c1e6372e31c",
-        type: "text",
-        name: "",
-        content: "Rotate me!",
-        width: 200,
-        height: 60,
-        textColor: "#03a9f4",
-        fontSize: "2xl",
-        fontWeight: "extraBold",
-        rotation: -6.39,
-        left: 112,
-        top: 85,
-        radius: 0,
-        opacity: 100,
-        isLock: false
-    },
-    {
-        id: "element_90f8a8db-ba09-4dc2-a365-70cc7c45a90f",
-        type: "text",
-        name: "",
-        content: "Scale me!",
-        width: 200,
-        height: 60,
-        textColor: "#ff5722",
-        fontSize: "2xl",
-        fontWeight: "extraBold",
-        rotation: 8.3,
-        left: 96,
-        top: 158,
-        radius: 0,
-        opacity: 100,
-        isLock: false
-    },
-    {
-        id: "element_638476aa-6d9e-4649-b7f0-01442b120337",
-        type: "image",
-        name: "example image 01",
-        content: "https://i.imgur.com/gAzhP1L.png",
-        width: 370,
-        height: 320,
-        rotation: 0,
-        left: 525,
-        top: 350,
-        radius: 0,
-        opacity: 100,
-        isLock: false
-    },
-    {
-        id: "element_288b510f-c08a-4705-9fac-aecbacbe3a11",
-        type: "image",
-        name: "example image 02",
-        content: "https://i.imgur.com/XOkGMfS.png",
-        width: 277,
-        height: 240,
-        rotation: 0,
-        left: 1070,
-        top: 435,
-        radius: 0,
-        opacity: 100,
-        isLock: false
-    }
-] 
