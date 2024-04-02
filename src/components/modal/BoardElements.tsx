@@ -321,7 +321,7 @@ export default function ElementModal({ permission }: IElementModal) {
                                     }}
                                     className={`flex items-center justify-center relative h-fit`}
                                 >
-                                    <Card url={item.cardData?.imageUrl ?? ""} name={item.cardData?.name ?? ""} cardLize={"lg"}
+                                    <Card id={item.id} url={item.cardData?.imageUrl ?? ""} name={item.cardData?.name ?? ""} cardLize={"lg"}
                                         classProps={``}
                                     />
                                 </div>}

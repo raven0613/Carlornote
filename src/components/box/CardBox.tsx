@@ -63,7 +63,7 @@ export default function CardBox({ cardData, handleUpdateElement, handleClick, is
                 distenceToLeftTop={distenceToLeftTop}
             >
                 <Link href={`/card/${cardData.cardData?.id.split("_")[1]}`}
-                    rel="preconnect"
+                    prefetch 
                     onClick={(e) => {
                         e.stopPropagation();
                     }}
@@ -73,7 +73,7 @@ export default function CardBox({ cardData, handleUpdateElement, handleClick, is
                     </div>
                 </Link>
 
-                <Card url={cardData.cardData?.imageUrl ?? ""} name={cardData.cardData?.name ?? ""} cardLize={"lg"}
+                <Card id={cardData.id} url={cardData.cardData?.imageUrl ?? ""} name={cardData.cardData?.name ?? ""} cardLize={"lg"}
                     classProps={`${isSelected ? "bg-zinc-800" : "group-hover:bg-zinc-600 group-hover:-top-6 cursor-pointer"}
                     absolute top-0 left-1/2 -translate-x-1/2
                     `} >

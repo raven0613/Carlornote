@@ -4,6 +4,7 @@ import ShareIcon from "@/components/svg/Share";
 import Image from "next/image";
 import EmptyImageIcon from "@/components/svg/EmptyImage";
 import EditIcon from "./svg/Edit";
+import Link from "next/link";
 
 interface ICard {
     url: string;
@@ -12,9 +13,10 @@ interface ICard {
     classProps: string;
     cardLize: "hidden" | "sm" | "lg";
     isSelected?: boolean
+    id: string;
 }
 
-export default function Card({ url, name, children, classProps, cardLize, isSelected }: ICard) {
+export default function Card({ id, url, name, children, classProps, cardLize, isSelected }: ICard) {
     // console.log("name", name, url)
     return (
         <>
@@ -22,6 +24,10 @@ export default function Card({ url, name, children, classProps, cardLize, isSele
                     ${isSelected ? "bg-gray-700 text-white/90" : "bg-gray-300 group-hover:bg-gray-600 group-hover:-top-6 group-hover:text-white/90 cursor-pointer text-seagull-950/90"}
                     ${classProps} ${cardLize === "lg" ? "sm:h-32" : "sm:h-24"}
                 `}
+                onMouseDown={(e) => {
+                    if (e.button !== 1 || !window || !id) return;
+                    window.open(`/card/${id.split("_")[1]}`, "_blank")
+                }}
             >
                 <div className={`${(name && cardLize === "lg") ? "row-span-4" : "row-span-5"} flex items-center justify-center overflow-hidden`}>
                     {!url && <EmptyImageIcon classProps="p-1 pointer-events-none text-gray-400" />}
@@ -57,9 +63,10 @@ interface ICardWithHover {
     name: string;
     cardLize: "hidden" | "sm" | "lg";
     handleDrag: () => void;
+    id: string
 }
 
-export function CardWithHover({ handleClick, isSelected, url, name, handleClickEdit, cardLize, handleDrag }: ICardWithHover) {
+export function CardWithHover({ handleClick, isSelected, url, name, handleClickEdit, cardLize, handleDrag, id }: ICardWithHover) {
     // console.log("name", name, url)
     return (
         <>
@@ -79,7 +86,7 @@ export function CardWithHover({ handleClick, isSelected, url, name, handleClickE
                 }}
                 draggable={!isSelected}
             >
-                <Card url={url} name={name} cardLize={cardLize} isSelected={isSelected}
+                <Card id={id} url={url} name={name} cardLize={cardLize} isSelected={isSelected}
                     classProps={`
                     absolute top-0 left-1/2 -translate-x-1/2
                     `} >

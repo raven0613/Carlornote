@@ -14,6 +14,7 @@ import { setUserPermission } from "@/redux/reducers/user";
 import ControlBar from "@/components/ControlBar";
 import Link from "next/link";
 import { changeIndex } from "@/utils/utils";
+import { useRouter } from "next/navigation";
 
 export type StepType = { id: string, newIdx: number, oldIdx: number } | { newData: IBoardElement, oldData: IBoardElement } | { added: IBoardElement } | { deleted: IBoardElement, index: number };
 
@@ -25,13 +26,19 @@ export default function Home() {
     const [draggingBox, setDraggingBox] = useState<boxType>("");
     const [draggingCard, setDraggingCard] = useState<ICard>();
     const dispatch = useDispatch();
+    const router = useRouter();
     const selectedCard = useSelector((state: IState) => state.selectedCard);
     const allCards = useSelector((state: IState) => state.card);
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
+    const user = useSelector((state: IState) => state.user);
 
     // console.log("回復", undoList)
     // console.log("重來", redoList)
+    useEffect(() => {
+        if (user) return;
+        router.push("/login");
+    }, [user, router])
 
     useEffect(() => {
         dispatch(setUserPermission("editable"));
@@ -174,12 +181,13 @@ export default function Home() {
 
             <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
             >
-                {!selectedCard && <p className="text-center w-full">{status !== "authenticated" ?
+                {!selectedCard && <p className="text-center w-full">{user ?
+                    "請選擇一張卡片" :
                     <>
                         {"請先"}
                         <Link scroll={false} href={"./login"} className="border border-slate-400 px-1.5 py-1 rounded-md ml-1.5">登入</Link>
                     </>
-                    : "請選擇一張卡片"}</p>}
+                }</p>}
                 {selectedCard && <>
                     <Board
                         handlePushStep={(step: StepType) => {
@@ -205,7 +213,7 @@ export default function Home() {
                             dispatch(setDirtyState("dirty"))
                             dispatch(setDirtyCardId(selectedCard.id));
                         }}
-                        permission={status === "authenticated" ? "editable" : "none"}
+                        permission={user?.id === selectedCard.authorId ? "editable" : "none"}
                         draggingCard={draggingCard}
                     />
                 </>}

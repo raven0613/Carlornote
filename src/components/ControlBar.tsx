@@ -7,6 +7,8 @@ import { removeUser } from "@/redux/reducers/user";
 import UndoRedoIcon from "./svg/UndoRedo";
 import SearchGroup from "./SearchPanel";
 import Link from "next/link";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { storageKey } from "./Auth";
 
 interface IControlBar {
     handleRedo: () => void;
@@ -22,7 +24,7 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
     const user = useSelector((state: IState) => state.user);
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
-
+    const { removeStorage } = useLocalStorage({ storageKey });
     return (
         <div className="hidden sm:flex fixed top-2 right-10 z-30 gap-2 items-center justify-center">
             {dirtyCards.length > 0 && <p className="cursor-default text-sm text-seagull-700/80 z-20 pr-2">正在儲存...</p>}
@@ -61,6 +63,7 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                     // hrefAs: user ? "" : "/login",
                     handleClick: user ? async () => {
                         // logout
+                        removeStorage();
                         await signOut();
                         dispatch(removeUser());
                     } : () => { }

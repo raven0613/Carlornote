@@ -72,6 +72,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     // console.log("createdAt", new Date(allCards[0].createdAt).getTime())
 
     useEffect(() => {
+        if (allCards.length > 0) return setCardState("ok");
         async function handleFetchCard() {
             const response = await handleGetCards(user?.id || "");
             if (response.status === "FAIL") return setCardState("error");
@@ -84,7 +85,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
         }
         setCardState("loading");
         handleFetchCard();
-    }, [dispatch, user]);
+    }, [dispatch, user, allCards.length]);
 
     useEffect(() => {
         if (!windowWidth) return;
@@ -220,6 +221,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         return (
                             <Link scroll={false} key={item.id} href={`/card/${item.id.split("card_")[1]}`} className="w-full h-full">
                                 <Card
+                                    id={item.id}
                                     url={item.imageUrl}
                                     name={item.name}
                                     classProps={""}
@@ -276,6 +278,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                         )
                             .map((item) =>
                                 <CardWithHover key={item.id}
+                                    id={item.id}
                                     name={item.name}
                                     url={item.imageUrl}
                                     isSelected={selectedCardId === item.id}

@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { IState } from "@/redux/store";
 import { removeUser } from "@/redux/reducers/user";
 import Popup from "./Popup";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { storageKey } from "./Auth";
 
 interface IHeader {
 }
@@ -13,6 +15,7 @@ export default function Header({ }: IHeader) {
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
     const [openPopup, setOpenPopup] = useState<"setting" | null>(null);
+    const { removeStorage } = useLocalStorage({ storageKey });
     // 先 hidden 之後看怎麼改
     return (
         <header className="grid sm:hidden fixed inset-x-0 top-0 h-12 bg-white grid-cols-6 z-50 shadow-md">
@@ -32,6 +35,7 @@ export default function Header({ }: IHeader) {
                         // hrefAs: user ? "" : "/login",
                         handleClick: user ? async () => {
                             // logout
+                            removeStorage();
                             await signOut();
                             dispatch(removeUser());
                         } : () => { }

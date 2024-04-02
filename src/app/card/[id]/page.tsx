@@ -256,7 +256,7 @@ export default function CardPage() {
                 {(windowWidth && windowWidth >= 640) && <CardList selectedCardId={selectedCard?.id}
                     handleSetSelectedCard={(id: string) => {
                         // console.log("id", id)
-                        // dispatch(selectCard(allCards.find(item => item.id === id) || null));
+                        dispatch(selectCard(allCards.find(item => item.id === id) || null));
                         window && window.history.pushState(null, 'cardId', `/card/${id.split("_").at(-1)}`);
                     }}
                     handleDrag={() => {
