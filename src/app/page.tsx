@@ -35,10 +35,11 @@ export default function Home() {
 
     // console.log("回復", undoList)
     // console.log("重來", redoList)
-    useEffect(() => {
-        if (user) return;
-        router.push("/login");
-    }, [user, router])
+    // useEffect(() => {
+    //     if (user) return;
+    //     console.log("轉址 login")
+    //     router.push("/login");
+    // }, [user, router])
 
     useEffect(() => {
         dispatch(setUserPermission("editable"));

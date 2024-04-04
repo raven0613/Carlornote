@@ -9,6 +9,7 @@ import SearchGroup from "./SearchPanel";
 import Link from "next/link";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { storageKey } from "./Auth";
+import { useRouter } from "next/navigation";
 
 interface IControlBar {
     handleRedo: () => void;
@@ -21,10 +22,13 @@ interface IControlBar {
 export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, canEdit }: IControlBar) {
     const [openPopup, setOpenPopup] = useState<"setting" | null>(null);
     const dispatch = useDispatch();
+    const router = useRouter();
     const user = useSelector((state: IState) => state.user);
     const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
     const dirtyState = useSelector((state: IState) => state.dirtyState);
+
     const { removeStorage } = useLocalStorage({ storageKey });
+
     return (
         <div className="hidden sm:flex fixed top-2 right-10 z-30 gap-2 items-center justify-center">
             {dirtyCards.length > 0 && <p className="cursor-default text-sm text-seagull-700/80 z-20 pr-2">正在儲存...</p>}
@@ -63,9 +67,11 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                     // hrefAs: user ? "" : "/login",
                     handleClick: user ? async () => {
                         // logout
+                        console.log("按登出")
                         removeStorage();
                         await signOut();
                         dispatch(removeUser());
+                        router.push("/login");
                     } : () => { }
                 }]}
                     isOpen={openPopup === "setting"}
@@ -74,7 +80,7 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                 />
             </button>}
             {!user && <Link prefetch scroll={false} href={"/login"} className={`border bg-transparent border-seagull-400 text-seagull-600 px-2 py-1 rounded relative overflow-hidden z-10 duration-150
-            before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:-z-10 before:rounded-full before:opacity-0 before:w-5 before:h-5 hover:before:scale-[700%] before:bg-seagull-500  hover:before:opacity-100 before:duration-150 hover:text-white/80
+            before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:-z-10 before:rounded-full before:opacity-0 before:w-5 before:h-5 hover:before:scale-[700%] hover:border-seagull-500 before:bg-seagull-500  hover:before:opacity-100 before:duration-150 hover:text-white/80
             backdrop-blur-lg
             `}
             >

@@ -4,6 +4,7 @@ import SortIcon from "./svg/Sort";
 import TagIcon from "./svg/Tag";
 import { ICard } from "@/type/card";
 import SortedIcon from "./svg/Sorted";
+import ResetIcon from "./svg/Reset";
 
 export type sortConditionType = { key: keyof ICard, sort: "asc" | "desc" };
 
@@ -90,7 +91,15 @@ export function TagCore({ allTags, selectedTagsProp, handleSelectTag }: ITagCore
     const selectedTagSet = new Set<string>(selectedTags);
     return (
         <div className="flex flex-col gap-2">
-            <TagIcon classProps={`text-seagull-400 w-6 h-6 mr-52`} />
+            <div className="flex w-full justify-between items-center gap-2">
+                <TagIcon classProps={`text-seagull-400 w-6 h-6`} />
+                <ResetIcon classProps={`text-seagull-400 w-5 h-5 cursor-pointer hover:text-seagull-600 duration-150`}
+                    handleClick={() => {
+                        handleSelectTag && handleSelectTag([]);
+                        setSelectedTags([]);
+                    }}
+                />
+            </div>
             <div className="flex flex-wrap gap-2">
                 {allTags.map(tag => {
                     return (

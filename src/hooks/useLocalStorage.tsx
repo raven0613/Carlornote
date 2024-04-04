@@ -6,16 +6,16 @@ interface IUseLocalStorage {
 
 export default function useLocalStorage({ storageKey }: IUseLocalStorage) {
     const data = useRef<string>("");
-    console.log("storageKey", storageKey)
+    // console.log("storageKey", storageKey)
 
-    function saveLocalStorage (saveSata: string) {
+    function saveLocalStorage(saveSata: string) {
         if (!saveSata) return;
         const localStorage = window?.localStorage;
         if (!localStorage) return;
         localStorage.setItem(storageKey, saveSata);
     }
-    
-    function removeLocalStorage () {
+
+    function removeLocalStorage() {
         console.log("window", window)
         const localStorage = window?.localStorage;
         if (!localStorage) return console.log("ㄟㄟㄟ");
@@ -29,9 +29,9 @@ export default function useLocalStorage({ storageKey }: IUseLocalStorage) {
         data.current = localStorage.getItem(storageKey) ?? "";
     }, [storageKey]);
 
-    return { 
-        saveStorage: saveLocalStorage, 
-        removeStorage: removeLocalStorage, 
-        storageData: data.current 
+    return {
+        saveStorage: saveLocalStorage,
+        removeStorage: removeLocalStorage,
+        storageData: data.current
     };
 }

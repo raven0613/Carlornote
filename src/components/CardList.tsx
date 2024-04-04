@@ -80,12 +80,20 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
             dispatch(setCards(JSON.parse(response.data).sort((a: ICard, b: ICard) => {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             })));
-            setCardSize("lg");
+
+            if (pathname === "/") {
+                setCardSize("lg");
+                return;
+            }
+            if (!selectedCard) return;
+            if (user && (selectedCard.authorId === user.id || selectedCard.visibility === "public" || selectedCard.visibility === "limited" && selectedCard.userList.includes(user.id))) {
+                setCardSize("lg");
+            }
             // console.log("get data", JSON.parse(response.data))
         }
         setCardState("loading");
         handleFetchCard();
-    }, [dispatch, user, allCards.length]);
+    }, [dispatch, user, allCards.length, selectedCard, pathname]);
 
     useEffect(() => {
         if (!windowWidth) return;
@@ -138,6 +146,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     selectedTagsProp={selectedTags}
                     handleSelectTag={(tags: string[]) => {
                         setSelectedTags(tags);
+                        setWheelIdx(0);
                     }}
                     handleClose={() => { setOpenedPanel("") }}
                 />
