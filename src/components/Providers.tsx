@@ -1,4 +1,5 @@
 "use client";
+import ScrollProvider from "@/hooks/useScrollToView";
 import { store } from "@/redux/store";
 import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
@@ -12,7 +13,9 @@ const Providers = (props: IProps) => {
     return (
         <Provider store={store}>
             <SessionProvider>
-                {props.children}
+                <ScrollProvider>
+                    {props.children}
+                </ScrollProvider>
             </SessionProvider>
         </Provider>
     )

@@ -16,6 +16,7 @@ import { StepType } from "@/app/page";
 import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
 import { xDirection, yDirection } from "./box/Box";
 import useMousemoveDirection from "@/hooks/useMousemoveDirection";
+import useCheckTabVisibility from "@/hooks/useCheckTabVisibility";
 
 // 看 board 離螢幕左和上有多少 px
 // export const distenceToLeftTop = { left: 0, top: 0 };
@@ -108,6 +109,11 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // console.log("distenceToLeftTop", distenceToLeftTop)
     const mouseMoveResult = useMousemoveDirection();
 
+    const isCurrentTab = useCheckTabVisibility();
+    // useEffect(() => {
+    //     let time: NodeJS.Timeout | null = null;
+    // }, [isCurrentTab])
+    console.log("isCurrentTab", isCurrentTab)
 
     useEffect(() => {
         if (permission !== "editable") {

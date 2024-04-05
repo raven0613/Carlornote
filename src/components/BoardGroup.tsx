@@ -3,6 +3,8 @@ import React, { useRef, useState } from 'react'
 import ControlPanel from './ControlPanel';
 import Board from './Board';
 import { IBoardElement, ICard, boxType } from '@/type/card';
+import useScrollToView, { ScrollContextType, useScroll } from '@/hooks/useScrollToView';
+import useCheckTabVisibility from '@/hooks/useCheckTabVisibility';
 
 export default function BoardGroup() {
     const [card, setCard] = useState<ICard>({
@@ -20,34 +22,38 @@ export default function BoardGroup() {
     });
     const [draggingBox, setDraggingBox] = useState<boxType>("");
     const boardWrapperRef = useRef<HTMLDivElement>(null);
+    const { nodeRef } = useScroll() as ScrollContextType;
+
     return (
-        <div ref={boardWrapperRef} className=" justify-center items-center w-[90%] h-[80%] rounded-lg overflow-hidden shadow-lg shadow-black/20 px-0 pt-0 relative bg-white"
-        >
-            <Board
-                distenceToLeftTop={{ left: boardWrapperRef.current?.offsetLeft ?? 0, top: boardWrapperRef.current?.getBoundingClientRect().top ?? 0 }}
-                handlePushStep={() => { }}
-                elements={card.boardElement}
-                handleUpdateElementList={(allElement: IBoardElement[]) => {
-                    // console.log("update allElement list", allElement)
-                    setCard(pre => {
-                        return { ...pre, boardElement: allElement };
-                    });
-                }}
-                draggingBox={draggingBox}
-                handleMouseUp={() => {
-                    setDraggingBox("");
-                }}
-                handleSetDirty={() => {
-                }}
-                permission={"editable"}
-            />
-            <ControlPanel
-                isSelectingCard={true}
-                handleDrag={(type) => {
-                    setDraggingBox(type);
-                }}
-            />
-        </div>
+        <>
+            <div ref={nodeRef} className="boardWrapper justify-center items-center w-[90%] h-[80%] rounded-lg overflow-hidden shadow-lg shadow-black/20 px-0 pt-0 relative bg-white"
+            >
+                <Board
+                    distenceToLeftTop={{ left: boardWrapperRef.current?.offsetLeft ?? 0, top: boardWrapperRef.current?.getBoundingClientRect().top ?? 0 }}
+                    handlePushStep={() => { }}
+                    elements={card.boardElement}
+                    handleUpdateElementList={(allElement: IBoardElement[]) => {
+                        // console.log("update allElement list", allElement)
+                        setCard(pre => {
+                            return { ...pre, boardElement: allElement };
+                        });
+                    }}
+                    draggingBox={draggingBox}
+                    handleMouseUp={() => {
+                        setDraggingBox("");
+                    }}
+                    handleSetDirty={() => {
+                    }}
+                    permission={"editable"}
+                />
+                <ControlPanel
+                    isSelectingCard={true}
+                    handleDrag={(type) => {
+                        setDraggingBox(type);
+                    }}
+                />
+            </div>
+        </>
     )
 }
 

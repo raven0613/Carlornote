@@ -2,6 +2,7 @@ import Image from "next/image";
 import { } from "react";
 import 'dompurify';
 import BoardGroup from "@/components/BoardGroup";
+import { IntroTopButton, IntroTryButton } from "@/components/IntroButton";
 
 // https://fonts.google.com/selection/embed
 
@@ -20,14 +21,7 @@ export default function Intro() {
                 </div>
             </header>
 
-            <button className="w-20 h-20 rounded-full fixed right-5 bottom-5 bg-seagull-700 text-white/80 z-10"
-            // onClick={() => {
-            //     scrollTo({
-            //         top: 0,
-            //         behavior: "smooth"
-            //     })
-            // }}
-            >TOP</button>
+            <IntroTopButton />
 
             <section className={`flex h-svh w-full items-center bg-gradient-to-tr from-orange-50 to-cyan-50 relative`}>
                 <div className="absolute left-24 bottom-10 h-[40%] w-[30rem]  text-5xl font-signika flex flex-col items-center z-10">
@@ -48,11 +42,7 @@ export default function Intro() {
                     <div className="w-[5rem] h-[7rem] bg-seagull-800 absolute -bottom-10 right-48 rounded-md shadow-md skew-y-6 hover:-rotate-1 hover:skew-y-3 hover:scale-105 origin-[90%_10%] duration-150 ease-out hover:shadow-seagull-950/40 z-0 hover:z-10" />
                     <div className="w-[20rem] h-[12rem] bg-seagull-700 absolute -bottom-5 left-30 rounded-md shadow-md skew-y-6 hover:skew-y-3 hover:-rotate-1 hover:scale-105 origin-[90%_10%] duration-150 ease-out hover:shadow-lg hover:shadow-seagull-950/40 z-0 hover:z-10" />
                 </div>
-                <div className="absolute bottom-2 w-20 left-1/2 -translate-x-1/2 text-center font-signika h-6 border-b border-seagull-700 text-seagull-700 hover:w-28 duration-150 cursor-pointer hover:scale-105"
-                // onClick={() => {
-                //     boardSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
-                // }}
-                >Try now</div>
+                <IntroTryButton />
             </section>
 
             {/* 三個特色 */}
@@ -96,7 +86,6 @@ export default function Intro() {
                 完成的卡片範例
             </section> */}
 
-            {/* ref={boardSectionRef} */}
             <section className={`hidden sm:flex flex-col gap-2 pt-5 h-svh w-full items-center justify-center bg-seagull-200 relative`}
                 style={{
                     backgroundImage: "radial-gradient(rgb(100 100 120) 1px, transparent 0)",
@@ -104,9 +93,15 @@ export default function Intro() {
                     backgroundPosition: "-19px -19px"
                 }}
             >
-                <span className="w-[90%] text-5xl font-serif text-seagull-800">Try It
-                    <span className="pl-5 text-xl font-sans text-seagull-800">Do Something on the Board</span>
-                </span>
+                <div className="flex items-center justify-between w-[90%]">
+                    <span className=" text-5xl font-serif text-seagull-800 flex items-center">
+                        Try It
+                        <span className="pl-5 text-xl font-sans text-seagull-800">Do Something on the Board</span>
+
+                    </span>
+                    <button className="bg-seagull-500 px-3 py-2 text-white rounded-sm hover:bg-seagull-600 duration-150">Sign up to save card</button>
+                </div>
+
                 <BoardGroup />
             </section>
             <footer className={`flex h-20 w-full items-center bg-seagull-900 justify-center gap-96`}>
@@ -114,7 +109,7 @@ export default function Intro() {
                     <span className="text-seagull-400">Carlor</span>
                     <span className="madimi-one-regular text-2xl text-seagull-600">note</span>
                 </div>
-                <span className="text-seagull-300 font-extralight">Copyright © 2024 Raven. All rights reserved.</span>
+                <span className="text-seagull-300 font-extralight">Copyright © 2024 Carlornote. All rights reserved.</span>
             </footer>
         </main>
     );
