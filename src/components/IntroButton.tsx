@@ -1,6 +1,8 @@
 "use client"
 import useScrollToView, { ScrollContextType, useScroll } from '@/hooks/useScrollToView';
+import { IState } from '@/redux/store';
 import React, { createContext, useContext } from 'react'
+import { useSelector } from 'react-redux';
 
 export function IntroTopButton() {
     return (
@@ -23,5 +25,14 @@ export function IntroTryButton() {
                 scrollToNode();
             }}
         >Try now</div>
+    )
+}
+
+export function IntroHeaderButton() {
+    const user = useSelector((state: IState) => state.user);
+    return (
+        <button className="bg-seagull-500 px-3 py-2 text-white rounded-sm hover:bg-seagull-600 duration-150">
+            {user? "Go to your board" :"Sign up for free"}
+        </button>
     )
 }

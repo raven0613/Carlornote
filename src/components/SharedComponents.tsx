@@ -40,7 +40,7 @@ const SharedComponents = (props: IProps) => {
         function handleMouse(e: MouseEvent) {
             // e.stopPropagation();
             // e.preventDefault();
-            console.log((e.target as HTMLElement))
+            // console.log((e.target as HTMLElement))
         }
         document.addEventListener("click", handleMouse);
         return () => document.removeEventListener("click", handleMouse);

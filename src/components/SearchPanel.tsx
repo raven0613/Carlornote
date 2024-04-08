@@ -93,7 +93,7 @@ export function SearchPanel() {
             })
             setResult(result.filter(card => card.summary.length > 0));
 
-            console.log(inputValue)
+            // console.log(inputValue)
             setIsLoading(false);
             if (time) clearInterval(time);
         }, 1000);

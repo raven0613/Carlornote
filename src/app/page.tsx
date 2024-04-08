@@ -10,11 +10,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearDirtyCardId, selectCard, setDirtyCardId, setDirtyState, setTags, updateCards } from "@/redux/reducers/card";
 import CardList from "@/components/CardList";
 import Popup from "@/components/Popup";
-import { setUserPermission } from "@/redux/reducers/user";
+import { addUser, setUserPermission } from "@/redux/reducers/user";
 import ControlBar from "@/components/ControlBar";
 import Link from "next/link";
 import { changeIndex } from "@/utils/utils";
 import { useRouter } from "next/navigation";
+import { handleAddUser, handleGetUserByEmail } from "@/api/user";
 
 export type StepType = { id: string, newIdx: number, oldIdx: number } | { newData: IBoardElement, oldData: IBoardElement } | { added: IBoardElement } | { deleted: IBoardElement, index: number };
 
@@ -101,9 +102,9 @@ export default function Home() {
                 canUndo={undoList.length > 0}
                 canRedo={redoList.length > 0}
                 handleUndo={() => {
-                    console.log("現在回復 boardElement", selectedCard.boardElement)
+                    // console.log("現在回復 boardElement", selectedCard.boardElement)
                     const lastStep = undoList.pop();
-                    console.log("現在回復 lastStep", lastStep)
+                    // console.log("現在回復 lastStep", lastStep)
                     if (typeof lastStep === "undefined") return;
 
                     let newBoardElements: IBoardElement[] = [];
@@ -142,9 +143,9 @@ export default function Home() {
                     dispatch(selectCard(updatedCard));
                 }}
                 handleRedo={() => {
-                    console.log("現在重來", redoList)
+                    // console.log("現在重來", redoList)
                     const lastStep = redoList.pop();
-                    console.log("現在重來", lastStep)
+                    // console.log("現在重來", lastStep)
                     if (!lastStep) return;
                     let newBoardElements: IBoardElement[] = [];
                     if ("added" in lastStep) {

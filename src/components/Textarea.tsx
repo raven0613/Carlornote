@@ -87,7 +87,7 @@ export default function Textarea({ text, handleUpdate }: { text: string, handleU
                         }).join("");
                         // rightSide 的字串不會被動到
                         const result = `${leftResult}${middleResult}${rightSide}`;
-                        console.log("result", result)
+                        // console.log("result", result)
                         setValue(result);
                         handleUpdate(result)
                         // handleUpdateElement({ ...textData, content: result });
@@ -118,7 +118,7 @@ export default function Textarea({ text, handleUpdate }: { text: string, handleU
                             return `\n\t${item}`;
                         }).join("");
                         const result = `${leftResult}${middleResult}${rightSide}`;
-                        console.log("result", result)
+                        // console.log("result", result)
                         setValue(result);
                         handleUpdate(result)
                         // handleUpdateElement({ ...textData, content: result });

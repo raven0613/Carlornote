@@ -24,13 +24,16 @@ export interface IBoardElement {
     }
 }
 
+export type CardVisibilityType = "public" | "private" | "limited";
+export type CardEditabilityType = "open" | "close" | "limited";
+
 export interface ICard {
     id: string,
     authorId: string,
     userList: string[],
     boardElement: IBoardElement[],
-    visibility: "public" | "private" | "limited",
-    editability: "open" | "close" | "limited"
+    visibility: CardVisibilityType,
+    editability: CardEditabilityType,
     createdAt: string,
     updatedAt: string,
     imageUrl: string,

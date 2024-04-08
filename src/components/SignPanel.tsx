@@ -88,7 +88,7 @@ export function SignPanel({ type }: { type: "login" | "signup" }) {
                 <button type="button" className=" bg-white shadow-md shadow-black/30 px-2 py-1 w-10 h-10 rounded-full text-white mb-5 hover:scale-110 duration-150"
                     onClick={async () => {
                         setIsLoading(true);
-                        await signIn("google");
+                        await signIn("google", { callbackUrl: "/" });
                         setIsLoading(false);
                     }}
                 >

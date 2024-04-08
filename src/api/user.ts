@@ -92,7 +92,7 @@ export async function handleAddUser(data: IUser): Promise<IResponse> {
         return { code: 500, status: "FAIL", message: JSON.stringify(error), data: null };
     } finally {
         return {
-            code: 200, status: "SUCCESS", data: JSON.stringify(data), message: "SUCCESS"
+            code: 200, status: "SUCCESS", data: JSON.stringify(addData), message: "SUCCESS"
         };
     }
 }

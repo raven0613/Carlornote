@@ -52,13 +52,18 @@ export function cardsReducer(state: ICard[] = initCardState, action: IAction<ICa
 
 export const initSelectedCardState = null;
 const SELECT_CARD = "SELECT_CARD";
+const RESET_SELECT_CARD = "RESET_SELECT_CARD";
 export const selectCard = (payload: ICard | null) => ({ type: SELECT_CARD, payload });
+export const resetSelectCard = (payload: ICard | null) => ({ type: RESET_SELECT_CARD, payload });
 
 export function selectedCardReducer(state: ICard | null = initSelectedCardState, action: IAction<ICard | string>) {
     // console.log("payload", action.payload)
     switch (action.type) {
         case SELECT_CARD: {
             return action.payload;
+        }
+        case RESET_SELECT_CARD: {
+            return null;
         }
         default: return state;
     }
@@ -110,7 +115,7 @@ export function cardSettingIsDirtyReducer(state: boolean = initDirtyCardSettingS
     // console.log("dirtyCards payload", action.payload)
     switch (action.type) {
         case SET_CARD_SETTING_IS_DIRTY: {
-            console.log("dirty", action.payload)
+            // console.log("dirty", action.payload)
             return action.payload;
         }
         default: return state;

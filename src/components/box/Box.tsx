@@ -181,7 +181,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     opacity: data.opacity
                 }}
                 onMouseUp={() => {
-                    console.log("ㄟ")
+                    // console.log("ㄟ")
                 }}
                 onMouseDown={(e) => {
                     // 紀錄點擊的時候的位置

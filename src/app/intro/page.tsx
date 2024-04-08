@@ -1,8 +1,9 @@
 import Image from "next/image";
-import { } from "react";
+import { Suspense } from "react";
 import 'dompurify';
 import BoardGroup from "@/components/BoardGroup";
-import { IntroTopButton, IntroTryButton } from "@/components/IntroButton";
+import { IntroHeaderButton, IntroTopButton, IntroTryButton } from "@/components/IntroButton";
+import Loading from "@/components/loading";
 
 // https://fonts.google.com/selection/embed
 
@@ -17,7 +18,8 @@ export default function Intro() {
                     <span className="madimi-one-regular text-2xl text-seagull-500">note</span>
                 </div>
                 <div className="flex items-center h-full">
-                    <button className="bg-seagull-500 px-3 py-2 text-white rounded-sm hover:bg-seagull-600 duration-150">Sign up for free</button>
+                    <IntroHeaderButton />
+                    {/* <button className="bg-seagull-500 px-3 py-2 text-white rounded-sm hover:bg-seagull-600 duration-150">Sign up for free</button> */}
                 </div>
             </header>
 
@@ -93,16 +95,9 @@ export default function Intro() {
                     backgroundPosition: "-19px -19px"
                 }}
             >
-                <div className="flex items-center justify-between w-[90%]">
-                    <span className=" text-5xl font-serif text-seagull-800 flex items-center">
-                        Try It
-                        <span className="pl-5 text-xl font-sans text-seagull-800">Do Something on the Board</span>
-
-                    </span>
-                    <button className="bg-seagull-500 px-3 py-2 text-white rounded-sm hover:bg-seagull-600 duration-150">Sign up to save card</button>
-                </div>
-
-                <BoardGroup />
+                <Suspense fallback={<Loading></Loading>}>
+                    <BoardGroup />
+                </Suspense>
             </section>
             <footer className={`flex h-20 w-full items-center bg-seagull-900 justify-center gap-96`}>
                 <div className="w-28 madimi-one-regular text-2xl cursor-default">

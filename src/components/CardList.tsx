@@ -64,20 +64,22 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     // console.log("touchMoveResult", touchMoveResult)
     // console.log("allCards", allCards)
     // console.log("wheelIdx", wheelIdx)
+    // console.log("CardList selectedCard", selectedCard)
+    // console.log("createdAt", allCards[0].createdAt)
+    // console.log("createdAt", new Date(allCards[0].createdAt).getTime())
 
     const tagSet = new Set(selectedTags);
     const filteredCards = (isFiltered && allCards) ? allCards.filter(card => card.tags?.some(t => tagSet.has(t))) : allCards;
 
-    // console.log("createdAt", allCards[0].createdAt)
-    // console.log("createdAt", new Date(allCards[0].createdAt).getTime())
-
+    // fetch card
     useEffect(() => {
         if (allCards.length > 0) return setCardState("ok");
         async function handleFetchCard() {
             const response = await handleGetCards(user?.id || "");
             if (response.status === "FAIL") return setCardState("error");
             setCardState("ok");
-            dispatch(setCards(JSON.parse(response.data).sort((a: ICard, b: ICard) => {
+            const cards = JSON.parse(response.data);
+            dispatch(setCards(cards.sort((a: ICard, b: ICard) => {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             })));
 
@@ -257,7 +259,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     />
                     <span className="w-8 h-8 absolute top-[6px] right-0 duration-150 ease-in-out cursor-pointer"
                         onClick={() => {
-                            console.log("ㄟ")
+                            // console.log("ㄟ")
                             dispatch(closeAllModal());
                         }}><CloseIcon classProps="pointer-events-none" />
                     </span>

@@ -454,6 +454,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                                         if (response.status === "FAIL") return;
                                         dispatch(removeCard(selectedCard.id));
                                         dispatch(closeAllModal({ type: "" }));
+                                        dispatch(selectCard(null));
                                         router.push("/");
                                     }
                                 }
@@ -475,10 +476,10 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                             console.log("儲存卡片設定")
                             const updatedCard = { ...selectedCard, imageUrl: url, name, visibility, editability, userList: emailList, tags: tagList };
                             const response = await handleUpdateCard([updatedCard]);
-                            console.log("response", response)
+                            // console.log("response", response)
                             if (response.status === "FAIL") return setEmailErrorMsg("儲存失敗，請再試一次");
                             const resData = JSON.parse(response.data);
-                            console.log("resData", resData)
+                            // console.log("resData", resData)
 
                             dispatch(setCardSettingIsDirty(false));
                             dispatch(updateCards(resData));

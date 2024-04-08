@@ -152,9 +152,9 @@ export default function ImageBox({ imageData, handleUpdateElement, handleImgOnLo
             distenceToLeftTop={distenceToLeftTop}
         >
             <ImageCore imageData={imageData} handleOnLoad={(card) => {
-                console.log("handleOnLoad1")
+                // console.log("handleOnLoad1")
                 if (isBoardLocked) return;
-                console.log("handleOnLoad2")
+                // console.log("handleOnLoad2")
                 handleImgOnLoad(card);
             }} />
         </Box>

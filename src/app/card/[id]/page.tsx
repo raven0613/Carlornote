@@ -55,14 +55,14 @@ export default function CardPage() {
         async function handleCard(cardId: string) {
             const response = await handleGetCard(`card_${cardId}`);
             // console.log("res", response)
-            console.log("user", user)
+            // console.log("user", user)
             // if (response.status === "FAIL") return await handleCard(cardId);
             if (response.status === "FAIL") {
                 router.push("/")
                 return;
             }
             const data = JSON.parse(response.data) as ICard;
-            console.log("data", data)
+            // console.log("data", data)
             // return;
 
             // 閱讀權限閘門
@@ -137,9 +137,9 @@ export default function CardPage() {
                 canUndo={undoList.length > 0}
                 canRedo={redoList.length > 0}
                 handleUndo={() => {
-                    console.log("現在回復 boardElement", selectedCard.boardElement)
+                    // console.log("現在回復 boardElement", selectedCard.boardElement)
                     const lastStep = undoList.pop();
-                    console.log("現在回復 lastStep", lastStep)
+                    // console.log("現在回復 lastStep", lastStep)
                     if (typeof lastStep === "undefined") return;
 
                     let newBoardElements: IBoardElement[] = [];
@@ -168,7 +168,7 @@ export default function CardPage() {
                         // 被改變 index 的話就放回原本 index
                         newBoardElements = changeIndex({ targetIdx: lastStep.oldIdx, originIdx: lastStep.newIdx, array: selectedCard.boardElement });
                     }
-                    console.log("newBoardElements", newBoardElements)
+                    // console.log("newBoardElements", newBoardElements)
 
                     const updatedCard: ICard = {
                         ...selectedCard,
@@ -178,9 +178,9 @@ export default function CardPage() {
                     dispatch(selectCard(updatedCard));
                 }}
                 handleRedo={() => {
-                    console.log("現在重來", redoList)
+                    // console.log("現在重來", redoList)
                     const lastStep = redoList.pop();
-                    console.log("現在重來", lastStep)
+                    // console.log("現在重來", lastStep)
                     if (!lastStep) return;
                     let newBoardElements: IBoardElement[] = [];
                     if ("added" in lastStep) {

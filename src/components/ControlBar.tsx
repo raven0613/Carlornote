@@ -67,7 +67,7 @@ export default function ControlBar({ handleRedo, handleUndo, canUndo, canRedo, c
                     // hrefAs: user ? "" : "/login",
                     handleClick: user ? async () => {
                         // logout
-                        console.log("按登出")
+                        // console.log("按登出")
                         removeStorage();
                         await signOut();
                         dispatch(removeUser());

@@ -72,7 +72,7 @@ export async function handleAddCard(data: ICard): Promise<IResponse> {
 }
 
 export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
-    console.log("UpdateCard data", data)
+    // console.log("UpdateCard data", data)
     const failedFetch = [];
     try {
         const db = await handleGetFirebaseDB();

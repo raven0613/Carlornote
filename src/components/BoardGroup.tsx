@@ -5,8 +5,15 @@ import Board from './Board';
 import { IBoardElement, ICard, boxType } from '@/type/card';
 import useScrollToView, { ScrollContextType, useScroll } from '@/hooks/useScrollToView';
 import useCheckTabVisibility from '@/hooks/useCheckTabVisibility';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectCard } from '@/redux/reducers/card';
+import { useRouter } from 'next/navigation';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { storageKey } from './Auth';
+import { IState } from '@/redux/store';
 
 export default function BoardGroup() {
+    const user = useSelector((state: IState) => state.user);
     const [card, setCard] = useState<ICard>({
         id: "",
         authorId: "",
@@ -23,9 +30,30 @@ export default function BoardGroup() {
     const [draggingBox, setDraggingBox] = useState<boxType>("");
     const boardWrapperRef = useRef<HTMLDivElement>(null);
     const { nodeRef } = useScroll() as ScrollContextType;
+    const router = useRouter();
+    const { storageData: storage, saveStorage } = useLocalStorage({ storageKey });
+    const [isHandling, setIsHandling] = useState(false);
 
+    // console.log("BoardGroup card", card)
     return (
         <>
+            <div className="flex items-center justify-between w-[90%]">
+                <span className=" text-5xl font-serif text-seagull-800 flex items-center">
+                    Try It
+                    <span className="pl-5 text-xl font-sans text-seagull-800 bg-seagull-200">Do Something on the Board</span>
+
+                </span>
+                <button disabled={isHandling} className="bg-seagull-500 px-3 py-2 text-white rounded-sm hover:bg-seagull-600 duration-150" onClick={() => {
+                    if (isHandling) return;
+                    setIsHandling(true);
+                    saveStorage(JSON.stringify({...JSON.parse(storage || "{}"), introCard: card}));
+                    if (user) router.push("/");
+                    else router.push("/signup");
+                    setIsHandling(false);
+                }}>
+                    {user? "Save this card and Check your Board" : "Sign up to save your card" }
+                </button>
+            </div>
             <div ref={nodeRef} className="boardWrapper justify-center items-center w-[90%] h-[80%] rounded-lg overflow-hidden shadow-lg shadow-black/20 px-0 pt-0 relative bg-white"
             >
                 <Board
