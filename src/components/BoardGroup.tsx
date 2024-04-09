@@ -6,11 +6,12 @@ import { IBoardElement, ICard, boxType } from '@/type/card';
 import useScrollToView, { ScrollContextType, useScroll } from '@/hooks/useScrollToView';
 import useCheckTabVisibility from '@/hooks/useCheckTabVisibility';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectCard } from '@/redux/reducers/card';
+import { addCard, addCards, selectCard } from '@/redux/reducers/card';
 import { useRouter } from 'next/navigation';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { storageKey } from './Auth';
 import { IState } from '@/redux/store';
+import { handleAddCard } from '@/api/card';
 
 export default function BoardGroup() {
     const user = useSelector((state: IState) => state.user);
@@ -33,6 +34,7 @@ export default function BoardGroup() {
     const router = useRouter();
     const { storageData: storage, saveStorage } = useLocalStorage({ storageKey });
     const [isHandling, setIsHandling] = useState(false);
+    const dispatch = useDispatch();
 
     // console.log("BoardGroup card", card)
     return (
@@ -43,15 +45,33 @@ export default function BoardGroup() {
                     <span className="pl-5 text-xl font-sans text-seagull-800 bg-seagull-200">Do Something on the Board</span>
 
                 </span>
-                <button disabled={isHandling} className="bg-seagull-500 px-3 py-2 text-white rounded-sm hover:bg-seagull-600 duration-150" onClick={() => {
+                <button disabled={isHandling} className="bg-seagull-500 px-3 py-2 text-white rounded-sm hover:bg-seagull-600 duration-150" onClick={async() => {
                     if (isHandling) return;
                     setIsHandling(true);
-                    saveStorage(JSON.stringify({...JSON.parse(storage || "{}"), introCard: card}));
-                    if (user) router.push("/");
-                    else router.push("/signup");
+
+                    if (user) {
+                        const newCard = {
+                            ...card,
+                            authorId: user?.id,
+                            createdAt: new Date().toUTCString(),
+                            updatedAt: new Date().toUTCString(),
+                            imageUrl: "https://i.imgur.com/gAzhP1L.png"
+                        }
+                        const response = await handleAddCard(newCard);
+                        // console.log("response", response)
+                        console.log("有 user, add newCard", newCard)
+                        if (response.status === "FAIL") return router.push("/");
+                        // dispatch(addCard(newCard));
+                        router.push("/");
+                        setIsHandling(false);
+                        return;
+                    }
+
+                    saveStorage(JSON.stringify({ ...JSON.parse(storage || "{}"), introCard: card }));
+                    router.push("/signup");
                     setIsHandling(false);
                 }}>
-                    {user? "Save this card and Check your Board" : "Sign up to save your card" }
+                    {user ? "Save this card and Check your Board" : "Sign up to save your card"}
                 </button>
             </div>
             <div ref={nodeRef} className="boardWrapper justify-center items-center w-[90%] h-[80%] rounded-lg overflow-hidden shadow-lg shadow-black/20 px-0 pt-0 relative bg-white"

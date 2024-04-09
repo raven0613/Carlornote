@@ -23,7 +23,6 @@ let undoList: Array<StepType> = [];
 let redoList: Array<StepType> = [];
 
 export default function Home() {
-    const { data: session, status } = useSession();
     const [draggingBox, setDraggingBox] = useState<boxType>("");
     const [draggingCard, setDraggingCard] = useState<ICard>();
     const dispatch = useDispatch();
