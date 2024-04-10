@@ -13,6 +13,7 @@ import { outerPage } from "./Auth";
 import CheckWindow from "./modal/CheckWindow";
 import { SearchPanel } from "./SearchPanel";
 import { setCardSettingIsDirty } from "@/redux/reducers/card";
+import ConfirmWindow from "./modal/ConfirmWindow";
 
 interface IProps {
     children: ReactNode;
@@ -139,6 +140,23 @@ const SharedComponents = (props: IProps) => {
                     <CheckWindow data={modalProp?.data} text={modalProp?.text}
                         handleClose={() => {
                             dispatch(closeModal({ type: "checkWindow", props: modalProp }));
+                        }}
+                        handleConfirm={modalProp.handleConfirm}
+                    />
+                </div>}
+            </Modal>}
+
+            {/* update card window */}
+            {userPermission === "editable" && <Modal
+                position="center"
+                isOpen={openModalType.includes("updateCardWindow")}
+                handleClose={() => {}}
+                top="top-1/2 -translate-y-1/2 sm:top-48 sm:translate-y-0"
+            >
+                {openModalType.includes("updateCardWindow") && <div className="w-fit h-fit z-50">
+                    <ConfirmWindow data={modalProp?.data} text={modalProp?.text}
+                        handleClose={() => {
+                            dispatch(closeModal({ type: "updateCardWindow", props: modalProp }));
                         }}
                         handleConfirm={modalProp.handleConfirm}
                     />

@@ -32,7 +32,7 @@ const Auth = (props: IProps) => {
     const [isAuthValid, setIsAuthValid] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
     // console.log("Auth isAuthValid", isAuthValid)
-    console.log("Auth status", status)
+    // console.log("Auth status", status)
     // console.log("Auth session", session)
     // console.log("Auth user", user)
     // console.log("Auth storageData", storageData)

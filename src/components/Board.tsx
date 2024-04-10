@@ -8,7 +8,7 @@ import { handlePostImgur } from "@/api/imgur";
 import { useDispatch, useSelector } from "react-redux";
 import { selectElementId } from "@/redux/reducers/boardElement";
 import { IState } from "@/redux/store";
-import { closeModal } from "@/redux/reducers/modal";
+import { closeModal, openModal, openOneModal } from "@/redux/reducers/modal";
 import CodeBox from "./box/CodeBox";
 import MarkdownBox from "./box/MarkdownBox";
 import CardBox from "./box/CardBox";
@@ -17,6 +17,8 @@ import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
 import { xDirection, yDirection } from "./box/Box";
 import useMousemoveDirection from "@/hooks/useMousemoveDirection";
 import useCheckTabVisibility from "@/hooks/useCheckTabVisibility";
+import { handleGetCards } from "@/api/card";
+import { setCards, updateCards } from "@/redux/reducers/card";
 
 // 看 board 離螢幕左和上有多少 px
 // export const distenceToLeftTop = { left: 0, top: 0 };
@@ -98,6 +100,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     });
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [isMoving, setIsMoving] = useState(false);
+    const user = useSelector((state: IState) => state.user);
 
     // console.log("isMoving", isMoving)
     // console.log("draggingBox", draggingBox)
@@ -109,11 +112,75 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // console.log("distenceToLeftTop", distenceToLeftTop)
     const mouseMoveResult = useMousemoveDirection();
 
+    // 當在不同地方開著兩個視窗的時候，視窗A有更新，視窗B在閒置10分鐘後就要 fetch 資料檢查所有資料的 updatedAt 是否相同，否的話即更新所有 card 資料
+    const allCards = useSelector((state: IState) => state.card);
+    // 必須用 ref 來裝，因為如果用 allCards 在 dependency 裡面會造成最後 update allCards 的時候又啟動一次 effect function
+    const allCardsRef = useRef(allCards);
+    useEffect(() => {
+        allCardsRef.current = allCards;
+    }, [allCards])
+    const selectedCard = useSelector((state: IState) => state.selectedCard);
+    const shouldFetchRef = useRef(false);
     const isCurrentTab = useCheckTabVisibility();
-    // useEffect(() => {
-    //     let time: NodeJS.Timeout | null = null;
-    // }, [isCurrentTab])
-    console.log("isCurrentTab", isCurrentTab)
+    useEffect(() => {
+        if (isCurrentTab && shouldFetchRef.current) {
+            setIsLock(true);
+            setIsPointerNone(true);
+            async function fetchCards() {
+                const response = await handleGetCards(user?.id ?? "");
+                if (response.status === "FAIL" || !response.data) return;
+                const data = JSON.parse(response.data);
+                console.log(data)
+                // 如果本卡片有更新就跳視窗說請更新卡片
+                // 如果更新的是別的卡片就默默更新
+                const incomingCardsMap = new Map();
+                data.forEach((card: ICard) => {
+                    incomingCardsMap.set(card.id, card);
+                })
+                const changedCardSet = new Set();
+                allCardsRef.current.forEach((card: ICard) => {
+                    const incomingCard = incomingCardsMap.get(card.id);
+                    const incomingLastUpdate = new Date(incomingCard.updatedAt).getTime();
+                    const originalLastUpdate = new Date(card.updatedAt).getTime();
+                    if (incomingLastUpdate !== originalLastUpdate) {
+                        changedCardSet.add(card.id);
+                    }
+                });
+                if (changedCardSet.has(selectedCard.id)) {
+                    // 為了避免 updateCardWindow 疊加，必須先關掉原本的再開新的
+                    dispatch(closeModal({ type: "updateCardWindow", props: {} }));
+                    dispatch(openModal({
+                        type: "updateCardWindow", props: {
+                            handleConfirm: () => {
+                                //更新所有卡片
+                                dispatch(setCards(data));
+                                dispatch(closeModal({ type: "updateCardWindow", props: {} }));
+                                allCardsRef.current = data;
+                            },
+                            text: "卡片資料有更新，請點選確認以同步最新資料"
+                        }
+                    }));
+                }
+                else if (changedCardSet.size > 0) {
+                    dispatch(setCards(data));
+                    allCardsRef.current = data;
+                }
+                setIsLock(false);
+                setIsPointerNone(false);
+            }
+            fetchCards();
+        }
+        let time: NodeJS.Timeout | null = null;
+        if (!isCurrentTab) {
+            time = setTimeout(() => {
+                shouldFetchRef.current = true;
+            }, 600000)
+        }
+
+        return () => {
+            if (time) clearTimeout(time);
+        }
+    }, [dispatch, isCurrentTab, selectedCard?.id, user?.id])
 
     useEffect(() => {
         if (permission !== "editable") {
