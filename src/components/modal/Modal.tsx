@@ -19,7 +19,7 @@ export default function Modal({ isOpen, handleClose, children, position, top }: 
         },
         exceptions: ["checkWindow"]
     })
-    console.log("isOpen", isOpen)
+    // console.log("isOpen", isOpen)
     // console.log("nodeRef", nodeRef)
     // console.log("position", position)
 

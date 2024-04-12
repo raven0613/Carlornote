@@ -19,6 +19,8 @@ import useMousemoveDirection from "@/hooks/useMousemoveDirection";
 import useCheckTabVisibility from "@/hooks/useCheckTabVisibility";
 import { handleGetCards } from "@/api/card";
 import { setCards, updateCards } from "@/redux/reducers/card";
+import usePointerPosition from "@/hooks/usePointerPosition";
+import useCheckLastUpdate from "@/hooks/useCheckLastUpdate";
 
 // 看 board 離螢幕左和上有多少 px
 // export const distenceToLeftTop = { left: 0, top: 0 };
@@ -84,7 +86,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     // console.log("selectedElementId", selectedElementId)
     // 用來記錄拖曳圖片進來時候的滑鼠位置
-    const pointerRef = useRef({ x: 0, y: 0 });
+    const dragPointerRef = useRef({ x: 0, y: 0 });
     // 用來記錄拖曳白板時候的滑鼠位置
     const clickedPointRef = useRef({ startX: 0, startY: 0, endX: 0, endY: 0 });
     const [isLock, setIsLock] = useState(false);
@@ -100,11 +102,11 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     });
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [isMoving, setIsMoving] = useState(false);
-    const user = useSelector((state: IState) => state.user);
 
     // console.log("isMoving", isMoving)
     // console.log("draggingBox", draggingBox)
-    // console.log("pointerRef", pointerRef.current)
+    // console.log("dragPointerRef", dragPointerRef.current)
+    // console.log("poionterX", poionterX)
     // console.log("Board isLock", isLock)
     // console.log("Board isPointerNone", isPointerNone)
     // console.log("permission", permission)
@@ -112,75 +114,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // console.log("distenceToLeftTop", distenceToLeftTop)
     const mouseMoveResult = useMousemoveDirection();
 
-    // 當在不同地方開著兩個視窗的時候，視窗A有更新，視窗B在閒置10分鐘後就要 fetch 資料檢查所有資料的 updatedAt 是否相同，否的話即更新所有 card 資料
-    const allCards = useSelector((state: IState) => state.card);
-    // 必須用 ref 來裝，因為如果用 allCards 在 dependency 裡面會造成最後 update allCards 的時候又啟動一次 effect function
-    const allCardsRef = useRef(allCards);
-    useEffect(() => {
-        allCardsRef.current = allCards;
-    }, [allCards])
-    const selectedCard = useSelector((state: IState) => state.selectedCard);
-    const shouldFetchRef = useRef(false);
-    const isCurrentTab = useCheckTabVisibility();
-    useEffect(() => {
-        if (isCurrentTab && shouldFetchRef.current) {
-            setIsLock(true);
-            setIsPointerNone(true);
-            async function fetchCards() {
-                const response = await handleGetCards(user?.id ?? "");
-                if (response.status === "FAIL" || !response.data) return;
-                const data = JSON.parse(response.data);
-                console.log(data)
-                // 如果本卡片有更新就跳視窗說請更新卡片
-                // 如果更新的是別的卡片就默默更新
-                const incomingCardsMap = new Map();
-                data.forEach((card: ICard) => {
-                    incomingCardsMap.set(card.id, card);
-                })
-                const changedCardSet = new Set();
-                allCardsRef.current.forEach((card: ICard) => {
-                    const incomingCard = incomingCardsMap.get(card.id);
-                    const incomingLastUpdate = new Date(incomingCard.updatedAt).getTime();
-                    const originalLastUpdate = new Date(card.updatedAt).getTime();
-                    if (incomingLastUpdate !== originalLastUpdate) {
-                        changedCardSet.add(card.id);
-                    }
-                });
-                if (changedCardSet.has(selectedCard.id)) {
-                    // 為了避免 updateCardWindow 疊加，必須先關掉原本的再開新的
-                    dispatch(closeModal({ type: "updateCardWindow", props: {} }));
-                    dispatch(openModal({
-                        type: "updateCardWindow", props: {
-                            handleConfirm: () => {
-                                //更新所有卡片
-                                dispatch(setCards(data));
-                                dispatch(closeModal({ type: "updateCardWindow", props: {} }));
-                                allCardsRef.current = data;
-                            },
-                            text: "卡片資料有更新，請點選確認以同步最新資料"
-                        }
-                    }));
-                }
-                else if (changedCardSet.size > 0) {
-                    dispatch(setCards(data));
-                    allCardsRef.current = data;
-                }
-                setIsLock(false);
-                setIsPointerNone(false);
-            }
-            fetchCards();
-        }
-        let time: NodeJS.Timeout | null = null;
-        if (!isCurrentTab) {
-            time = setTimeout(() => {
-                shouldFetchRef.current = true;
-            }, 600000)
-        }
 
-        return () => {
-            if (time) clearTimeout(time);
-        }
-    }, [dispatch, isCurrentTab, selectedCard?.id, user?.id])
+    const handleLock = useCallback((isLock: boolean) => {
+        setIsLock(isLock);
+        setIsPointerNone(isLock);
+    }, [])
+    useCheckLastUpdate({ handleLock });
 
     useEffect(() => {
         if (permission !== "editable") {
@@ -284,7 +223,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 newBoardElement = handleAddImageBox({
                     name: "",
                     content: "",
-                    position: { left: pointerRef.current.x + (wrapperRef.current?.scrollLeft ?? 0), top: pointerRef.current.y + (wrapperRef.current?.scrollTop ?? 0) },
+                    position: { left: dragPointerRef.current.x + (wrapperRef.current?.scrollLeft ?? 0), top: dragPointerRef.current.y + (wrapperRef.current?.scrollTop ?? 0) },
                     size: { width, height }
                 }) ?? [];
                 // console.log("newBoardElement", newBoardElement)
@@ -374,7 +313,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                 handleAddBox({
                     type: "text",
                     content: pastedText,
-                    position: { left: pointerRef.current.x + (wrapperRef.current?.scrollLeft ?? 0), top: pointerRef.current.y + (wrapperRef.current?.scrollTop ?? 0) },
+                    position: { left: dragPointerRef.current.x + (wrapperRef.current?.scrollLeft ?? 0), top: dragPointerRef.current.y + (wrapperRef.current?.scrollTop ?? 0) },
                     size: { width: draggingBoxWidth["text"], height: draggingBoxHeight["text"] }
                 })
             }
@@ -520,7 +459,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             e.target.value = "";
                         }}
                         onMouseMove={(e) => {
-                            pointerRef.current = {
+                            dragPointerRef.current = {
                                 x: e.clientX - distenceToLeftTop.left,
                                 y: e.clientY - distenceToLeftTop.top
                             };
