@@ -13,9 +13,7 @@ export default function Login() {
     const router = useRouter();
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
-    const path = usePathname()
-    // const [page, setPage] = useState("login");
-
+    const path = usePathname();
 
     // console.log("path", path)
     // console.log("query", query)
@@ -23,43 +21,6 @@ export default function Login() {
     // console.log("session", session)
     // console.log("status", status)
     // console.log("user", user)
-
-    // move to Auth
-    // useEffect(() => {
-    //     if (user) return router.replace("./");
-    //     async function handleUser() {
-    //         if (status === "authenticated") {
-    //             console.log("HEEYYYYYYYYY")
-    //             const getUserRes = await handleGetUserByEmail(session.user?.email || "")
-    //             const registeredUser = JSON.parse(getUserRes.data);
-    //             // console.log("registeredUser", registeredUser)
-
-    //             if (registeredUser.length > 0) {
-    //                 console.log("already registered")
-    //                 dispatch(addUser(registeredUser[0]));
-    //                 router.replace("./");
-    //                 return;
-    //             }
-    //             const addUserRes = await handleAddUser({
-    //                 id: "",
-    //                 name: session.user?.name || "",
-    //                 email: session.user?.email || "",
-    //                 password: "",
-    //                 role: "user",
-    //                 birthday: "",
-    //                 accessLevel: "initial",
-    //                 avatorUrl: session.user?.image || "",
-    //                 createdAt: new Date().toUTCString(),
-    //                 updatedAt: new Date().toUTCString(),
-    //                 lastLogin: new Date().toUTCString()
-    //             })
-    //             console.log("addUserRes", addUserRes)
-    //             dispatch(addUser(JSON.parse(addUserRes.data)));
-    //             router.push("./");
-    //         }
-    //     }
-    //     handleUser();
-    // }, [dispatch, router, session, status, user])
 
     return (
         <main className="w-10/12 sm:w-[40rem] h-[30rem] fixed left-1/2 -translate-x-1/2 bg-gray-100 shadow-gray-400 shadow-lg top-1/2 -translate-y-1/2 rounded-xl z-50 flex gap-2 overflow-hidden">

@@ -74,10 +74,10 @@ export function SignPanel({ type }: { type: "login" | "signup" }) {
             handleSubmit={async () => {
                 if (!email || !password) return;
                 setIsLoading(true);
-                await signIn("credentials", { email, password });
+                await signIn("credentials", { email, password, callbackUrl: "/" });
                 setIsLoading(false);
             }}
-            submitBtnText={"SIGNUP"}
+            submitBtnText={"LOGIN"}
             directToDescription={"JOIN US"}
             handleDirectTo={() => {
                 window && window.history.pushState(null, 'signup', '/signup');
