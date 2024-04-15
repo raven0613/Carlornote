@@ -11,6 +11,8 @@ interface IUseCheckLastUpdate {
     handleLock: (isLock: boolean) => void;
 }
 
+const checkTime = 600000;
+
 export default function useCheckLastUpdate({ handleLock }: IUseCheckLastUpdate) {
     const dispatch = useDispatch();
     const user = useSelector((state: IState) => state.user);
@@ -52,7 +54,7 @@ export default function useCheckLastUpdate({ handleLock }: IUseCheckLastUpdate) 
                     const incomingCard = incomingCardsMap.get(card.id);
                     const incomingLastUpdate = new Date(incomingCard.updatedAt).getTime();
                     const originalLastUpdate = new Date(card.updatedAt).getTime();
-                    if (incomingLastUpdate !== originalLastUpdate) {
+                    if (incomingLastUpdate > originalLastUpdate) {
                         changedCardSet.add(card.id);
                     }
                 });
@@ -85,7 +87,7 @@ export default function useCheckLastUpdate({ handleLock }: IUseCheckLastUpdate) 
         if (!isCurrentTab) {
             time = setTimeout(() => {
                 shouldFetchRef.current = true;
-            }, 600000)
+            }, checkTime)
         }
 
         function handleMouseEnter() {
@@ -105,7 +107,7 @@ export default function useCheckLastUpdate({ handleLock }: IUseCheckLastUpdate) 
             time = setTimeout(() => {
                 if (!isMouseOut) return;
                 shouldFetchRef.current = true;
-            }, 600000)
+            }, checkTime)
         }
 
         return () => {

@@ -90,8 +90,8 @@ export function TagCore({ allTags, selectedTagsProp, handleSelectTag }: ITagCore
     const [selectedTags, setSelectedTags] = useState<string[]>(selectedTagsProp ?? []);
     const selectedTagSet = new Set<string>(selectedTags);
     return (
-        <div className="flex flex-col gap-2">
-            <div className="flex w-full justify-between items-center gap-2">
+        <div className="flex flex-col gap-2 overflow-y-scroll">
+            <div className="flex w-full justify-between items-center gap-2 pr-4">
                 <TagIcon classProps={`text-seagull-400 w-6 h-6`} />
                 <ResetIcon classProps={`text-seagull-400 w-5 h-5 cursor-pointer hover:text-seagull-600 duration-150`}
                     handleClick={() => {
@@ -100,7 +100,7 @@ export function TagCore({ allTags, selectedTagsProp, handleSelectTag }: ITagCore
                     }}
                 />
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 ">
                 {allTags.map(tag => {
                     return (
                         <span key={tag} className={`py-0.5 px-2 h-fit rounded text-sm border border-seagull-400 cursor-pointer 

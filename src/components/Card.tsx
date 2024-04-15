@@ -72,7 +72,7 @@ export function CardWithHover({ handleClick, isSelected, url, name, handleClickE
         <>
             <main className={`w-12 rounded-lg relative group hover:z-20 duration-200  
             ${isSelected ? "z-10 mx-14" : "hover:w-[7rem]"}
-            ${cardLize === "lg" ? "h-32" : `${cardLize === "sm" ? "h-24" : "h-0 opacity-0"}`}
+            ${cardLize === "lg" ? "h-32" : `${cardLize === "sm" ? "h-24" : "h-0 opacity-0 pointer-events-none"}`}
             `}
                 onClick={(e) => {
                     e.preventDefault();

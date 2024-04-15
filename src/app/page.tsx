@@ -35,6 +35,15 @@ export default function Home() {
 
     // console.log("回復", undoList)
     // console.log("重來", redoList)
+    // console.log("wheelPx", wheelPx)
+    // console.log("user", user)
+    // console.log("session", session)
+    // console.log("draggingBox page", draggingBox)
+    // console.log("allCards page", allCards)
+    // console.log("dirtyState", dirtyState)
+    // console.log("dirtyCards", dirtyCards)
+    // console.log("selectedCard page", selectedCard)
+
     // useEffect(() => {
     //     if (user) return;
     //     console.log("轉址 login")
@@ -44,15 +53,6 @@ export default function Home() {
     useEffect(() => {
         dispatch(setUserPermission("editable"));
     }, [dispatch])
-    // console.log("wheelPx", wheelPx)
-    // console.log("user", user)
-    // console.log("session", session)
-
-    // console.log("draggingBox page", draggingBox)
-    // console.log("allCards page", allCards)
-    // console.log("dirtyState", dirtyState)
-    // console.log("dirtyCards", dirtyCards)
-    // console.log("selectedCard page", selectedCard)
 
     // 有修改的話 5 秒存檔一次
     useEffect(() => {
@@ -201,7 +201,8 @@ export default function Home() {
                             const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
                             const updatedCard: ICard = {
                                 ...newCard,
-                                boardElement: allElement
+                                boardElement: allElement,
+                                updatedAt: new Date().toUTCString()
                             }
                             dispatch(updateCards([updatedCard]));
                             dispatch(selectCard(updatedCard));
@@ -247,34 +248,4 @@ export default function Home() {
         </main>
     );
 }
-
-// useEffect(() => {
-//   async function handleFetchCard() {
-//     const data = await handleAddCard({
-//       id: "",
-//       authorId: user?.id ?? "",
-//       boardElement: [
-//         {
-//           id: "element_50b366cd-81b5-4fd8-a034-c97fbcfbce0b",
-//           type: "text",
-//           name: "",
-//           content: "初始text",
-//           width: 250,
-//           height: 100,
-//           rotation: 40,
-//           left: 500,
-//           top: 300,
-//           radius: 0
-//         }
-//       ],
-//       userId: user ? [user.id] : [],
-//       visibility: "private",
-//       createdAt: new Date().toUTCString(),
-//       updatedAt: new Date().toUTCString(),
-//     })
-//     console.log("post data", data)
-//   }
-//   handleFetchCard();
-// }, [user])
-
 

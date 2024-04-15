@@ -12,6 +12,7 @@ import CloseIcon from "./svg/Close";
 import { v4 as uuidv4 } from 'uuid';
 import BarLoader from "react-spinners/BarLoader";
 import { closeAllModal } from "@/redux/reducers/modal";
+import Link from "next/link";
 
 function Card({ cardData, summary, handleClick, isDisabled }: { cardData: ICard, summary: string[], handleClick: () => void, isDisabled: boolean }) {
     return (
@@ -106,7 +107,7 @@ export function SearchPanel() {
     return (
         <>
             <div className="flex items-center justify-center px-5 bg-white sm:rounded-lg">
-                <input type="text" autoFocus className="outline-none flex-1 h-8 rounded border border-seafull-400 pl-2 pr-7 text-sm mx-auto my-5" value={inputValue} placeholder="請輸入搜尋關鍵字"
+                <input type="text" autoFocus className="textInput outline-none flex-1 h-8 rounded border border-seafull-400 pl-2 pr-7 text-sm mx-auto my-5" value={inputValue} placeholder="請輸入搜尋關鍵字"
                     onChange={(e) => {
                         setInputValue(e.target.value);
                     }}
@@ -131,16 +132,34 @@ export function SearchPanel() {
                 {(result.length === 0 && !isLoading) && <p className="mt-3.5 text-center">沒有結果</p>}
                 {(result.length > 0 && !isLoading) && <p className="mt-3.5 text-center">共 {result.length} 筆結果</p>}
                 {result.length > 0 && result.map(item => (
-                    <Card key={item.cardData.id} cardData={item.cardData}
-                        isDisabled={isLoading}
-                        summary={item.summary} handleClick={() => {
-                            if (pathname === "/") {
-                                dispatch(selectCard(item.cardData));
-                                return;
-                            }
-                            router.push(`/card/${item.cardData.id.split("_")[1]}`);
-                            dispatch(closeAllModal());
-                        }} />
+                    <>
+                        <div className="sm:hidden" key={`${item.cardData.id}_mobile`}>
+                            <Link href={`/card/${item.cardData?.id.split("_")[1]}`}
+                                prefetch
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    dispatch(closeAllModal());
+                                }}
+                            >
+                                <Card cardData={item.cardData}
+                                    isDisabled={isLoading}
+                                    summary={item.summary} handleClick={() => {}} />
+                            </Link>
+                        </div>
+                        <div className="hidden sm:block" key={`${item.cardData.id}_pc`}>  
+                            <Card cardData={item.cardData}
+                                isDisabled={isLoading}
+                                summary={item.summary} handleClick={() => {
+                                    if (pathname === "/") {
+                                        dispatch(selectCard(item.cardData));
+                                        return;
+                                    }
+                                    router.push(`/card/${item.cardData.id.split("_")[1]}`);
+                                    dispatch(closeAllModal());
+                                }}
+                            />
+                        </div>
+                    </>
                 ))}
             </div>
         </>

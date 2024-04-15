@@ -82,7 +82,7 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
                 boardElement: item.boardElement ?? [],
                 visibility: item.visibility ?? "private",
                 editability: item.editability ?? "close",
-                updatedAt: new Date().toUTCString(),
+                updatedAt: item.updatedAt,
                 userList: item.userList ?? [],
                 imageUrl: item.imageUrl ?? "",
                 name: item.name ?? "",

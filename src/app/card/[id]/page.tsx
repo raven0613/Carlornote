@@ -228,7 +228,8 @@ export default function CardPage() {
                             const newCard: ICard = allCards.find(item => item.id === selectedCard.id) as ICard;
                             const updatedCard: ICard = {
                                 ...newCard,
-                                boardElement: allElement
+                                boardElement: allElement,
+                                updatedAt: new Date().toUTCString()
                             }
                             dispatch(updateCards([updatedCard]));
                             dispatch(selectCard(updatedCard));

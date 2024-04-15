@@ -130,7 +130,10 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 ${cardSize === "hidden" ? "bg-[#f8f8f8] border-t-[1px]" : "border-t-[3px]"}
                 duration-150
             `}
-                onClick={() => {
+                onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (cardSize === "hidden") return;
                     const cardId = pathname.split("/").at(-1);
                     if (cardId) return;
                     handleSetSelectedCard("");
@@ -244,7 +247,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 </div>
 
                 {/* mobile filter */}
-                {(openModalType[0] === "mobileFilter" || openedPanel === "") && <div className={`sm:hidden flex flex-col gap-4 absolute inset-x-0 bottom-0 p-4 h-[40%] z-40 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)] overflow-y-scroll bg-white rounded-t-lg duration-150 ease-in-out 
+                {(openModalType[0] === "mobileFilter" || openedPanel === "") && <div className={`sm:hidden flex flex-col gap-4 absolute inset-x-0 bottom-0 pl-4 pt-4 pb-20 h-[40%] z-40 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)]  bg-white rounded-t-lg duration-150 ease-in-out 
                 ${openModalType[0] === "mobileFilter" ? "translate-y-0" : "translate-y-full"}`}
                     onTouchMove={() => {
                         if (touchMoveResult.y === "bottom") dispatch(closeAllModal());

@@ -119,6 +119,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         setIsLock(isLock);
         setIsPointerNone(isLock);
     }, [])
+    
     useCheckLastUpdate({ handleLock });
 
     useEffect(() => {

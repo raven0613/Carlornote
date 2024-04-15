@@ -353,8 +353,8 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}
                 `}
                 ></div>
-                {/* z-index */}
-                <div
+                {/* z-index 暫時不需要 */}
+                {/* <div
                     onClick={(e) => {
                         e.stopPropagation();
                         // console.log("BackForward")
@@ -364,7 +364,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                     ${isEditMode ? "opacity-100" : "opacity-0 pointer-events-none"}
                     before:content-[""] before:w-2 before:h-2 before:border-2 before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:absolute before:rounded-[2px] before:bg-transparent before:border-slate-500
                     `}
-                ></div>
+                ></div> */}
             </div >
         </>
     )
