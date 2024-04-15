@@ -66,7 +66,7 @@ export default function Home() {
             if (data.length === 0) return;
 
             const response = await handleUpdateCard(data);
-            console.log("存檔", response);
+            // console.log("存檔", response);
             const resData = JSON.parse(response.data);
             const failedData = response.failedData && JSON.parse(response.failedData);
             if (failedData) console.log("failedData", failedData);
@@ -108,13 +108,13 @@ export default function Home() {
 
                     let newBoardElements: IBoardElement[] = [];
                     if ("added" in lastStep) {
-                        console.log("added")
+                        // console.log("added")
                         redoList.push({ added: lastStep.added });
                         // 原本被增加的 undo 要刪除
                         newBoardElements = selectedCard.boardElement.filter(item => item.id !== lastStep.added.id);
                     }
                     else if ("deleted" in lastStep) {
-                        console.log("deleted")
+                        // console.log("deleted")
                         redoList.push({ deleted: lastStep.deleted, index: lastStep.index });
                         // 原本被刪除的 undo 要加回原本的 index
                         newBoardElements = [...selectedCard.boardElement.slice(0, lastStep.index), lastStep.deleted, ...selectedCard.boardElement.slice(lastStep.index, -1)]
@@ -132,7 +132,7 @@ export default function Home() {
                         // 被改變 index 的話就放回原本 index
                         newBoardElements = changeIndex({ targetIdx: lastStep.oldIdx, originIdx: lastStep.newIdx, array: selectedCard.boardElement });
                     }
-                    console.log("newBoardElements", newBoardElements)
+                    // console.log("newBoardElements", newBoardElements)
 
                     const updatedCard: ICard = {
                         ...selectedCard,
@@ -202,7 +202,7 @@ export default function Home() {
                             const updatedCard: ICard = {
                                 ...newCard,
                                 boardElement: allElement,
-                                updatedAt: new Date().toUTCString()
+                                updatedAt: new Date().toISOString()
                             }
                             dispatch(updateCards([updatedCard]));
                             dispatch(selectCard(updatedCard));

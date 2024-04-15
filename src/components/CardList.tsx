@@ -209,8 +209,8 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                             visibility: "private",
                             editability: "close",
                             imageUrl: "",
-                            createdAt: new Date().toUTCString(),
-                            updatedAt: new Date().toUTCString(),
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
                             tags: []
                         });
                         if (response.status === "FAIL") return setAddCardState("error");
@@ -262,7 +262,6 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     />
                     <span className="w-8 h-8 absolute top-[6px] right-0 duration-150 ease-in-out cursor-pointer"
                         onClick={() => {
-                            // console.log("ㄟ")
                             dispatch(closeAllModal());
                         }}><CloseIcon classProps="pointer-events-none" />
                     </span>

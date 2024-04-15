@@ -8,8 +8,8 @@ export default function GlobalError({ error, reset }: {
     return (
         <html>
             <body>
-                <h2>得到錯誤</h2>
-                <button onClick={() => reset()}>再試試</button>
+                <h2>Error</h2>
+                <button onClick={() => reset()}>reset</button>
             </body>
         </html>
     )

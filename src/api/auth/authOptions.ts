@@ -43,7 +43,7 @@ const authOptions: NextAuthOptions = {
                     if (userData.password !== credentials?.password) return null;
                     const loginUser = {
                         ...userData,
-                        lastLogin: new Date().toUTCString()
+                        lastLogin: new Date().toISOString()
                     }
                     const updateUserRes = await handleUpdateUser([loginUser])
                     // console.log(updateUserRes)
@@ -58,11 +58,11 @@ const authOptions: NextAuthOptions = {
                     birthday: "",
                     accessLevel: "initial",
                     avatorUrl: "",
-                    createdAt: new Date().toUTCString(),
-                    updatedAt: new Date().toUTCString(),
-                    lastLogin: new Date().toUTCString()
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString()
                 })
-                console.log("addUserRes", addUserRes)
+                // console.log("addUserRes", addUserRes)
                 if (addUserRes.status === "FAIL") return null;
                 return JSON.parse(addUserRes.data);
             },

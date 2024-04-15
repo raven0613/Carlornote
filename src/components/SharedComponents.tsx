@@ -75,7 +75,7 @@ const SharedComponents = (props: IProps) => {
                 isOpen={openModalType.includes("card") || openModalType[0] === "mobileCardSetting"}
                 handleClose={() => {
                     // 電腦版會讀這邊
-                    console.log("close")
+                    // console.log("close")
                     if (isCardSettingDirty) {
                         if (openModalType.at(-1) === "checkWindow") {
                             dispatch(closeModal({ type: "checkWindow", props: { data: selectedCard } }));
@@ -86,7 +86,7 @@ const SharedComponents = (props: IProps) => {
                             props: {
                                 text: "改動尚未儲存，確定要關閉視窗嗎？",
                                 handleConfirm: () => {
-                                    console.log("confirm")
+                                    // console.log("confirm")
                                     dispatch(setCardSettingIsDirty(false));
                                     dispatch(closeAllModal({ type: "" }));
                                 },

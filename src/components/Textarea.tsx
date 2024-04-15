@@ -76,7 +76,7 @@ export default function Textarea({ text, handleUpdate, handleWheel, classProps }
                         if (selectionStart === selectionEnd) {
 
                             // 遇到沒空格了就不退格
-                            if (value[selectionStart - 1] !== "\t" && value[selectionStart - 1] !== " ") return console.log("不 tab");
+                            if (value[selectionStart - 1] !== "\t" && value[selectionStart - 1] !== " ") return;
                             const newText = `${value.slice(0, selectionStart - 1)}${value.slice(selectionEnd)}`
                             setValue(newText);
                             // handleUpdateElement({ ...textData, content: newText });

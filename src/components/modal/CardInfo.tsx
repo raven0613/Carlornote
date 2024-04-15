@@ -162,7 +162,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                                 opacity: isLoading ? 0 : 200
                             }}
                             onLoad={(e) => {
-                                console.log("onLoad")
+                                // console.log("onLoad")
                                 setIsLoading(false);
                             }}
                             onError={() => {
@@ -473,7 +473,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                         onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log("儲存卡片設定")
+                            // console.log("儲存卡片設定")
                             const updatedCard = { ...selectedCard, imageUrl: url, name, visibility, editability, userList: emailList, tags: tagList };
                             const response = await handleUpdateCard([updatedCard]);
                             // console.log("response", response)

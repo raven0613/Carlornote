@@ -147,7 +147,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     // add box
     const handleAddBox = useCallback(({ type, content, name, position: { left, top }, size: { width, height } }: INewBoxProps) => {
-        console.log("add box")
+        // console.log("add box")
         const id = `element_${uuidv4()}`;
         const newBoardElement: IBoardElement = {
             id: id,
@@ -181,10 +181,10 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     }, [dispatch, elements, handleUpdateElementList, draggingCard, handlePushStep])
 
     const handleAddImageBox = useCallback(({ name, content, position: { left, top }, size: { width, height } }: INewImageBoxProps) => {
-        console.log("add img box")
+        // console.log("add img box")
         const id = `element_${uuidv4()}`;
         if (!left || !top) return;
-        console.log("AddImageBox")
+        // console.log("AddImageBox")
         const newBoardElement = {
             id: id,
             type: "image" as boxType,
@@ -206,7 +206,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     }, [dispatch, elements, handleUpdateElementList])
 
     const imageUpload = useCallback(async (file: File) => {
-        console.log("imageUpload")
+        // console.log("imageUpload")
         const formData = new FormData();
         formData.append("image", file);
         let newBoardElement: IBoardElement[] = [];
@@ -447,7 +447,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                     <input id="board_input" name="board_input" type="file" accept="image/*,.gif" className={`boardElement board_input opacity-0 w-full h-full bg-red-200 z-0 ${isMoving ? " cursor-grabbing" : "cursor-default"}`}
                         onChange={async (e) => {
                             // TODO: 
-                            console.log("image drop")
+                            // console.log("image drop")
                             e.preventDefault()
                             e.stopPropagation()
                             if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;

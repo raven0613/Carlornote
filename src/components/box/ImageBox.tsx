@@ -54,7 +54,7 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
                     objectFit: 'cover', // cover, contain, none
                 }}
                 onLoad={(e) => {
-                    console.log("onLoad")
+                    // console.log("onLoad")
                     setShowingBlock("image");
                     setImageLoadState("success");
                     const name = uuidv4();

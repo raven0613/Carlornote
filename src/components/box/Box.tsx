@@ -202,7 +202,7 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 }}
                 onDragEnd={(e: DragEvent) => {
                     // 這時候才存資料
-                    console.log("box drag end")
+                    // console.log("box drag end")
                     handleUpdate({ ...data, left: position.left, top: position.top, width: size.width, height: size.height, rotation: deg, radius });
                     otherPositionsRef.current = {
                         x: elementPositions.x.filter(xAxis => xAxis !== data.left && xAxis !== data.left + data.width),

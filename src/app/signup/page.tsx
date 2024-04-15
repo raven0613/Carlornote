@@ -54,9 +54,9 @@ export default function Signup() {
                     birthday: "",
                     accessLevel: "initial",
                     avatorUrl: session.user?.image || "",
-                    createdAt: new Date().toUTCString(),
-                    updatedAt: new Date().toUTCString(),
-                    lastLogin: new Date().toUTCString()
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString()
                 })
                 // console.log("addUserRes", addUserRes)
                 dispatch(addUser(JSON.parse(addUserRes.data)));

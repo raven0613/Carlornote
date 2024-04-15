@@ -18,11 +18,11 @@ export default function useClickOutside<T extends HTMLElement>({ handleMouseDown
                 if (exceptions?.some(item => (e.target as HTMLElement)?.classList.contains(item))) return console.log("exceptions");
 
                 if (!nodeRef.current?.contains(e.target)) {
-                    console.log("handleMouseDown")
+                    // console.log("handleMouseDown")
                     handleMouseDownOutside();
                 }
                 else {
-                    console.log("handleMouseDownInside")
+                    // console.log("handleMouseDownInside")
                     handleMouseDownInside && handleMouseDownInside();
                 }
             }

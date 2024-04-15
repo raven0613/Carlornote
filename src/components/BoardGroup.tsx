@@ -53,13 +53,13 @@ export default function BoardGroup() {
                         const newCard = {
                             ...card,
                             authorId: user?.id,
-                            createdAt: new Date().toUTCString(),
-                            updatedAt: new Date().toUTCString(),
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
                             imageUrl: "https://i.imgur.com/gAzhP1L.png"
                         }
                         const response = await handleAddCard(newCard);
                         // console.log("response", response)
-                        console.log("有 user, add newCard", newCard)
+                        // console.log("有 user, add newCard", newCard)
                         if (response.status === "FAIL") return router.push("/");
                         // dispatch(addCard(newCard));
                         router.push("/");
