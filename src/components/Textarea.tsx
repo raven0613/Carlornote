@@ -27,7 +27,14 @@ function getLastTabDeletedString(string: string) {
     return beforeLastLine + "\n" + lastLine;
 }
 
-export default function Textarea({ text, handleUpdate }: { text: string, handleUpdate: (value: string) => void }) {
+interface ITextarea {
+    text: string, 
+    handleUpdate: (value: string) => void, 
+    handleWheel?: (e: React.WheelEvent<HTMLTextAreaElement>) => void,
+    classProps?: string
+}
+
+export default function Textarea({ text, handleUpdate, handleWheel, classProps }: ITextarea) {
     const [value, setValue] = useState(text);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const selectionRef = useRef<{ start: number, end: number }>({ start: 0, end: 0 });
@@ -46,6 +53,9 @@ export default function Textarea({ text, handleUpdate }: { text: string, handleU
     return (
         <>
             <textarea ref={textareaRef}
+                onWheel={(e) => {
+                    handleWheel && handleWheel(e);
+                }}
                 onChange={(e) => {
                     const selectionStart = e.currentTarget.selectionStart;
                     const selectionEnd = e.currentTarget.selectionEnd;
@@ -129,7 +139,7 @@ export default function Textarea({ text, handleUpdate }: { text: string, handleU
                     }
 
                 }}
-                className={`textbox_textarea textInput w-full flex-1 p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5
+                className={`textbox_textarea textInput w-full flex-1 p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5 ${classProps}
                     `}
                 value={value} />
         </>

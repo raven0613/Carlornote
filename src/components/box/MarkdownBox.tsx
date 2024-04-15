@@ -13,6 +13,7 @@ import { Marked } from 'marked';
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
+import Textarea from "../Textarea";
 // import 'highlight.js/styles/vs2015.css';
 // import 'highlight.js/styles/rainbow.css';
 // import 'highlight.js/styles/androidstudio.css';
@@ -61,39 +62,34 @@ interface IMarkdownCore {
 }
 
 export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, articleMode, needFull }: IMarkdownCore) {
-    const [value, setValue] = useState(textData.content);
+    // const [value, setValue] = useState(textData.content);
     const [isFull, setIsFull] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const articleRef = useRef<HTMLTitleElement>(null);
 
-    useEffect(() => {
-        if (textData.content === value) return;
-        setValue(textData.content);
-    }, [textData.content, value])
+    // useEffect(() => {
+    //     if (textData.content === value) return;
+    //     setValue(textData.content);
+    // }, [textData.content, value])
 
     return (
         <>
             {articleMode === "edit" && <div className="h-full w-full rounded-xl p-4 bg-[#282c2e] text-slate-400 relative">
                 {/* 編輯 */}
-                <textarea ref={textareaRef}
-                    onWheel={(e) => {
+                <Textarea text={textData.content}
+                    handleUpdate={(value) => {
+                        handleUpdateElement({ ...textData, content: value });
+                        handleSetDirty();
+                    }}
+                    handleWheel={(e) => {
                         const ratio = e.currentTarget.scrollTop / e.currentTarget.scrollHeight;
                         articleRef.current?.scrollTo({
                             top: articleRef.current.scrollHeight * ratio,
                             behavior: "smooth"
                         });
                     }}
-                    onChange={(e) => {
-                        // console.log("e.target.value", e.target.value)
-                        setValue(e.target.value);
-                        handleUpdateElement({ ...textData, content: e.target.value });
-                        handleSetDirty();
-                    }}
-                    className={`textbox_textarea textInput w-full p-2 rounded-md whitespace-pre-wrap outline-none resize-none bg-white/5
-                    ${needFull ? (isFull ? "min-h-[30rem]" : "h-60") : "h-full"} 
-                    `}
-                    value={value}>
-                </textarea>
+                    classProps={`${needFull ? (isFull ? "min-h-[30rem]" : "h-60") : "h-full"} p-2`}
+                />
                 {/* 預覽 */}
                 <article ref={articleRef} className="hidden sm:block prose max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30"
                     onWheel={(e) => {
@@ -103,7 +99,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                             behavior: "smooth"
                         });
                     }}
-                    dangerouslySetInnerHTML={renderMarkdown(value)}
+                    dangerouslySetInnerHTML={renderMarkdown(textData.content)}
                 />
             </div>}
 
@@ -112,7 +108,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
             `}
             >
                 <article className={`prose prose-pre:bg-[#1d1f21] marker:text-slate-700 max-w-none w-full h-full
-                text-slate-700  p-4`} dangerouslySetInnerHTML={renderMarkdown(value)} />
+                text-slate-700  p-4`} dangerouslySetInnerHTML={renderMarkdown(textData.content)} />
             </div>}
 
             {needFull && <button className="absolute top-4 right-4 z-20 w-8 h-8 hover:scale-110 duration-150"
