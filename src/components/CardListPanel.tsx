@@ -90,7 +90,12 @@ export function TagCore({ allTags, selectedTagsProp, handleSelectTag }: ITagCore
     const [selectedTags, setSelectedTags] = useState<string[]>(selectedTagsProp ?? []);
     const selectedTagSet = new Set<string>(selectedTags);
     return (
-        <div className="flex flex-col gap-2 overflow-y-scroll">
+        <div className="flex flex-col gap-2 overflow-y-scroll"
+            onTouchMove={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }}
+        >
             <div className="flex w-full justify-between items-center gap-2 pr-4 sm:pr-0">
                 <TagIcon classProps={`text-seagull-400 w-6 h-6`} />
                 <ResetIcon classProps={`text-seagull-400 w-5 h-5 cursor-pointer hover:text-seagull-600 duration-150`}

@@ -33,11 +33,13 @@ export default function useCheckLastUpdate({ handleLock }: IUseCheckLastUpdate) 
         selectedCardRef.current = selectedCard;
     }, [selectedCard])
     useEffect(() => {
+        let ignore = false;
         // console.log("isCurrentTab", isCurrentTab)
         // console.log("shouldFetchRef", shouldFetchRef.current)
         if (isCurrentTab && !isMouseOut && shouldFetchRef.current) {
             handleLock(true);
             async function fetchCards() {
+                if (ignore) return;
                 const response = await handleGetCards(user?.id ?? "");
                 if (response.status === "FAIL" || !response.data) return;
                 const data = JSON.parse(response.data);
@@ -111,6 +113,7 @@ export default function useCheckLastUpdate({ handleLock }: IUseCheckLastUpdate) 
         }
 
         return () => {
+            ignore = true;
             if (time) clearTimeout(time);
             document.removeEventListener("mouseleave", handleMouseLeave);
             document.removeEventListener("mouseenter", handleMouseEnter);
