@@ -193,10 +193,10 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 }}
                 onDragStart={(e: DragEvent) => {
                     // console.log("box drag start", e.target)
-                    // 設定游標 iconvar image = new Image();
-                    const image = new Image();
-                    image.src = 'https://static.thenounproject.com/png/617175-200.png';
-                    e.dataTransfer.setDragImage(image, window.outerWidth, window.outerHeight);
+                    // 設定游標 icon;
+                    // const image = new Image();
+                    // image.src = 'https://static.thenounproject.com/png/617175-200.png';
+                    // e.dataTransfer.setDragImage(image, window.outerWidth, window.outerHeight);
                     e.dataTransfer.effectAllowed = "copyMove";
                     setIsEditMode(true);
                 }}
