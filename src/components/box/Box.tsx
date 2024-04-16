@@ -194,9 +194,9 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
                 onDragStart={(e: DragEvent) => {
                     // console.log("box drag start", e.target)
                     // 設定游標 icon;
-                    // const image = new Image();
-                    // image.src = 'https://static.thenounproject.com/png/617175-200.png';
-                    // e.dataTransfer.setDragImage(image, window.outerWidth, window.outerHeight);
+                    const image = new Image();
+                    image.src = 'https://i.imgur.com/CTivgL7.png';
+                    e.dataTransfer.setDragImage(image, window.outerWidth, window.outerHeight);
                     e.dataTransfer.effectAllowed = "copyMove";
                     setIsEditMode(true);
                 }}
