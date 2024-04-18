@@ -325,7 +325,9 @@ export default function ElementModal({ permission }: IElementModal) {
                                         needFull={true}
                                     />
                                     <button className="sm:hidden absolute top-4 right-4 z-20 w-8 h-8 hover:scale-110 duration-150"
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
                                             setExpandElementId(item.id);
                                         }}
                                     >
