@@ -12,10 +12,10 @@ export default function useClickOutside<T extends HTMLElement>({ handleMouseDown
         function handleMouse(e: MouseEvent) {
             // console.log("nodeRef", nodeRef.current)
             // console.log("e.target", e.target)
-            if (!e.target) return console.log("no target");
+            if (!e.target) return;
             if (e.target instanceof HTMLElement) {
                 // 點到例外的 element
-                if (exceptions?.some(item => (e.target as HTMLElement)?.classList.contains(item))) return console.log("exceptions");
+                if (exceptions?.some(item => (e.target as HTMLElement)?.classList.contains(item))) return;
 
                 if (!nodeRef.current?.contains(e.target)) {
                     // console.log("handleMouseDown")

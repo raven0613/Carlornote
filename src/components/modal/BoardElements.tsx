@@ -564,7 +564,9 @@ export default function ElementModal({ permission }: IElementModal) {
                     textData={selectedCard.boardElement.find(item => item.id === expandElementId) as IBoardElement}
                     articleMode={"read"}
                 />}
-                <div className="w-8 h-8 fixed right-5 top-16 z-50" onClick={() => {
+                <div className="w-8 h-8 fixed right-5 top-16 z-50" onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
                     setExpandElementId("");
                 }}>
                     <ShrinkIcon classProps="stroke-slate-600" />

@@ -94,7 +94,7 @@ const Auth = (props: IProps) => {
         // console.log("有 localStorage")
         // 在主頁以外的頁面，例如卡片頁可能沒登入也可以看，但沒登入就不要去 fetch user
         async function handleCheckUser(): Promise<void> {
-            if (ignore) return console.log("ignored");
+            if (ignore) return;
             try {
                 if (isFetching) return;
                 // console.log("user 不存在.....")

@@ -22,7 +22,7 @@ export default function useLocalStorage({ storageKey }: IUseLocalStorage) {
     function removeLocalStorage() {
         // console.log("window", window)
         const localStorage = window?.localStorage;
-        if (!localStorage) return console.log("no localStorage");
+        if (!localStorage) return;
         localStorage.removeItem(storageKey);
         // data.current = "";
         // setData("")

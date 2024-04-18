@@ -82,7 +82,7 @@ interface IBoard {
 
 export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, draggingCard, handlePushStep, distenceToLeftTop = { left: 0, top: 0 } }: IBoard) {
     const boardRef = useRef<HTMLDivElement>(null)
-    console.log("Board elements", elements)
+    // console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     // console.log("selectedElementId", selectedElementId)
     // 用來記錄拖曳圖片進來時候的滑鼠位置

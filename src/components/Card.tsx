@@ -17,7 +17,7 @@ interface ICard {
 }
 
 export default function Card({ id, url, name, children, classProps, cardLize, isSelected }: ICard) {
-    console.log("name", name, url, cardLize)
+    // console.log("name", name, url, cardLize)
     return (
         <>
             <div className={`card w-full h-full sm:w-24 rounded-lg duration-200 shadow-md grid grid-rows-5
