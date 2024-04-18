@@ -553,7 +553,7 @@ export default function ElementModal({ permission }: IElementModal) {
                 </span>
             </div>
             {/* mobile markdown fullscreen */}
-            <div className={`${expandElementId ? "fixed inset-x-0 top-12 bottom-16 z-40 opacity-100" : "w-full h-full z-0 opacity-0 pointer-events-none"} duration-300 sm:hidden`}>
+            <div className={`${expandElementId ? "fixed inset-x-0 top-12 bottom-16 z-40 opacity-100" : "w-full h-full -z-10 opacity-0 pointer-events-none"} duration-300 sm:hidden`}>
                 {expandElementId && <MarkdownCore
                     handleUpdateElement={(data: IBoardElement) => {
                     }}
