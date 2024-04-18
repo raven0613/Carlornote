@@ -7,7 +7,7 @@ import { selectElementId } from "@/redux/reducers/boardElement";
 import { ImageCore } from "../box/ImageBox";
 import { selectCard, setDirtyCardId, setDirtyState, updateCards } from "@/redux/reducers/card";
 import { draggingBoxHeight, draggingBoxWidth } from "../Board";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import StackArrowIcon from "../svg/StackArrow";
 import DeleteIcon from "../svg/Delete";
 import PositionIcon from "../svg/Position";
@@ -30,6 +30,8 @@ import Card from "@/components/Card";
 import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
 import CloseIcon from "../svg/Close";
 import useTouchmoveDirection from "@/hooks/useTouchmoveDirection";
+import ShrinkIcon from "../svg/Shrink";
+import ExpandIcon from "../svg/Expand";
 
 interface IButton {
     children: ReactNode;
@@ -59,6 +61,7 @@ export default function ElementModal({ permission }: IElementModal) {
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
     // console.log("selectedCard", selectedCard)
     const [editingElementId, setEditingElementId] = useState("");
+    const [expandElementId, setExpandElementId] = useState("");
     const textRef = useAutosizedTextarea<HTMLTextAreaElement>(selectedCard?.boardElement.find(item => item.id === selectedElementId)?.content ?? "", true);
     const isLock = (permission && permission !== "editable") ? true : false;
     const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
@@ -91,6 +94,13 @@ export default function ElementModal({ permission }: IElementModal) {
         dispatch(setDirtyCardId(selectedCard.id));
         dispatch(setDirtyState("dirty"));
     }
+
+    useEffect(() => {
+        return () => {
+            setExpandElementId("");
+        }
+    }, [])
+
     return (
         <>
             {/* panel */}
@@ -101,7 +111,7 @@ export default function ElementModal({ permission }: IElementModal) {
             }}>
                 {dirtyCards.length > 0 && <p className="block sm:hidden w-full h-8 leading-8  text-center cursor-default text-sm text-seagull-700/80 z-20 pr-2 backdrop-blur-xl fixed top-12">正在儲存...</p>}
                 {dirtyState === "clear" && <p className={`block sm:hidden w-full h-8 leading-8  text-center cursor-default animate-hide opacity-0 text-sm text-seagull-700/80 z-20 pr-2 backdrop-blur-xl fixed top-12`}>已成功儲存</p>}
-                
+
                 {/* wrapper */}
                 <div className="w-full h-fit flex flex-col-reverse">
                     {/* elements */}
@@ -314,6 +324,13 @@ export default function ElementModal({ permission }: IElementModal) {
                                         articleMode={editingElementId === item.id ? "edit" : "read"}
                                         needFull={true}
                                     />
+                                    <button className="sm:hidden absolute top-4 right-4 z-20 w-8 h-8 hover:scale-110 duration-150"
+                                        onClick={() => {
+                                            setExpandElementId(item.id);
+                                        }}
+                                    >
+                                        {expandElementId === item.id ? <ShrinkIcon classProps="stroke-slate-600" /> : <ExpandIcon classProps="stroke-slate-600" />}
+                                    </button>
                                 </div>}
                                 {(item.type === "card") && <div
                                     onClick={() => {
@@ -331,12 +348,12 @@ export default function ElementModal({ permission }: IElementModal) {
                 </div>
             </main>
 
-            {/* mobile add button */}
+            {/* mobile add area */}
             {!isLock && <>
                 {/* add panel */}
                 <div className={`fixed duration-200 ease-in-out overflow-hidden origin-bottom bottom-0
-                ${isAddPanelOpen ? "opacity-100 -translate-y-40" : "translate-y-0 opacity-0"}
-                left-1/2 -translate-x-1/2 bg-slate-100 shadow-md shadow-black/30 flex gap-2 p-2 z-40 rounded-xl`}>
+                ${isAddPanelOpen ? "opacity-100 -translate-y-20" : "translate-y-0 opacity-0"}
+                left-1/2 -translate-x-1/2 bg-slate-100 shadow-md shadow-black/30 flex gap-2 p-2 z-30 rounded-xl`}>
                     <AddBoxButton
                         handleClick={() => {
                             if (!user?.id) return;
@@ -463,7 +480,7 @@ export default function ElementModal({ permission }: IElementModal) {
 
                 {/* add button */}
                 <button ref={nodeRef} type="button"
-                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-40 bottom-20 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-40 bottom-20 right-5 shadow-md shadow-black/30
                 sm:hidden
                 text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 duration-150 hover:bg-seagull-600`}
                     onClick={async (e) => {
@@ -534,6 +551,23 @@ export default function ElementModal({ permission }: IElementModal) {
                         dispatch(closeAllModal());
                     }}><CloseIcon classProps="pointer-events-none" />
                 </span>
+            </div>
+            {/* mobile markdown fullscreen */}
+            <div className={`${expandElementId ? "fixed inset-x-0 top-12 bottom-16 z-40 opacity-100" : "w-full h-full z-0 opacity-0 pointer-events-none"} duration-300 sm:hidden`}>
+                {expandElementId && <MarkdownCore
+                    handleUpdateElement={(data: IBoardElement) => {
+                    }}
+                    handleSetDirty={() => {
+                    }}
+                    textData={selectedCard.boardElement.find(item => item.id === expandElementId) as IBoardElement}
+                    articleMode={"read"}
+                />}
+                <div className="w-8 h-8 fixed right-5 top-16 z-50" onClick={() => {
+                    setExpandElementId("");
+                }}>
+                    <ShrinkIcon classProps="stroke-slate-600" />
+                </div>
+
             </div>
         </>
     )

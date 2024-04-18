@@ -103,7 +103,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                 />
             </div>}
 
-            {articleMode === "read" && <div className={`w-full relative bg-[#e9e6e2] rounded-lg overflow-y-scroll pb-2
+            {articleMode === "read" && <div className={`w-full  bg-[#e9e6e2] rounded-lg overflow-y-scroll pb-2
             ${needFull ? (isFull ? "h-full max-h-[70vh] min-h-48" : "h-48") : "h-full"}
             `}
             >
@@ -111,16 +111,17 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                 text-slate-700  p-4`} dangerouslySetInnerHTML={renderMarkdown(textData.content)} />
             </div>}
 
-            {needFull && <button className="absolute top-4 right-4 z-20 w-8 h-8 hover:scale-110 duration-150"
+            {/* {needFull && <button className="absolute top-4 right-4 z-20 w-8 h-8 hover:scale-110 duration-150"
                 onClick={() => {
                     setIsFull(pre => !pre);
                 }}
             >
                 {isFull ? <ShrinkIcon classProps="stroke-slate-600" /> : <ExpandIcon classProps="stroke-slate-600" />}
-            </button>}
+            </button>} */}
         </>
     )
 }
+// ${needFull ? (isFull ? "h-full max-h-[70vh] min-h-48" : "h-48") : "h-full"}
 
 interface IMarkdownBox {
     textData: IBoardElement;

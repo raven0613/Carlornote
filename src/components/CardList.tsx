@@ -193,9 +193,9 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
 
                 {/* add button */}
                 <button disabled={addCardState === "loading" || !user?.id} type="button"
-                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-30 bottom-20 left-1/2 -translate-x-1/2 shadow-md shadow-black/30
+                    className={`w-14 h-14 bg-seagull-500 rounded-full absolute z-30 bottom-20 right-5 shadow-md shadow-black/30
                 sm:left-12 sm:bottom-1/2 sm:translate-y-1/2 
-                text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 hover:bg-seagull-600 duration-150 ${cardSize === "hidden" ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                text-seagull-200 text-3xl font-light disabled:bg-seagull-100 hover:scale-110 hover:bg-seagull-600 duration-150 ${cardSize === "hidden" ? "sm:opacity-0 sm:pointer-events-none" : "opacity-100"}`}
                     onClick={async () => {
                         // 之後再新增公開匿名卡片
                         if (!user?.id) return;
@@ -239,7 +239,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                                     url={item.imageUrl}
                                     name={item.name}
                                     classProps={""}
-                                    cardLize={cardSize}
+                                    cardLize={"lg"}
                                 />
                             </Link>
                         )

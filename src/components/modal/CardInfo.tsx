@@ -107,6 +107,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
         if (!selectedCard) return;
         setName(selectedCard.name);
         setUrl(selectedCard.imageUrl);
+        setInputUrl(selectedCard.imageUrl);
         setTagList(selectedCard.tags ?? []);
         setEmailList(selectedCard.userList ?? []);
         setVisibility(selectedCard.visibility ?? "private");
