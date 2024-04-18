@@ -231,7 +231,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 px-8 min-[400px]:px-12 min-[560px]:px-14
                 sm:hidden overflow-scroll gap-4 justify-items-center"
                 >
-                    {filteredCards.map(item => {
+                    {filteredCards.length > 0 && filteredCards.map(item => {
                         return (
                             <Link scroll={false} key={item.id} href={`/card/${item.id.split("card_")[1]}`} className="w-full h-full">
                                 <Card

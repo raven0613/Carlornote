@@ -134,7 +134,13 @@ const Auth = (props: IProps) => {
                 // add a new card
                 if (addUserRes.status === "FAIL") return;
                 const newCard = storageData ? {
-                    ...(JSON.parse(storageData).introCard || "{}"),
+                    id: "",
+                    boardElement: JSON.parse(storageData).introCard.boardElement ?? [],
+                    name: "",
+                    visibility: "private" as CardVisibilityType,
+                    editability: "close" as CardEditabilityType,
+                    tags: [],
+                    userList: [],
                     authorId: JSON.parse(addUserRes.data).id,
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),

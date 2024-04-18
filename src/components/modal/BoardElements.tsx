@@ -62,12 +62,12 @@ export default function ElementModal({ permission }: IElementModal) {
     // console.log("selectedCard", selectedCard)
     const [editingElementId, setEditingElementId] = useState("");
     const [expandElementId, setExpandElementId] = useState("");
-    const textRef = useAutosizedTextarea<HTMLTextAreaElement>(selectedCard?.boardElement.find(item => item.id === selectedElementId)?.content ?? "", true);
+    const textRef = useAutosizedTextarea<HTMLTextAreaElement>(selectedCard?.boardElement?.find(item => item.id === selectedElementId)?.content ?? "", true);
     const isLock = (permission && permission !== "editable") ? true : false;
     const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
     const [filterType, setFilterType] = useState<boxType[]>([]);
     const filterTypeSet = new Set(filterType);
-    const filteredElements = selectedCard?.boardElement.filter(item => {
+    const filteredElements = selectedCard?.boardElement?.filter(item => {
         if (filterTypeSet.size === 0) return true;
         return filterTypeSet.has(item.type);
     }) ?? [];
