@@ -66,6 +66,26 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
     const [isFull, setIsFull] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const articleRef = useRef<HTMLTitleElement>(null);
+    const [title, setTitle] = useState(textData.name);
+    // const [note, setNote] = useState(textData.content);
+
+    // console.log("note", note)
+    console.log("textData", textData.content)
+
+    // useEffect(() => {
+    //     if (note === textData.content) return;
+    //     let time: NodeJS.Timeout | null = null;
+    //     if (time) clearTimeout(time);
+    //     time = setTimeout(() => {
+    //         if (note === textData.content) return;
+    //         console.log("ㄟㄟㄟ", note)
+    //         handleUpdateElement({ ...textData, content: note });
+    //         // handleSetDirty();
+    //     }, 1000);
+    //     return () => {
+    //         clearTimeout(time);
+    //     }
+    // }, [note, handleSetDirty, handleUpdateElement, textData]);
 
     // useEffect(() => {
     //     if (textData.content === value) return;
@@ -76,39 +96,52 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
         <>
             {articleMode === "edit" && <div className="h-full w-full rounded-xl p-4 bg-[#282c2e] text-slate-400 relative">
                 {/* 編輯 */}
-                <Textarea text={textData.content}
-                    handleUpdate={(value) => {
-                        handleUpdateElement({ ...textData, content: value });
-                        handleSetDirty();
-                    }}
-                    handleWheel={(e) => {
-                        const ratio = e.currentTarget.scrollTop / e.currentTarget.scrollHeight;
-                        articleRef.current?.scrollTo({
-                            top: articleRef.current.scrollHeight * ratio,
-                            behavior: "smooth"
-                        });
-                    }}
-                    classProps={`${needFull ? (isFull ? "min-h-[30rem]" : "h-60") : "h-full"} p-2`}
-                />
+                <div className="flex flex-col w-full h-full gap-2">
+                    <input className="textInput h-8 w-full bg-white/5 rounded-md outline-none pl-2 pr-9 sm:pr-2" value={title}
+                        onChange={(e) => {
+                            setTitle(e.target.value);
+                            handleUpdateElement({ ...textData, name: e.target.value });
+                            handleSetDirty();
+                        }}
+                    />
+                    <Textarea text={textData.content}
+                        handleUpdate={(value) => {
+                            // setNote(value);
+                            handleUpdateElement({ ...textData, content: value });
+                            handleSetDirty();
+                        }}
+                        handleWheel={(e) => {
+                            const ratio = e.currentTarget.scrollTop / e.currentTarget.scrollHeight;
+                            articleRef.current?.scrollTo({
+                                top: articleRef.current.scrollHeight * ratio,
+                                behavior: "smooth"
+                            });
+                        }}
+                        classProps={`${needFull ? (isFull ? "min-h-[30rem]" : "h-60") : "h-full"} p-2`}
+                    />
+                </div>
                 {/* 預覽 */}
-                <article ref={articleRef} className="hidden sm:block prose max-w-none marker:text-slate-500 w-full h-full bg-[#e9e6e2] outline-none p-4 ml-2 text-slate-700 absolute left-full top-0 rounded-md overflow-y-scroll z-30 shadow-md shadow-black/30"
-                    onWheel={(e) => {
-                        const ratio = e.currentTarget.scrollTop / e.currentTarget.scrollHeight;
-                        textareaRef.current?.scrollTo({
-                            top: textareaRef.current.scrollHeight * ratio,
-                            behavior: "smooth"
-                        });
-                    }}
-                    dangerouslySetInnerHTML={renderMarkdown(textData.content)}
-                />
+                <div className="flex flex-col w-full h-full gap-2 absolute left-full top-0 ml-2 bg-[#e9e6e2] shadow-md shadow-black/30 rounded-md py-4">
+                    {title && <p className={`truncate text-[1.7rem] h-10 px-4 leading-10 text-slate-800 font-bold`}>{title}</p>}
+                    <article ref={articleRef} className="hidden sm:block prose max-w-none marker:text-slate-500 w-full flex-1 grow outline-none text-slate-700  overflow-y-scroll z-30 p-4"
+                        onWheel={(e) => {
+                            const ratio = e.currentTarget.scrollTop / e.currentTarget.scrollHeight;
+                            textareaRef.current?.scrollTo({
+                                top: textareaRef.current.scrollHeight * ratio,
+                                behavior: "smooth"
+                            });
+                        }}
+                        dangerouslySetInnerHTML={renderMarkdown(textData.content)}
+                    />
+                </div>
             </div>}
 
-            {articleMode === "read" && <div className={`w-full  bg-[#e9e6e2] rounded-lg overflow-y-scroll pb-2
+            {articleMode === "read" && <div className={`w-full flex flex-col bg-[#e9e6e2] rounded-lg
             ${needFull ? (isFull ? "h-full max-h-[70vh] min-h-48" : "h-48") : "h-full"}
             `}
             >
-                <article className={`prose prose-pre:bg-[#1d1f21] marker:text-slate-700 max-w-none w-full h-full
-                text-slate-700  p-4`} dangerouslySetInnerHTML={renderMarkdown(textData.content)} />
+                {textData.name && <p className={`truncate text-[1.7rem] h-16 px-4 pt-4 pb-2 leading-10 text-slate-800 font-bold`}>{textData.name}</p>}
+                <article className={`prose prose-pre:bg-[#1d1f21] marker:text-slate-700 max-w-none w-full flex-1 grow outline-none overflow-y-scroll text-slate-700 p-4`} dangerouslySetInnerHTML={renderMarkdown(textData.content)} />
             </div>}
 
             {/* {needFull && <button className="absolute top-4 right-4 z-20 w-8 h-8 hover:scale-110 duration-150"
