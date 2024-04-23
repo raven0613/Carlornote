@@ -133,7 +133,8 @@ export default function CardPage() {
             {(windowWidth && windowWidth < 640) && <ElementModal permission={userPermission} />}
 
             <ControlBar
-                canEdit={userPermission === "editable"}
+                canUserEdit={userPermission === "editable"}
+                isCardLock={!selectedCard?.isLock}
                 canUndo={undoList.length > 0}
                 canRedo={redoList.length > 0}
                 handleUndo={() => {
@@ -213,7 +214,18 @@ export default function CardPage() {
                     }
                     dispatch(updateCards([updatedCard]));
                     dispatch(selectCard(updatedCard));
-                }} />
+                }} 
+                handleLockCard={() => {
+                    const updatedCard: ICard = {
+                        ...selectedCard,
+                        isLock: !selectedCard.isLock
+                    }
+                    dispatch(updateCards([updatedCard]));
+                    dispatch(selectCard(updatedCard));
+                    dispatch(setDirtyState("dirty"));
+                    dispatch(setDirtyCardId(selectedCard.id));
+                }}
+            />
             <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
             >
                 {selectedCard && <>
@@ -243,6 +255,7 @@ export default function CardPage() {
                             dispatch(setDirtyCardId(selectedCard.id));
                         }}
                         permission={userPermission}
+                        isCardLock={selectedCard.isLock}
                     />
                 </>}
                 {userPermission === "editable" && <ControlPanel

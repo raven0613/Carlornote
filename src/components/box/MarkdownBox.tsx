@@ -70,7 +70,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
     // const [note, setNote] = useState(textData.content);
 
     // console.log("note", note)
-    console.log("textData", textData.content)
+    // console.log("textData", textData.content)
 
     // useEffect(() => {
     //     if (note === textData.content) return;

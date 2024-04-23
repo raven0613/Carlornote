@@ -86,7 +86,8 @@ export async function handleUpdateCard(data: ICard[]): Promise<IResponse> {
                 userList: item.userList ?? [],
                 imageUrl: item.imageUrl ?? "",
                 name: item.name ?? "",
-                tags: item.tags ?? []
+                tags: item.tags ?? [],
+                isLock: item.isLock || false
             });
         }))
     } catch (error) {

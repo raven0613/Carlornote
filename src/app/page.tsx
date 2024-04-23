@@ -59,11 +59,12 @@ export default function Home() {
         let time: NodeJS.Timeout | null = null;
         if (dirtyState !== "dirty" || time) return;
         time = setInterval(async () => {
-            // console.log("dirtyCards in time", dirtyCards);
+            console.log("dirtyCards in time", dirtyCards);
             const idSet = new Set([...dirtyCards]);
             // console.log("idSet", idSet);
             const data = allCards.filter(item => idSet.has(item.id));
             if (data.length === 0) return;
+            // console.log("data", data);
 
             const response = await handleUpdateCard(data);
             // console.log("存檔", response);
@@ -97,7 +98,8 @@ export default function Home() {
     return (
         <main className="mainpage flex h-svh w-full flex-col items-center justify-between overflow-hidden">
             <ControlBar
-                canEdit={true}
+                canUserEdit={true}
+                isCardLock={!selectedCard?.isLock}
                 canUndo={undoList.length > 0}
                 canRedo={redoList.length > 0}
                 handleUndo={() => {
@@ -178,6 +180,16 @@ export default function Home() {
                     dispatch(updateCards([updatedCard]));
                     dispatch(selectCard(updatedCard));
                 }}
+                handleLockCard={() => {
+                    const updatedCard: ICard = {
+                        ...selectedCard,
+                        isLock: !selectedCard.isLock
+                    }
+                    dispatch(updateCards([updatedCard]));
+                    dispatch(selectCard(updatedCard));
+                    dispatch(setDirtyState("dirty"));
+                    dispatch(setDirtyCardId(selectedCard.id));
+                }}
             />
 
             <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
@@ -217,6 +229,7 @@ export default function Home() {
                         }}
                         permission={user?.id === selectedCard.authorId ? "editable" : "none"}
                         draggingCard={draggingCard}
+                        isCardLock={selectedCard.isLock}
                     />
                 </>}
                 <ControlPanel

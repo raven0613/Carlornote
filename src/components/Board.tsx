@@ -77,10 +77,11 @@ interface IBoard {
     handleSetDirty: () => void;
     permission: "editable" | "readable" | "none";
     handlePushStep: (step: StepType) => void;
-    distenceToLeftTop?: { left: number, top: number }
+    distenceToLeftTop?: { left: number, top: number };
+    isCardLock?: boolean;
 }
 
-export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, draggingCard, handlePushStep, distenceToLeftTop = { left: 0, top: 0 } }: IBoard) {
+export default function Board({ elements, handleUpdateElementList, draggingBox, handleMouseUp, handleSetDirty, permission, isCardLock, draggingCard, handlePushStep, distenceToLeftTop = { left: 0, top: 0 } }: IBoard) {
     const boardRef = useRef<HTMLDivElement>(null)
     // console.log("Board elements", elements)
     const selectedElementId = useSelector((state: IState) => state.selectedElementId);
@@ -123,10 +124,12 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     useCheckLastUpdate({ handleLock });
 
     useEffect(() => {
-        if (permission !== "editable") {
+        if (permission !== "editable" || isCardLock) {
             setIsLock(true);
+            return;
         }
-    }, [permission])
+        setIsLock(false);
+    }, [permission, isCardLock])
 
     // 每次切換卡片的時候重新設定 existPositions
     useEffect(() => {
@@ -296,6 +299,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
     // paste
     useEffect(() => {
         async function handlePaste(e: ClipboardEvent) {
+            if (isCardLock) return;
             // console.log("e.target", e.target)
             // 是一般的 input 的話不要新增 box
             if ((e.target as HTMLElement).classList.contains("textInput")) return;
@@ -322,7 +326,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         }
         document.addEventListener("paste", handlePaste);
         return () => document.removeEventListener("paste", handlePaste);
-    }, [draggingBox, handleAddBox, handleSetDirty, imageUpload])
+    }, [draggingBox, handleAddBox, handleSetDirty, imageUpload, isCardLock])
 
     function handleDelete(id: string) {
         if (!id) return;
@@ -451,6 +455,10 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
                             e.preventDefault()
                             e.stopPropagation()
                             if (!e.currentTarget.files || e.currentTarget.files?.length === 0) return;
+                            if (isCardLock) {
+                                e.target.value = "";
+                                return;
+                            }
                             const file = e.currentTarget.files[0];
                             if (!file.type.includes("image")) return;
                             // console.log("image drop2", file.type)

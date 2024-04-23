@@ -34,6 +34,7 @@ export interface ICard {
     boardElement: IBoardElement[],
     visibility: CardVisibilityType,
     editability: CardEditabilityType,
+    isLock?: boolean,
     createdAt: string,
     updatedAt: string,
     imageUrl: string,
