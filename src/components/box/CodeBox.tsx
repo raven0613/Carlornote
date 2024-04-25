@@ -160,7 +160,7 @@ export function EditButton({ handleClick, defaultMode }: IEditButton) {
 
 interface ICodeBox {
     textData: IBoardElement;
-    handleUpdateElement: (data: IBoardElement) => void;
+    handleUpdateElement: (data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => void;
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;

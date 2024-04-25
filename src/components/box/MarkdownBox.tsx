@@ -1,6 +1,6 @@
 "use client"
 import { IBoardElement, ICard } from "@/type/card";
-import React, { RefObject, useEffect, useRef, useState, DragEvent, ReactNode } from "react";
+import React, { RefObject, useEffect, useRef, useState, DragEvent, ReactNode, useCallback } from "react";
 import Box from "./Box";
 import markdownit from 'markdown-it'
 import EditIcon from '../svg/Edit';
@@ -14,6 +14,7 @@ import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 import Textarea from "../Textarea";
+import useDebounce from "@/hooks/useDebounce";
 // import 'highlight.js/styles/vs2015.css';
 // import 'highlight.js/styles/rainbow.css';
 // import 'highlight.js/styles/androidstudio.css';
@@ -46,7 +47,7 @@ console.error = (...args: any) => {
     error(...args);
 };
 
-function renderMarkdown(text: string) {
+function renderMarkdown(text: string = "") {
     // const renderedHTML = md.render(text);
     const renderedHTML = marked.parse(text) as string;
     const sanitizeHTML = DOMPurify.sanitize(renderedHTML);
@@ -55,42 +56,25 @@ function renderMarkdown(text: string) {
 
 interface IMarkdownCore {
     textData: IBoardElement;
-    handleUpdateElement: (data: IBoardElement) => void;
+    handleUpdateElement: (data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => void;
     handleSetDirty: () => void;
     articleMode: "read" | "edit";
     needFull?: boolean;
 }
 
 export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, articleMode, needFull }: IMarkdownCore) {
-    // const [value, setValue] = useState(textData.content);
     const [isFull, setIsFull] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const articleRef = useRef<HTMLTitleElement>(null);
     const [title, setTitle] = useState(textData.name);
-    // const [note, setNote] = useState(textData.content);
+    const [note, setNote] = useState(textData.content);
 
-    // console.log("note", note)
-    // console.log("textData", textData.content)
+    const handleUpdate = useCallback(() => {
+        handleUpdateElement((pre) => ({...pre, content: note}));
+        handleSetDirty(); 
+    }, [handleSetDirty, handleUpdateElement, note])
 
-    // useEffect(() => {
-    //     if (note === textData.content) return;
-    //     let time: NodeJS.Timeout | null = null;
-    //     if (time) clearTimeout(time);
-    //     time = setTimeout(() => {
-    //         if (note === textData.content) return;
-    //         console.log("ㄟㄟㄟ", note)
-    //         handleUpdateElement({ ...textData, content: note });
-    //         // handleSetDirty();
-    //     }, 1000);
-    //     return () => {
-    //         clearTimeout(time);
-    //     }
-    // }, [note, handleSetDirty, handleUpdateElement, textData]);
-
-    // useEffect(() => {
-    //     if (textData.content === value) return;
-    //     setValue(textData.content);
-    // }, [textData.content, value])
+    const setIsDebounceActive = useDebounce({ callback: handleUpdate, time: 1000 });
 
     return (
         <>
@@ -99,16 +83,17 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                 <div className="flex flex-col w-full h-full gap-2">
                     <input className="textInput h-8 w-full bg-white/5 rounded-md outline-none pl-2 pr-9 sm:pr-2" value={title}
                         onChange={(e) => {
+                            console.log("change title")
                             setTitle(e.target.value);
                             handleUpdateElement({ ...textData, name: e.target.value });
                             handleSetDirty();
                         }}
                     />
-                    <Textarea text={textData.content}
+                    <Textarea text={note}
                         handleUpdate={(value) => {
-                            // setNote(value);
-                            handleUpdateElement({ ...textData, content: value });
-                            handleSetDirty();
+                            console.log("update content", value)
+                            setNote(value);
+                            setIsDebounceActive(true);
                         }}
                         handleWheel={(e) => {
                             const ratio = e.currentTarget.scrollTop / e.currentTarget.scrollHeight;
@@ -131,7 +116,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                                 behavior: "smooth"
                             });
                         }}
-                        dangerouslySetInnerHTML={renderMarkdown(textData.content)}
+                        dangerouslySetInnerHTML={renderMarkdown(note)}
                     />
                 </div>
             </div>}
@@ -158,7 +143,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
 
 interface IMarkdownBox {
     textData: IBoardElement;
-    handleUpdateElement: (data: IBoardElement) => void;
+    handleUpdateElement: (data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => void;
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;

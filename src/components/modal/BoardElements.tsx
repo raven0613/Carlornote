@@ -307,8 +307,21 @@ export default function ElementModal({ permission }: IElementModal) {
                                     className={`flex items-center justify-center relative h-fit`}
                                 >
                                     <MarkdownCore
-                                        handleUpdateElement={(data: IBoardElement) => {
-                                            // console.log("data!!!", data)
+                                        handleUpdateElement={(data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => {
+                                            if (typeof data === "function") {
+                                                const newElement = data(item);
+                                                console.log(newElement)
+                                    
+                                                const updatedCard: ICard = {
+                                                    ...selectedCard,
+                                                    boardElement: selectedCard.boardElement.map(ele => {
+                                                        if (ele.id === item.id) return newElement;
+                                                        return ele;
+                                                    })
+                                                }
+                                                save(updatedCard)
+                                                return;
+                                            }
                                             const updatedCard: ICard = {
                                                 ...selectedCard,
                                                 boardElement: selectedCard.boardElement.map(ele => {
@@ -557,7 +570,7 @@ export default function ElementModal({ permission }: IElementModal) {
             {/* mobile markdown fullscreen */}
             <div className={`${expandElementId ? "fixed inset-x-0 top-12 bottom-16 z-40 opacity-100" : "w-full h-full -z-10 opacity-0 pointer-events-none"} duration-300 sm:hidden`}>
                 {expandElementId && <MarkdownCore
-                    handleUpdateElement={(data: IBoardElement) => {
+                    handleUpdateElement={(data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => {
                     }}
                     handleSetDirty={() => {
                     }}

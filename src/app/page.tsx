@@ -1,6 +1,6 @@
 "use client"
 import Board from "@/components/Board";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import ControlPanel from "@/components/ControlPanel";
 import { handleUpdateCard } from "@/api/card";
@@ -16,6 +16,7 @@ import Link from "next/link";
 import { changeIndex } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import { handleAddUser, handleGetUserByEmail } from "@/api/user";
+import useDebounce from "@/hooks/useDebounce";
 
 export type StepType = { id: string, newIdx: number, oldIdx: number } | { newData: IBoardElement, oldData: IBoardElement } | { added: IBoardElement } | { deleted: IBoardElement, index: number };
 
@@ -54,34 +55,35 @@ export default function Home() {
         dispatch(setUserPermission("editable"));
     }, [dispatch])
 
+    const handleSave = useCallback(async() => {
+        if (dirtyState !== "dirty") return;
+
+        console.log("dirtyCards in time", dirtyCards);
+        const idSet = new Set([...dirtyCards]);
+        // console.log("idSet", idSet);
+        const data = allCards.filter(item => idSet.has(item.id));
+        if (data.length === 0) return;
+        // console.log("data", data);
+
+        // 測試用
+        // dispatch(setDirtyState("clear"))
+        // dispatch(clearDirtyCardId());
+        // console.log("先不存")
+        // return;
+
+        const response = await handleUpdateCard(data);
+        // console.log("存檔", response);
+        const resData = JSON.parse(response.data);
+        const failedData = response.failedData && JSON.parse(response.failedData);
+        if (failedData) console.log("failedData", failedData);
+        // dispatch(updateCards(JSON.parse(response.data)));
+
+        dispatch(setDirtyState("clear"));
+        dispatch(clearDirtyCardId());
+    }, [allCards, dirtyCards, dirtyState, dispatch])
     // 有修改的話 5 秒存檔一次
-    useEffect(() => {
-        let time: NodeJS.Timeout | null = null;
-        if (dirtyState !== "dirty" || time) return;
-        time = setInterval(async () => {
-            console.log("dirtyCards in time", dirtyCards);
-            const idSet = new Set([...dirtyCards]);
-            // console.log("idSet", idSet);
-            const data = allCards.filter(item => idSet.has(item.id));
-            if (data.length === 0) return;
-            // console.log("data", data);
-
-            const response = await handleUpdateCard(data);
-            // console.log("存檔", response);
-            const resData = JSON.parse(response.data);
-            const failedData = response.failedData && JSON.parse(response.failedData);
-            if (failedData) console.log("failedData", failedData);
-            // dispatch(updateCards(JSON.parse(response.data)));
-
-            dispatch(setDirtyState("clear"))
-            dispatch(clearDirtyCardId());
-            if (time) clearInterval(time);
-        }, 5000);
-        return () => {
-            if (time) clearInterval(time);
-        }
-    }, [allCards, dirtyCards, dirtyState, dispatch]);
-
+    const setIsDebounceActive = useDebounce({ callback: handleSave, time: 5000 });
+    
     // 儲存 tags
     useEffect(() => {
         if (!allCards) return;
@@ -189,6 +191,7 @@ export default function Home() {
                     dispatch(selectCard(updatedCard));
                     dispatch(setDirtyState("dirty"));
                     dispatch(setDirtyCardId(selectedCard.id));
+                    setIsDebounceActive(true);
                 }}
             />
 
@@ -226,6 +229,7 @@ export default function Home() {
                         handleSetDirty={() => {
                             dispatch(setDirtyState("dirty"))
                             dispatch(setDirtyCardId(selectedCard.id));
+                            setIsDebounceActive(true);
                         }}
                         permission={user?.id === selectedCard.authorId ? "editable" : "none"}
                         draggingCard={draggingCard}

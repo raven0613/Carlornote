@@ -1,7 +1,7 @@
 "use client"
 // import { handleGoogleLogin } from "@/api/firebase_admin";
 import { IBoardElement, ICard, boxType } from "@/type/card";
-import React, { RefObject, useEffect, useRef, useState, DragEvent, use } from "react";
+import React, { RefObject, useEffect, useRef, useState, DragEvent, use, useCallback } from "react";
 // import { firebaseConfig } from "@/api/firebase";
 import * as firebase from "firebase/app";
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -19,6 +19,7 @@ import useWindowSize from "@/hooks/useWindowSize";
 import { setUserPermission } from "@/redux/reducers/user";
 import { StepType } from "@/app/page";
 import { changeIndex } from "@/utils/utils";
+import useDebounce from "@/hooks/useDebounce";
 // import login from "@/api/user";
 
 let undoList: Array<StepType> = [];
@@ -90,30 +91,34 @@ export default function CardPage() {
         handleCard(cardId);
     }, [dispatch, pathname, router, user])
 
+    const handleSave = useCallback(async() => {
+        if (dirtyState !== "dirty") return;
+
+        console.log("dirtyCards in time", dirtyCards);
+        const idSet = new Set([...dirtyCards]);
+        // console.log("idSet", idSet);
+        const data = allCards.filter(item => idSet.has(item.id));
+        if (data.length === 0) return;
+        // console.log("data", data);
+
+        // 測試用
+        // dispatch(setDirtyState("clear"))
+        // dispatch(clearDirtyCardId());
+        // console.log("先不存")
+        // return;
+
+        const response = await handleUpdateCard(data);
+        // console.log("存檔", response);
+        const resData = JSON.parse(response.data);
+        const failedData = response.failedData && JSON.parse(response.failedData);
+        if (failedData) console.log("failedData", failedData);
+        // dispatch(updateCards(JSON.parse(response.data)));
+
+        dispatch(setDirtyState("clear"));
+        dispatch(clearDirtyCardId());
+    }, [allCards, dirtyCards, dirtyState, dispatch])
     // 有修改的話 5 秒存檔一次
-    useEffect(() => {
-        let time: NodeJS.Timeout | null = null;
-        if (dirtyState !== "dirty" || time) return;
-        time = setInterval(async () => {
-            const idSet = new Set([...dirtyCards]);
-            const data = allCards.filter(item => idSet.has(item.id));
-            if (data.length === 0) return;
-
-            const response = await handleUpdateCard(data);
-            // console.log("存檔", response);
-            const resData = JSON.parse(response.data);
-            const failedData = response.failedData && JSON.parse(response.failedData);
-            if (failedData) console.log("failedData", failedData);
-            // dispatch(updateCards(JSON.parse(response.data)));
-
-            dispatch(setDirtyState("clear"))
-            dispatch(clearDirtyCardId());
-            if (time) clearInterval(time);
-        }, 5000);
-        return () => {
-            if (time) clearInterval(time);
-        }
-    }, [allCards, dirtyCards, dirtyState, dispatch]);
+    const setIsDebounceActive = useDebounce({ callback: handleSave, time: 5000 });
 
     // 儲存 tags
     useEffect(() => {
@@ -224,6 +229,7 @@ export default function CardPage() {
                     dispatch(selectCard(updatedCard));
                     dispatch(setDirtyState("dirty"));
                     dispatch(setDirtyCardId(selectedCard.id));
+                    setIsDebounceActive(true);
                 }}
             />
             <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
@@ -253,6 +259,7 @@ export default function CardPage() {
                         handleSetDirty={() => {
                             dispatch(setDirtyState("dirty"))
                             dispatch(setDirtyCardId(selectedCard.id));
+                            setIsDebounceActive(true);
                         }}
                         permission={userPermission}
                         isCardLock={selectedCard.isLock}

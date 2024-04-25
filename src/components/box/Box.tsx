@@ -41,7 +41,7 @@ const binarySearch = (array: number[], target: number, direction: "before" | "af
 
 interface IBox {
     data: IBoardElement;
-    handleUpdate: (data: IBoardElement) => void;
+    handleUpdate: (data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => void;
     isSelected: boolean;
     handleClick: () => void;
     children: ReactNode;

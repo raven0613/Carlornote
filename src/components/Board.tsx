@@ -339,7 +339,19 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         handleSetDirty();
     }
 
-    function handleBoxUpdateElement(data: IBoardElement) {
+    function handleBoxUpdateElement(data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) {
+        if (typeof data === "function") {
+            const selectedElement = elements.find(ele => ele.id === selectedElementId);
+            if (!selectedElement) return;
+            const newElement = data(selectedElement);
+
+            handlePushStep({ newData: newElement, oldData: selectedElement });
+            handleUpdateElementList(elements.map((item) => {
+                if (item.id === selectedElementId) return newElement;
+                return item;
+            }))
+            return;
+        }
         const selectedElement = elements.find(ele => ele.id === data.id);
         selectedElement && handlePushStep({ newData: data, oldData: selectedElement });
 

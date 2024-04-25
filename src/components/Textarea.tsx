@@ -60,7 +60,6 @@ export default function Textarea({ text, handleUpdate, handleWheel, classProps }
                     const selectionStart = e.currentTarget.selectionStart;
                     const selectionEnd = e.currentTarget.selectionEnd;
                     selectionRef.current = { start: selectionStart, end: selectionEnd };
-
                     setValue(e.target.value);
                     handleUpdate(e.target.value)
                     // handleUpdateElement({ ...textData, content: e.target.value });
