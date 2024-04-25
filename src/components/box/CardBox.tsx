@@ -19,7 +19,7 @@ import Link from 'next/link';
 
 interface ICardBox {
     cardData: IBoardElement;
-    handleUpdateElement: (data: IBoardElement) => void;
+    handleUpdateElement: (data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => void;
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;
@@ -63,7 +63,7 @@ export default function CardBox({ cardData, handleUpdateElement, handleClick, is
                 distenceToLeftTop={distenceToLeftTop}
             >
                 <Link href={`/card/${cardData.cardData?.id.split("_")[1]}`}
-                    prefetch 
+                    prefetch
                     onClick={(e) => {
                         e.stopPropagation();
                     }}

@@ -30,7 +30,7 @@ const fontWeightMap = {
 
 interface ITextBox {
     textData: IBoardElement;
-    handleUpdateElement: (data: IBoardElement) => void;
+    handleUpdateElement: (data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => void;
     isSelected: boolean;
     handleClick: () => void;
     isShadow?: boolean;

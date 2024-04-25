@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import 'dompurify';
 import BoardGroup from "@/components/BoardGroup";
 import { IntroHeaderButton, IntroTopButton, IntroTryButton } from "@/components/IntroButton";
-import Loading from "@/components/loading";
+import Loading from "@/components/Loading";
 
 // https://fonts.google.com/selection/embed
 

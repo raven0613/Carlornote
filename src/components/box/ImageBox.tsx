@@ -116,7 +116,7 @@ function getUrlIsValid(url: string) {
 
 interface IImageBox {
     imageData: IBoardElement;
-    handleUpdateElement: (data: IBoardElement) => void;
+    handleUpdateElement: (data: ((pre: IBoardElement) => IBoardElement) | IBoardElement) => void;
     handleImgOnLoad: (data: IBoardElement) => void;
     isSelected: boolean;
     handleClick: () => void;
