@@ -74,7 +74,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
         handleSetDirty(); 
     }, [handleSetDirty, handleUpdateElement, note])
 
-    const setIsDebounceActive = useDebounce({ callback: handleUpdate, time: 1000 });
+    const setIsDebounceActive = useDebounce({ callback: handleUpdate, time: 800 });
 
     return (
         <>
@@ -83,7 +83,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                 <div className="flex flex-col w-full h-full gap-2">
                     <input className="textInput h-8 w-full bg-white/5 rounded-md outline-none pl-2 pr-9 sm:pr-2" value={title}
                         onChange={(e) => {
-                            console.log("change title")
+                            // console.log("change title")
                             setTitle(e.target.value);
                             handleUpdateElement({ ...textData, name: e.target.value });
                             handleSetDirty();
@@ -91,7 +91,7 @@ export function MarkdownCore({ textData, handleUpdateElement, handleSetDirty, ar
                     />
                     <Textarea text={note}
                         handleUpdate={(value) => {
-                            console.log("update content", value)
+                            // console.log("update content", value)
                             setNote(value);
                             setIsDebounceActive(true);
                         }}

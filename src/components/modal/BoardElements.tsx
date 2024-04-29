@@ -1,7 +1,7 @@
 "use client"
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import { useDispatch, useSelector } from "react-redux";
-import { closeAllModal, closeModal, openModal } from "@/redux/reducers/modal";
+import { closeAllModal, closeModal, modalTypes, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { selectElementId } from "@/redux/reducers/boardElement";
 import { ImageCore } from "../box/ImageBox";
@@ -212,7 +212,7 @@ export default function ElementModal({ permission }: IElementModal) {
                                     <ElementControlButton
                                         handleClick={() => {
                                             dispatch(openModal({
-                                                type: "checkWindow",
+                                                type: modalTypes.checkWindow,
                                                 props: {
                                                     text: "刪除後將無法復原，確定要刪除嗎？",
                                                     handleConfirm: async () => {

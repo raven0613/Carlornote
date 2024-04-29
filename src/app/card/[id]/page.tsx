@@ -12,7 +12,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { addCard, clearDirtyCardId, selectCard, setCards, setDirtyCardId, setDirtyState, setTags, updateCards } from "@/redux/reducers/card";
 import Board from "@/components/Board";
 import ControlPanel from "@/components/ControlPanel";
-import ElementModal from "@/components/modal/BoardElements";
+import BoardElementModal from "@/components/modal/BoardElements";
 import CardList from "@/components/CardList";
 import ControlBar from "@/components/ControlBar";
 import useWindowSize from "@/hooks/useWindowSize";
@@ -135,7 +135,7 @@ export default function CardPage() {
 
     return (
         <main className="flex h-svh flex-col items-center justify-between overflow-hidden">
-            {(windowWidth && windowWidth < 640) && <ElementModal permission={userPermission} />}
+            {(windowWidth && windowWidth < 640) && <BoardElementModal permission={userPermission} />}
 
             <ControlBar
                 canUserEdit={userPermission === "editable"}

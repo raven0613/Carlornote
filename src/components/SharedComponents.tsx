@@ -4,7 +4,7 @@ import { ReactNode, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CardInfo from "@/components/modal/CardInfo";
 import Modal from "@/components/modal/Modal";
-import { closeAllModal, closeModal, openModal } from "@/redux/reducers/modal";
+import { closeAllModal, closeModal, modalTypes, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import ElementModal from "./modal/BoardElements";
 import CardList from "./CardList";
@@ -71,18 +71,18 @@ const SharedComponents = (props: IProps) => {
             {props.children}
 
             {selectedCard && <Modal
-                position={openModalType.includes("card") ? "center" : "full"}
-                isOpen={openModalType.includes("card") || openModalType[0] === "mobileCardSetting"}
+                position={openModalType.includes(modalTypes.card) ? "center" : "full"}
+                isOpen={openModalType.includes(modalTypes.card) || openModalType[0] === modalTypes.mobileCardSetting}
                 handleClose={() => {
                     // 電腦版會讀這邊
                     // console.log("close")
                     if (isCardSettingDirty) {
-                        if (openModalType.at(-1) === "checkWindow") {
-                            dispatch(closeModal({ type: "checkWindow", props: { data: selectedCard } }));
+                        if (openModalType.at(-1) === modalTypes.checkWindow) {
+                            dispatch(closeModal({ type: modalTypes.checkWindow, props: { data: selectedCard } }));
                             return;
                         }
                         dispatch(openModal({
-                            type: "checkWindow",
+                            type: modalTypes.checkWindow,
                             props: {
                                 text: "改動尚未儲存，確定要關閉視窗嗎？",
                                 handleConfirm: () => {
@@ -95,7 +95,7 @@ const SharedComponents = (props: IProps) => {
                         }));
                         return;
                     }
-                    if (openModalType.includes("card")) dispatch(closeModal({ type: "card", props: null }));
+                    if (openModalType.includes(modalTypes.card)) dispatch(closeModal({ type: modalTypes.card, props: null }));
                 }}
             >
                 {/* card setting */}
@@ -105,9 +105,9 @@ const SharedComponents = (props: IProps) => {
             {/* side boardElements */}
             {userPermission === "editable" && <Modal
                 position="aside"
-                isOpen={openModalType.includes("boardElements")}
+                isOpen={openModalType.includes(modalTypes.boardElements)}
                 handleClose={() => {
-                    if (openModalType.includes("boardElements")) dispatch(closeModal({ type: "", props: modalProp }))
+                    if (openModalType.includes(modalTypes.boardElements)) dispatch(closeModal({ type: "", props: modalProp }))
                 }}
             >
                 <div className="w-fit h-fit hidden sm:block">
@@ -115,11 +115,11 @@ const SharedComponents = (props: IProps) => {
                 </div>
                 {/* 小耳朵 */}
                 <div className={`hidden sm:block absolute top-0 bg-white w-10 h-24 rounded-lg cursor-pointer -z-10  shadow-black/30 duration-150
-                    ${openModalType.includes("boardElements") ? "left-0" : "-left-6 shadow-md"}
+                    ${openModalType.includes(modalTypes.boardElements) ? "left-0" : "-left-6 shadow-md"}
                     `}
                     onClick={() => {
-                        if (openModalType.includes("boardElements")) return dispatch(closeModal({ type: "" }));
-                        dispatch(openModal({ type: "boardElements", props: selectedCard?.boardElement }));
+                        if (openModalType.includes(modalTypes.boardElements)) return dispatch(closeModal({ type: "" }));
+                        dispatch(openModal({ type: modalTypes.boardElements, props: selectedCard?.boardElement }));
                     }}>
                 </div>
             </Modal>}
@@ -127,19 +127,19 @@ const SharedComponents = (props: IProps) => {
             {/* checkWindow */}
             {userPermission === "editable" && <Modal
                 position="center"
-                isOpen={openModalType.includes("checkWindow")}
+                isOpen={openModalType.includes(modalTypes.checkWindow)}
                 handleClose={() => {
-                    if (openModalType.includes("checkWindow")) {
-                        dispatch(closeModal({ type: "checkWindow", props: modalProp }));
+                    if (openModalType.includes(modalTypes.checkWindow)) {
+                        dispatch(closeModal({ type: modalTypes.checkWindow, props: modalProp }));
                         dispatch(setCardSettingIsDirty(false));
                     }
                 }}
                 top="top-1/2 -translate-y-1/2 sm:top-48 sm:translate-y-0"
             >
-                {openModalType.includes("checkWindow") && <div className="w-fit h-fit z-50">
+                {openModalType.includes(modalTypes.checkWindow) && <div className="w-fit h-fit z-50">
                     <CheckWindow data={modalProp?.data} text={modalProp?.text}
                         handleClose={() => {
-                            dispatch(closeModal({ type: "checkWindow", props: modalProp }));
+                            dispatch(closeModal({ type: modalTypes.checkWindow, props: modalProp }));
                         }}
                         handleConfirm={modalProp.handleConfirm}
                     />
@@ -149,14 +149,14 @@ const SharedComponents = (props: IProps) => {
             {/* update card window */}
             {userPermission === "editable" && <Modal
                 position="center"
-                isOpen={openModalType.includes("updateCardWindow")}
+                isOpen={openModalType.includes(modalTypes.confirmWindow)}
                 handleClose={() => {}}
                 top="top-1/2 -translate-y-1/2 sm:top-48 sm:translate-y-0"
             >
-                {openModalType.includes("updateCardWindow") && <div className="w-fit h-fit z-50">
+                {openModalType.includes(modalTypes.confirmWindow) && <div className="w-fit h-fit z-50">
                     <ConfirmWindow data={modalProp?.data} text={modalProp?.text}
                         handleClose={() => {
-                            dispatch(closeModal({ type: "updateCardWindow", props: modalProp }));
+                            dispatch(closeModal({ type: modalTypes.confirmWindow, props: modalProp }));
                         }}
                         handleConfirm={modalProp.handleConfirm}
                     />
@@ -165,7 +165,7 @@ const SharedComponents = (props: IProps) => {
 
             {/* mobile search */}
             <Modal
-                isOpen={openModalType[0] === "mobileSearch"}
+                isOpen={openModalType[0] === modalTypes.mobileSearch}
                 handleClose={() => { }} position={"full"}
             >
                 <SearchPanel />

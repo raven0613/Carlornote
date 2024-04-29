@@ -8,7 +8,7 @@ import Popup from "./Popup";
 import Search from "./svg/Search";
 import FilterIcon from "./svg/Filter";
 import Cards from "./svg/Cards";
-import { closeAllModal, closeModal, openModal, openOneModal } from "@/redux/reducers/modal";
+import { closeAllModal, closeModal, modalTypes, openModal, openOneModal } from "@/redux/reducers/modal";
 import { usePathname, useRouter } from "next/navigation";
 import SettingIcon from "./svg/Setting";
 import { setCardSettingIsDirty } from "@/redux/reducers/card";
@@ -31,12 +31,12 @@ export default function Footer({ }: IFooter) {
     function dirtyCheck () {
         // 手機版讀這邊
         if (isCardSettingDirty) {
-            if (openModalType.at(-1) === "checkWindow") {
-                dispatch(closeModal({ type: "checkWindow", props: { data: selectedCard } }));
+            if (openModalType.at(-1) === modalTypes.checkWindow) {
+                dispatch(closeModal({ type: modalTypes.checkWindow, props: { data: selectedCard } }));
                 return true;
             }
             dispatch(openModal({
-                type: "checkWindow",
+                type: modalTypes.checkWindow,
                 props: {
                     text: "改動尚未儲存，確定要關閉視窗嗎？",
                     handleConfirm: async () => {
@@ -71,11 +71,11 @@ export default function Footer({ }: IFooter) {
                 const isDirty = dirtyCheck();
                 if (isDirty) return;
 
-                if (openModalType.includes("mobileSearch")) {
+                if (openModalType.includes(modalTypes.mobileSearch)) {
                     dispatch(closeAllModal());
                     return;
                 }
-                dispatch(openOneModal({ type: "mobileSearch" }));
+                dispatch(openOneModal({ type: modalTypes.mobileSearch }));
             }}>
                 <Search classProps="w-7 h-7" />
                 <span className="text-xs font-light text-slate-600">搜尋</span>
@@ -86,11 +86,11 @@ export default function Footer({ }: IFooter) {
                 const isDirty = dirtyCheck();
                 if (isDirty) return;
 
-                if (openModalType.includes("mobileFilter")) {
+                if (openModalType.includes(modalTypes.mobileFilter)) {
                     dispatch(closeAllModal());
                     return;
                 }
-                dispatch(openOneModal({ type: "mobileFilter" }));
+                dispatch(openOneModal({ type: modalTypes.mobileFilter }));
             }}>
                 <FilterIcon classProps="w-7 h-7" />
                 <span className="text-xs font-light text-slate-600">篩選</span>
@@ -101,11 +101,11 @@ export default function Footer({ }: IFooter) {
                 const isDirty = dirtyCheck();
                 if (isDirty) return;
 
-                if (openModalType.includes("mobileCardSetting")) {
+                if (openModalType.includes(modalTypes.mobileCardSetting)) {
                     dispatch(closeAllModal());
                     return;
                 }
-                dispatch(openOneModal({ type: "mobileCardSetting" }));
+                dispatch(openOneModal({ type: modalTypes.mobileCardSetting }));
             }}>
                 <SettingIcon classProps="w-7 h-7" />
                 <span className="text-xs font-light text-slate-600">設定</span>

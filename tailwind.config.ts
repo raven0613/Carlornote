@@ -29,7 +29,8 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       animation: {
-        hide: "opacity 5000ms ease-out"
+        hide: "opacity 5000ms ease-out",
+        hideFast: "opacity 1500ms ease-out"
       },
       keyframes: {
         opacity: {

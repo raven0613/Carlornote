@@ -3,7 +3,7 @@ import useCheckTabVisibility from "./useCheckTabVisibility";
 import { handleGetCards } from "@/api/card";
 import { useDispatch, useSelector } from "react-redux";
 import { IState } from "@/redux/store";
-import { closeModal, openModal } from "@/redux/reducers/modal";
+import { closeModal, modalTypes, openModal } from "@/redux/reducers/modal";
 import { setCards } from "@/redux/reducers/card";
 import { ICard } from "@/type/card";
 
@@ -61,14 +61,14 @@ export default function useCheckLastUpdate({ handleLock }: IUseCheckLastUpdate) 
                     }
                 });
                 if (changedCardSet.has(selectedCardRef.current.id)) {
-                    // 為了避免 updateCardWindow 疊加，必須先關掉原本的再開新的
-                    dispatch(closeModal({ type: "updateCardWindow", props: {} }));
+                    // 為了避免 confirmWindow 疊加，必須先關掉原本的再開新的
+                    dispatch(closeModal({ type: modalTypes.confirmWindow, props: {} }));
                     dispatch(openModal({
-                        type: "updateCardWindow", props: {
+                        type: modalTypes.confirmWindow, props: {
                             handleConfirm: () => {
                                 //更新所有卡片
                                 dispatch(setCards(data));
-                                dispatch(closeModal({ type: "updateCardWindow", props: {} }));
+                                dispatch(closeModal({ type: modalTypes.confirmWindow, props: {} }));
                                 allCardsRef.current = data;
                             },
                             text: "卡片資料有更新，請點選確認以同步最新資料"

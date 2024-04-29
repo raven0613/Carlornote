@@ -15,7 +15,7 @@ import { ImageLoading } from "../ImageLoading";
 import DeleteIcon from "../svg/Delete";
 import OKIcon from "../svg/OK";
 import { checkEmail } from "../SignPanel";
-import { closeAllModal, closeModal, openModal } from "@/redux/reducers/modal";
+import { closeAllModal, closeModal, modalTypes, openModal } from "@/redux/reducers/modal";
 import ArrowIcon from "../svg/Arrow";
 import EditIcon from "../svg/Edit";
 import Modal from "./Modal";
@@ -446,7 +446,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                             e.preventDefault();
                             e.stopPropagation();
                             dispatch(openModal({
-                                type: "checkWindow",
+                                type: modalTypes.checkWindow,
                                 props: {
                                     text: "卡片刪除後無法復原，確定要刪除卡片嗎？",
                                     data: selectedCard,

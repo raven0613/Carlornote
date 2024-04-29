@@ -153,18 +153,6 @@ export default function Box({ data, handleUpdate, handleClick, children, isShado
     )
     return (
         <>
-            {/* <div className={`absolute z-10 ${isImage ? "overflow-hidden" : ""}`} style={{
-                borderRadius: `${radius}px`,
-                left: `${position.left / 0.95}px`,
-                top: `${position.top / 0.95}px`,
-                rotate: `${deg}deg`,
-                width: size.width * 0.95,
-                height: size.height * 0.95,
-                transition: "border-color 0.15s ease",
-                opacity: data.opacity
-            }}>
-                {children}
-            </div> */}
             <div ref={boxRef}
                 className={`boardElement absolute min-h-5 min-w-12  
                     ${isShadowElement ? "opacity-50" : "opacity-100"}

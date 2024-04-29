@@ -7,6 +7,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { ImageLoading } from "../ImageLoading";
 import UrlLoading from "../UrlLoading";
 import OKIcon from "../svg/OK";
+import CopyIcon from "../svg/Copy";
+import ImageIcon from "../svg/Image";
+import ImageSmIcon from "../svg/ImageSm";
+import { useDispatch, useSelector } from "react-redux";
+import { closeAllModal, modalTypes, openModal } from "@/redux/reducers/modal";
+import { IState } from "@/redux/store";
+import { handleUpdateCard } from "@/api/card";
+import { selectCard, updateCards } from "@/redux/reducers/card";
 
 interface IImageCore {
     imageData: IBoardElement;
@@ -34,7 +42,6 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
         setShowingBlock("image");
         setUrl(imageData.content);
     }, [imageData])
-
 
     return (
         <>
@@ -132,31 +139,95 @@ interface IImageBox {
 }
 
 export default function ImageBox({ imageData, handleUpdateElement, handleImgOnLoad, handleClick, isShadow, isBoardLocked, handleDelete, handleSetDirty, handleChangeZIndex, isSelected, isPointerNone, elementPositions, scrollPosition, distenceToLeftTop }: IImageBox) {
+    const [position, setPosition] = useState({ left: imageData.left, top: imageData.top });
+    const [isCopied, setIsCopied] = useState(false);
+    const dispatch = useDispatch();
+    const selectedCard = useSelector((state: IState) => state.selectedCard);
+
+    useEffect(() => {
+        // 為了 undo/redo 的時候位置要跟著跑
+        setPosition({ left: imageData.left, top: imageData.top })
+    }, [imageData.left, imageData.top]);
     // console.log("imageData", imageData)
     return (
-        <Box
-            handleMove={() => { }}
-            isLocked={isBoardLocked}
-            isShadowElement={isShadow}
-            handleUpdate={handleUpdateElement}
-            data={imageData}
-            isSelected={isSelected}
-            handleClick={handleClick}
-            handleDelete={handleDelete}
-            handleSetDirty={handleSetDirty}
-            handleChangeZIndex={handleChangeZIndex}
-            isImage={true}
-            isPointerNone={isPointerNone}
-            elementPositions={elementPositions}
-            scrollPosition={scrollPosition}
-            distenceToLeftTop={distenceToLeftTop}
-        >
-            <ImageCore imageData={imageData} handleOnLoad={(card) => {
-                // console.log("handleOnLoad1")
-                if (isBoardLocked) return;
-                // console.log("handleOnLoad2")
-                handleImgOnLoad(card);
-            }} />
-        </Box>
+        <>
+            <Box
+                handleMove={({ left, top }) => {
+                    setPosition({ left, top });
+                }}
+                isLocked={isBoardLocked}
+                isShadowElement={isShadow}
+                handleUpdate={handleUpdateElement}
+                data={imageData}
+                isSelected={isSelected}
+                handleClick={handleClick}
+                handleDelete={handleDelete}
+                handleSetDirty={handleSetDirty}
+                handleChangeZIndex={handleChangeZIndex}
+                isImage={true}
+                isPointerNone={isPointerNone}
+                elementPositions={elementPositions}
+                scrollPosition={scrollPosition}
+                distenceToLeftTop={distenceToLeftTop}
+            >
+                <ImageCore imageData={imageData} handleOnLoad={(card) => {
+                    // console.log("handleOnLoad1")
+                    if (isBoardLocked) return;
+                    // console.log("handleOnLoad2")
+                    handleImgOnLoad(card);
+                }} />
+            </Box>
+            {/* buttons */}
+            {isSelected && <div className="bg-white w-auto h-auto absolute border rounded-full flex gap-1 items-center p-[0.2rem] text-xs"
+                style={{ top: position.top - 30, left: position.left }}
+            >
+                <button type="button" className={`bg-slate-200 w-5 h-5 rounded-full font-semibold relative p-1`}
+                    onClick={() => {
+                        if (imageData.content === selectedCard.imageUrl) {
+                            dispatch(openModal({
+                                type: modalTypes.confirmWindow,
+                                props: {
+                                    text: "這張圖已經是卡片圖了",
+                                    handleConfirm: async () => {
+                                        dispatch(closeAllModal({ type: "", props: {} }));
+                                    },
+                                    data: selectedCard
+                                }
+                            }));
+                            return;
+                        }
+                        dispatch(openModal({
+                            type: modalTypes.checkWindow,
+                            props: {
+                                text: "要將這張圖設為卡片圖嗎？",
+                                handleConfirm: async () => {
+                                    const updatedCard = { ...selectedCard, imageUrl: imageData.content };
+                                    const response = await handleUpdateCard([updatedCard]);
+                                    // console.log("response", response)
+                                    if (response.status === "FAIL") return;
+                                    const resData = JSON.parse(response.data);
+                                    dispatch(updateCards(resData));
+                                    dispatch(selectCard(updatedCard));
+                                    dispatch(closeAllModal({ type: "", props: {} }));
+                                },
+                                data: selectedCard
+                            }
+                        }));
+                    }}
+                >
+                    <ImageSmIcon classProps='stroke-slate-700' />
+                </button>
+                <button type="button" className={`bg-slate-200 w-5 h-5 rounded-full font-semibold relative p-1`}
+                    onClick={() => {
+                        navigator.clipboard.writeText(imageData.content);
+                        setIsCopied(true);
+                        setTimeout(() => setIsCopied(false), 1500);
+                    }}
+                >
+                    <CopyIcon classProps='stroke-slate-700' />
+                    {isCopied && <span className="absolute left-[1.85rem] top-1/2 -translate-y-1/2 text-slate-400 font-light animate-hideFast opacity-0">copied</span>}
+                </button>
+            </div>}
+        </>
     )
 }

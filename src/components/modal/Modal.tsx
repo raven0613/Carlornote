@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useRef, useState, DragEvent, ReactNode, useTransition } from "react";
 import useClickOutside from "@/hooks/useClickOutside";
+import { modalTypes } from "@/redux/reducers/modal";
 
 
 interface IModal {
@@ -17,7 +18,7 @@ export default function Modal({ isOpen, handleClose, children, position, top }: 
             // console.log("點外面")
             handleClose();
         },
-        exceptions: ["checkWindow"]
+        exceptions: [modalTypes.checkWindow]
     })
     // console.log("isOpen", isOpen)
     // console.log("nodeRef", nodeRef)

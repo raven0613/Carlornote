@@ -2,7 +2,7 @@ import { handleAddCard, handleGetCards } from "@/api/card";
 import Card, { CardWithHover } from "@/components/Card";
 import useWindowSize from "@/hooks/useWindowSize";
 import { addCard, setCards } from "@/redux/reducers/card";
-import { closeAllModal, openModal } from "@/redux/reducers/modal";
+import { closeAllModal, modalTypes, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { ICard } from "@/type/card";
 import Link from "next/link";
@@ -247,8 +247,8 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                 </div>
 
                 {/* mobile filter */}
-                {(openModalType[0] === "mobileFilter" || openedPanel === "") && <div className={`sm:hidden flex flex-col gap-4 absolute inset-x-0 bottom-0 pl-4 pt-4 pb-20 h-[40%] z-40 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)]  bg-white rounded-t-lg duration-150 ease-in-out 
-                ${openModalType[0] === "mobileFilter" ? "translate-y-0" : "translate-y-full"}`}
+                {(openModalType[0] === modalTypes.mobileFilter || openedPanel === "") && <div className={`sm:hidden flex flex-col gap-4 absolute inset-x-0 bottom-0 pl-4 pt-4 pb-20 h-[40%] z-40 shadow-[0_1px_12px_-2px_rgba(0,0,0,0.3)]  bg-white rounded-t-lg duration-150 ease-in-out 
+                ${openModalType[0] === modalTypes.mobileFilter ? "translate-y-0" : "translate-y-full"}`}
                     onTouchMove={() => {
                         if (touchMoveResult.y === "bottom") dispatch(closeAllModal());
                     }}
@@ -301,7 +301,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                                         // setDirtyState("none");
                                     }}
                                     handleClickEdit={() => {
-                                        dispatch(openModal({ type: "card", props: { data: item } }));
+                                        dispatch(openModal({ type: modalTypes.card, props: { data: item } }));
                                     }}
                                     handleDrag={() => handleDrag(item)}
                                 />

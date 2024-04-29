@@ -40,3 +40,13 @@ export function modalReducer(state: IModalState = initModalState, action: IActio
         default: return state;
     }
 }
+
+export const modalTypes = {
+    boardElements: "boardElements",
+    card: "card",
+    checkWindow: "checkWindow",
+    confirmWindow: "confirmWindow",
+    mobileSearch: "mobileSearch",
+    mobileCardSetting: "mobileCardSetting",
+    mobileFilter: "mobileFilter"
+}
