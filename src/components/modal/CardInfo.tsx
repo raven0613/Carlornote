@@ -21,6 +21,7 @@ import EditIcon from "../svg/Edit";
 import Modal from "./Modal";
 import { IState } from "@/redux/store";
 import { useRouter } from "next/navigation";
+import CopyIcon from "../svg/Copy";
 
 function getTimeString(GMTTimeString: string) {
     const date = new Date(GMTTimeString);
@@ -100,6 +101,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
     const [isTagEditing, setIsTagEditing] = useState(false);
     const dispatch = useDispatch();
     const router = useRouter();
+    const [isCopied, setIsCopied] = useState(false);
     // console.log("modalProp", modalProp)
     // console.log("openModalType", openModalType)
 
@@ -215,6 +217,21 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                         {settingArea === "info" && "卡片詳細資訊"}
                         {settingArea === "access" && "卡片權限設定"}
                         {settingArea === "user" && "權限名單設定"}
+                        {/* share */}
+                        {settingArea === "info" && <div
+                            onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const url = process.env.NODE_ENV === "production" ? "https://carlornote.vercel.app/" : "https://carlornote.vercel.app/";
+
+                                window && window.open(`${url}card/${selectedCard.id.split("_")[1]}`, '_blank')?.focus();
+                                // navigator.clipboard.writeText(`${url}card/${selectedCard.id.split("_")[1]}`);
+                                return true;
+                            }}
+                            className={`w-5 h-5 p-[4px] rounded-full bg-slate-100 cursor-pointer hover:scale-125 duration-200
+                                            `}
+                        ><ShareIcon classProps="fill-none stroke-slate-500" />
+                        </div>}
                     </div>
                     {/* info setting */}
                     <div
@@ -303,7 +320,7 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
 
                                 {/* visibility setting panel */}
                                 <div className="flex flex-col py-2.5 pt-5 sm:pt-0">
-                                    <div className="w-full flex items-center">
+                                    <div className="w-full flex items-center relative">
                                         <span className="font-semibold text-md text-zinc-700">閱覽權設定</span>
                                         {/* share */}
                                         {visibility !== "private" && <div
@@ -312,11 +329,16 @@ export default function CardInfo({ isSelected, handleClose }: ICardModal) {
                                                 e.stopPropagation();
                                                 const url = process.env.NODE_ENV === "production" ? "https://carlornote.vercel.app/" : "https://carlornote.vercel.app/";
                                                 navigator.clipboard.writeText(`${url}card/${selectedCard.id.split("_")[1]}`);
+
+                                                setIsCopied(true);
+                                                setTimeout(() => setIsCopied(false), 1500);
                                                 return true;
                                             }}
                                             className={`w-5 h-5 p-[4px] rounded-full bg-slate-100 cursor-pointer hover:scale-125 duration-200 ml-2
                                             `}
-                                        ><ShareIcon classProps="fill-none stroke-slate-500" /></div>}
+                                        ><CopyIcon classProps="fill-none stroke-slate-500" />
+                                        </div>}
+                                        {isCopied && <span className="absolute left-[7rem] top-1/2 -translate-y-1/2 text-slate-500 text-xs font-light animate-hideFast opacity-0">copied</span>}
                                     </div>
 
                                     <p className="text-xs text-zinc-500 mb-2">誰可以觀看這張卡片？</p>

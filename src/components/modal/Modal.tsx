@@ -35,7 +35,7 @@ export default function Modal({ isOpen, handleClose, children, position, top }: 
         <>
             <>
                 <div className={`fixed inset-0 bg-slate-800/70 z-50 duration-150 ease-out ${isOpen? "opacity-100" : "opacity-0 pointer-events-none"}`}></div>
-                <div ref={nodeRef} className={`flex flex-col fixed w-fit min-w-10 min-h-10 h-fit  left-1/2 -translate-x-1/2 z-50 duration-150 ease-out ${top ? top : "top-36"} ${isOpen? "opacity-100" : "opacity-0"}
+                <div ref={nodeRef} className={`flex flex-col fixed w-fit min-w-10 min-h-10 h-fit  left-1/2 -translate-x-1/2 z-50 duration-150 ease-out ${top ? top : "top-36"} ${isOpen? "opacity-100" : "opacity-0 pointer-events-none"}
                 `}>
                     {children}
                 </div>

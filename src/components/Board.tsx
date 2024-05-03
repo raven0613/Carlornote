@@ -12,7 +12,6 @@ import { closeModal, openModal, openOneModal } from "@/redux/reducers/modal";
 import CodeBox from "./box/CodeBox";
 import MarkdownBox from "./box/MarkdownBox";
 import CardBox from "./box/CardBox";
-import { StepType } from "@/app/page";
 import { getResizedSize, handleChangeZIndex } from "@/utils/utils";
 import { xDirection, yDirection } from "./box/Box";
 import useMousemoveDirection from "@/hooks/useMousemoveDirection";
@@ -21,6 +20,7 @@ import { handleGetCards } from "@/api/card";
 import { setCards, updateCards } from "@/redux/reducers/card";
 import usePointerPosition from "@/hooks/usePointerPosition";
 import useCheckLastUpdate from "@/hooks/useCheckLastUpdate";
+import { StepType } from "./ClientWrapper";
 
 // 看 board 離螢幕左和上有多少 px
 // export const distenceToLeftTop = { left: 0, top: 0 };
