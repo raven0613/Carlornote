@@ -30,9 +30,11 @@ export async function generateMetadata(
     // console.log("response", response)
 
     let title = "Carlornote";
+    let image = "";
     if (response.status === "SUCCESS") {
         const data = JSON.parse(response.data) as ICard;
         title = `${data.name} - Carlornote`;
+        image = data.imageUrl;
     }
     // optionally access and extend (rather than replace) parent metadata
     const previousImages = (await parent).openGraph?.images || []
@@ -46,7 +48,7 @@ export async function generateMetadata(
             type: "website",
             title,
             description: "Create your decks, Note your cards",
-            images: ['/some-specific-page-image.jpg', ...previousImages]
+            images: image? [image, ...previousImages] : previousImages
         },
     }
 }

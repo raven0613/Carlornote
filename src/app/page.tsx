@@ -2,8 +2,6 @@ import { IBoardElement, ICard, boxType } from "@/type/card";
 import { Metadata, ResolvingMetadata } from "next/types";
 import ClientWrapper from "@/components/ClientWrapper";
 
-export type StepType = { id: string, newIdx: number, oldIdx: number } | { newData: IBoardElement, oldData: IBoardElement } | { added: IBoardElement } | { deleted: IBoardElement, index: number };
-
 export default function Home() {
     return (
         <main className="mainpage flex h-svh w-dvw flex-col items-center justify-between overflow-hidden">
@@ -23,7 +21,8 @@ export async function generateMetadata(
 ): Promise<Metadata> {
     // optionally access and extend (rather than replace) parent metadata
     const previousImages = (await parent).openGraph?.images || []
-
+    // TODO: Carlornote logo
+    let image = "";
     return {
         metadataBase: new URL("https://carlornote.vercel.app/"),
         title: "Home - Carlornote",
@@ -33,7 +32,7 @@ export async function generateMetadata(
             type: "website",
             title: "Home - Carlornote",
             description: "Create your decks, Note your cards",
-            images: ['/some-specific-page-image.jpg', ...previousImages]
+            images: image? [image, ...previousImages] : previousImages
         },
     }
 }

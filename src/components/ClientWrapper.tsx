@@ -300,7 +300,7 @@ export default function ClientWrapper({ isHome }: { isHome?: boolean }) {
                         redoList = [];
 
                         if (isHome) {
-                            document.title = `${selectedCard?.name} - Carlornote`;
+                            document.title = selectedCard?.name? `${selectedCard?.name} - Carlornote` : "Carlornote";
                             return;
                         }
                         window && window.history.pushState(null, 'card', `/card/${id.split("_").at(-1)}`);
