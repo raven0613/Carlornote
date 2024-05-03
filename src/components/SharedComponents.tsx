@@ -12,8 +12,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { outerPage } from "./Auth";
 import CheckWindow from "./modal/CheckWindow";
 import { SearchPanel } from "./SearchPanel";
-import { setCardSettingIsDirty } from "@/redux/reducers/card";
+import { selectCard, setCardSettingIsDirty } from "@/redux/reducers/card";
 import ConfirmWindow from "./modal/ConfirmWindow";
+import { ICard } from "@/type/card";
 
 interface IProps {
     children: ReactNode;
@@ -25,11 +26,8 @@ const SharedComponents = (props: IProps) => {
     const selectedCard = useSelector((state: IState) => state.selectedCard);
     const userPermission = useSelector((state: IState) => state.userPermission);
     const { type: openModalType, props: modalProp } = useSelector((state: IState) => state.modal)
-    const dirtyCards = useSelector((state: IState) => state.dirtyCardsId);
-    const dirtyState = useSelector((state: IState) => state.dirtyState);
-    const user = useSelector((state: IState) => state.user);
     const pathname = usePathname();
-    const isCardSettingDirty = useSelector((state: IState) => state.isCardSettingDirty)
+    const isCardSettingDirty = useSelector((state: IState) => state.isCardSettingDirty);
 
     // console.log("SharedComponents modalProp", modalProp)
     // console.log("SharedComponents openModalType", openModalType)
@@ -150,7 +148,7 @@ const SharedComponents = (props: IProps) => {
             {userPermission === "editable" && <Modal
                 position="center"
                 isOpen={openModalType.includes(modalTypes.confirmWindow)}
-                handleClose={() => {}}
+                handleClose={() => { }}
                 top="top-1/2 -translate-y-1/2 sm:top-48 sm:translate-y-0"
             >
                 {openModalType.includes(modalTypes.confirmWindow) && <div className="w-fit h-fit z-50">

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 interface widowSize {
-    width: number | undefined;
-    height: number | undefined;
+    width: number;
+    height: number;
 }
 const useWindowSize = () => {
     const [windowSize, setWindowSize] = useState<widowSize>({
-        width: undefined,
-        height: undefined,
+        width: 0,
+        height: 0,
     });
     useEffect(() => {
         const handleResize = () => {

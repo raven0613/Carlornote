@@ -54,6 +54,7 @@ export function ImageCore({ imageData, handleOnLoad }: IImageCore) {
             {showingBlock === "image" && <Image id={imageData.id}
                 className={`${(imageLoadState === "success") ? "opacity-100" : "opacity-0"}`}
                 width={imageData.width}
+                priority={true}
                 height={imageData.height}
                 src={url}
                 alt={imageData.name}

@@ -6,7 +6,7 @@ import { closeAllModal, modalTypes, openModal } from "@/redux/reducers/modal";
 import { IState } from "@/redux/store";
 import { ICard } from "@/type/card";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TagIcon from "./svg/Tag";
@@ -60,6 +60,7 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const isFiltered = Boolean(selectedTags.length > 0);
     const touchMoveResult = useTouchmoveDirection();
+    const router = useRouter();
 
     // console.log("touchMoveResult", touchMoveResult)
     // console.log("allCards", allCards)
@@ -135,7 +136,11 @@ export default function CardList({ selectedCardId, handleSetSelectedCard, handle
                     e.preventDefault();
                     if (cardSize === "hidden") return;
                     const cardId = pathname.split("/").at(-1);
-                    if (cardId) return;
+                    if (cardId) {
+                        handleSetSelectedCard("");
+                        router.push("/");
+                        return;
+                    };
                     handleSetSelectedCard("");
                 }}
             >

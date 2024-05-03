@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata, ResolvingMetadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "./imageLoading.css";
@@ -15,12 +15,6 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1
 }
-
-export const metadata: Metadata = {
-  title: "Carlornote",
-  description: "Create your decks, Note your cards",
-  verification: { google: "T698cdzTe6isNHm_JUoM2fQDaN-RvxIU2SIMG5J4M8g" }
-};
 
 export default function RootLayout({ children }: Readonly<{
   children: React.ReactNode;
