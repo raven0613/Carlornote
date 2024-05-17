@@ -21,6 +21,7 @@ import { setCards, updateCards } from "@/redux/reducers/card";
 import usePointerPosition from "@/hooks/usePointerPosition";
 import useCheckLastUpdate from "@/hooks/useCheckLastUpdate";
 import { StepType } from "./ClientWrapper";
+import Canvas from "./Canvas";
 
 // 看 board 離螢幕左和上有多少 px
 // export const distenceToLeftTop = { left: 0, top: 0 };
