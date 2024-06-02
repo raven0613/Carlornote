@@ -1,10 +1,6 @@
 "use client"
-// import { handleGoogleLogin } from "@/api/firebase_admin";
 import { IBoardElement, ICard, boxType } from "@/type/card";
 import React, { RefObject, useEffect, useRef, useState, DragEvent, use, useCallback } from "react";
-// import { firebaseConfig } from "@/api/firebase";
-import * as firebase from "firebase/app";
-import { useSession, signIn, signOut } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { handleGetCard, handleAddCard, handleUpdateCard, handleGetCards, handleDeleteCard } from "@/api/card";
 import { IState, store } from "@/redux/store";
@@ -15,12 +11,11 @@ import ControlPanel from "@/components/ControlPanel";
 import BoardElementModal from "@/components/modal/BoardElements";
 import CardList from "@/components/CardList";
 import ControlBar from "@/components/ControlBar";
-import useWindowSize from "@/hooks/useWindowSize";
 import { setUserPermission } from "@/redux/reducers/user";
 import { changeIndex } from "@/utils/utils";
 import useDebounce from "@/hooks/useDebounce";
 import Link from "next/link";
-// import login from "@/api/user";
+import Canvas from "./Canvas";
 
 export type StepType = { id: string, newIdx: number, oldIdx: number } | { newData: IBoardElement, oldData: IBoardElement } | { added: IBoardElement } | { deleted: IBoardElement, index: number };
 
@@ -240,7 +235,7 @@ export default function ClientWrapper({ isHome }: { isHome?: boolean }) {
                     setIsDebounceActive(true);
                 }}
             />
-            <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center"
+            <section className="hidden sm:flex flex-1 w-full h-full px-0 pt-0 relative items-center bg-white/80"
             >
                 {(isHome && !selectedCard) && <p className="text-center w-full">{user ?
                     "請選擇一張卡片" :
@@ -280,6 +275,7 @@ export default function ClientWrapper({ isHome }: { isHome?: boolean }) {
                         draggingCard={draggingCard}
                         isCardLock={selectedCard.isLock}
                     />
+                    {/* <Canvas /> */}
                 </>}
                 {(isHome || (!isHome && userPermission === "editable")) && <ControlPanel
                     isSelectingCard={selectedCard != null}
@@ -300,7 +296,7 @@ export default function ClientWrapper({ isHome }: { isHome?: boolean }) {
                         redoList = [];
 
                         if (isHome) {
-                            document.title = selectedCard?.name? `${selectedCard?.name} - Carlornote` : "Carlornote";
+                            document.title = selectedCard?.name ? `${selectedCard?.name} - Carlornote` : "Carlornote";
                             return;
                         }
                         window && window.history.pushState(null, 'card', `/card/${id.split("_").at(-1)}`);

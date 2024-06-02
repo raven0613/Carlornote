@@ -121,7 +121,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
         setIsLock(isLock);
         setIsPointerNone(isLock);
     }, [])
-    
+
     useCheckLastUpdate({ handleLock });
 
     useEffect(() => {
@@ -398,7 +398,7 @@ export default function Board({ elements, handleUpdateElementList, draggingBox, 
 
     return (
         <>
-            <main ref={wrapperRef} className="boardElement absolute inset-0 items-center overflow-scroll min-w-full min-h-full bg-white/80 "
+            <main ref={wrapperRef} className="boardElement absolute inset-0 items-center overflow-scroll min-w-full min-h-full"
             >
                 <div className={`boardElement absolute top-0 flex ${isMoving ? " cursor-grabbing" : "cursor-default"}`} ref={boardRef}
                     style={{
